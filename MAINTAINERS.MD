@@ -1,3 +1,4 @@
 | Org                    | Name                                                |
 | -----------------------| ----------------------------------------------------|
-| §company§ | $name§ |
+| Telefonica | Jorge Garcia Hospital |
+| Vodafone | Sachin Kumar |
