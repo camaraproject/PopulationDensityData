@@ -1,0 +1,640 @@
+openapi: 3.0.3
+info:
+  title: Population Density Data
+  description: >-
+    Allows developers with the capability to get population density estimations
+    for a specific area at a future period of time, considering historical
+    anonymized information of the network connected devices in the requested
+    area.
+
+    # Introduction
+
+    This API allows estimates of population density to be obtained for a specific
+    area in a future time period. This functionality can be used for multiple use
+    cases, some of the possible use cases for this API are shown below.
+
+
+    - Providing BVLOS (Beyond Visual Line of Sight) flights with the
+    information to meet SORA 2.5 (Specific Operation Risk Assessment)
+    requirements in terms of intrinsic Ground Risk Class (iGRC).
+    More information in [Specific Operations Risk Assessment](https://www.easa.europa.eu/en/domains/civil-drones-rpas/specific-category-civil-drones/specific-operations-risk-assessment-sora)
+
+    - Providing information to identify if the ground risk class for
+    a given drone flight path is acceptable for the time of the flight, or an
+    alternative time should be considered to lower the risk.
+
+    - Sustainable Urban Planning. Enabling urban planners to specify the area of
+    interest and a future time period.
+
+    - Environmental monitoring at mass events, such as concerts or festivals.
+
+    # Relevant terms and definitions
+
+    * **Population Density**: refers to the number of people in a concrete area.
+
+    # API Functionality
+
+    This API can be used for use cases that are not specified in this description,
+    we simply wanted to provide examples of possible use cases.
+
+
+    Once a developer specifies: (1) the area as a polygon shape, and (2) time interval
+    in which they want to obtain the population density, the API will return a data
+    set consisting of a sequence of quadrangular objects containing the input polygon
+    subdivided into uniform cells.
+
+
+    In each of the cells of the grid, a series of estimated statistics will be
+    reported for each time slot within the range, these being: maximum expected
+    population, minimum and average.
+
+
+    These KPIs per geographic unit are an estimate relative to the future and
+    based on calculations with historical data and/or prediction models trained
+    on such data.  The polygon provided must comply with certain restrictions,
+    which must be previously validated by the developer:
+
+    - The polygon will not be able to exceed a certain area.
+
+    - The polygon cannot have an arbitrary complexity (unlimited number of
+    sides, complex shapes, etc.).
+
+    - The polygon must be associated with a location where the telco provides
+    mobile connectivity services.
+
+
+    **NOTE**: In order to ensure anonymised information, if the data relating to
+    the cell in the required time interval is not sufficient to be displayed due
+    to [k-anonymity](https://en.wikipedia.org/wiki/K-anonymity), no such data will
+    be returned and the value of the dataType property will be `LOW_DENSITY`.
+
+    # Further info and support
+
+    (FAQs will be added in a later version of the documentation)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: project-email@sample.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.1.0-wip
+externalDocs:
+  description: Product documentation at Camara.
+  url: https://github.com/camaraproject/
+
+servers:
+  - url: '{apiRoot}/population-density-data/v0'
+    variables:
+      apiRoot:
+        default: http://localhost:9091
+        description: API root
+tags:
+  - name: Population Density Data
+    description: Operations to retrieve population density information.
+paths:
+  /retrieve:
+    post:
+      tags:
+        - Population Density Data
+      summary: Retrieves population density information in the specified area
+      description: >-
+        Retrieves estimated statistics (maximum, minimum and average) related to
+        expected population for a time slot for a given polygon as a data set
+        consisting of a sequence of quadrangular objects containing the input
+        polygon subdivided into uniform cells.
+      operationId: retrievePopulationDensity
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PopulationDensityRequest'
+        required: true
+      responses:
+        '200':
+          description: Population density data result.
+          headers:
+            x-correlator:
+              $ref: '#/components/headers/x-correlator'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PopulationDensityResponse'
+              examples:
+                geohashResponse:
+                  $ref: "#/components/examples/GeohashResponse"
+                boundaryResponse:
+                  $ref: "#/components/examples/BoundaryResponse"
+        '400':
+          $ref: '#/components/responses/RetrieveLocationBadRequest400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
+        '500':
+          $ref: '#/components/responses/Generic500'
+        '503':
+          $ref: '#/components/responses/Generic503'
+      security:
+        - openId:
+          - population-density-data:read
+
+components:
+  securitySchemes:
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
+  headers:
+    x-correlator:
+      description: Correlation id for the different services.
+      schema:
+        type: string
+  parameters:
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services.
+      schema:
+        type: string
+  schemas:
+    PopulationDensityRequest:
+      type: object
+      description: >-
+        Request object for retrieving population density data in a
+        specified area at a future period of time.
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        startDate:
+          type: string
+          format: date-time
+          description: >-
+            Start date time in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
+            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
+            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z).
+        endDate:
+          type: string
+          format: date-time
+          description: >-
+            End date time in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
+            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
+            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z).
+      required:
+        - area
+        - startDate
+        - endDate
+    Area:
+      type: object
+      description: >-
+        Geographical representation of a polygonal area defined
+        by a collection of coordinates forming a closed loop.
+      required:
+        - boundary
+      properties:
+        boundary:
+          type: array
+          description: >-
+            Collection of points defining the outer perimeter of the
+            area, forming a sequence of vertices connected by straight-line
+            segments.
+          items:
+            $ref: '#/components/schemas/Point'
+          minItems: 3
+          maxItems: 15
+    Point:
+      type: object
+      description: >-
+        Geographical coordinates (latitude, longitude) defining a location in a
+        map.
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          $ref: '#/components/schemas/Latitude'
+        longitude:
+          $ref: '#/components/schemas/Longitude'
+      example:
+        latitude: 39.699938
+        longitude: -2.777067
+    Latitude:
+      description: Latitude component of a location.
+      type: number
+      format: double
+      minimum: -90
+      maximum: 90
+    Longitude:
+      description: Longitude component of location.
+      type: number
+      format: double
+      minimum: -180
+      maximum: 180
+    PopulationDensityResponse:
+      type: array
+      description: >-
+        Cartographic representation where population density values will
+        be represented for an croncrete area in time intervals. Each
+        element in the array corresponds to a grid cell, containing population
+        data. The implementation will determine the interval size, which could
+        potentially be configurable through input in future iterations.
+      items:
+        $ref: '#/components/schemas/Cell'
+      minItems: 1
+    Cell:
+      description: Represents a rectangular grid cell within the specified area, including its population density data.
+      properties:
+        cellType:
+            type: string
+            enum:
+              - 'BOUNDARY_CELL'
+              - 'GEOHASH_CELL'
+        timePopulationData:
+          $ref: '#/components/schemas/TimePopulationDataArray'
+      required:
+         - cellType
+         - timePopulationData
+      discriminator:
+        propertyName: cellType
+        mapping:
+          BOUNDARY_CELL: '#/components/schemas/BoundaryCell'
+          GEOHASH_CELL: '#/components/schemas/GeohashCell'
+    BoundaryCell:
+      allOf:
+        - $ref: '#/components/schemas/Cell'
+        - type: object
+          description: Represents a rectangular grid cell specifying each of the vertices that form its boundary
+          properties:
+           boundary:
+              type: array
+              description: >-
+                Collection of points defining the outer perimeter of the cell,
+                forming a sequence of vertices connected by straight-line segments.
+              items:
+                $ref: '#/components/schemas/Point'
+              minItems: 4
+              maxItems: 4
+          required:
+            - boundary
+    GeohashCell:
+      allOf:
+        - $ref: '#/components/schemas/Cell'
+        - type: object
+          description: >-
+            Represents a rectangular grid cell using the Geohash system.
+          properties:
+            geohash:
+              type: string
+              description: >-
+                Coordinates of the cell representad as a string using the [Geohash system](https://en.wikipedia.org/wiki/Geohash).
+                Encoding a geographic location into a short string. The value length,
+                and thus the cell granularity, is determined by the implementation.
+              example: ezdmemd
+          required:
+            - geohash
+    TimePopulationDataArray:
+      type: array
+      description: >-
+        Population density data of a cell in time intervals. Time interval length
+        is determined by the implementation. The request startDate or the request
+        endDate have to be fully covered by the intervals. For example, if the
+        intervals are 1-hour long and the input date range were [2024-01-03T11:25:00Z
+        to 2024-01-03T12:45:00Z] it would contain 2 intervals (Interval from 2024-01-03T11:00:00Z
+        to 2024-01-03T12:00:00Z and interval from 2024-01-03T12:00:00Z to 2024-01-03T13:00:00Z).
+      items:
+        $ref: '#/components/schemas/TimePopulationData'
+      minItems: 1
+    TimePopulationData:
+      type: object
+      description: Population density data of a cell in a croncrete time range.
+      properties:
+        startTime:
+          type: string
+          format: date-time
+          description: >-
+            Interval start time in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
+            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
+            (i.e. which allows 2023-07-03T14:27:08+02:00 or 2023-07-03T12:27:08Z).
+        endTime:
+          type: string
+          format: date-time
+          description: >-
+            Interval end time in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
+            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
+            (i.e. which allows 2023-07-03T14:27:08+02:00 or 2023-07-03T12:27:08Z).
+          example: '2024-01-03T13:00:00Z'
+        populationData:
+          $ref: '#/components/schemas/PopulationData'
+      required:
+        - startTime
+        - endTime
+        - populationData
+    PopulationData:
+      description: >-
+        Object that contains the maximum, minimum and average population in a
+        cell for a specific interval. In case of insufficient data to guarantee an
+        anonymised prediction due to the k-anonymity within a specific cell and
+        time range, no population data will be returnet and the property dataType
+        value will be "LOW_DENSITY".
+      properties:
+        dataType:
+          type: string
+          enum:
+            - LOW_DENSITY
+            - DENSITY_ESTIMATION
+      required:
+        - dataType
+      discriminator:
+        propertyName: dataType
+        mapping:
+          LOW_DENSITY: '#/components/schemas/PopulationData'
+          DENSITY_ESTIMATION: '#/components/schemas/DensityEstimationPopulationData'
+    DensityEstimationPopulationData:
+      allOf:
+        - $ref: '#/components/schemas/PopulationData'
+        - type: object
+          properties:
+            maxPopulation:
+              type: number
+              format: double
+              description: Maximum population expected in the defined area.
+            minPopulation:
+              type: number
+              format: double
+              description: Minimum population expected in the defined area.
+            avgPopulation:
+              type: number
+              format: double
+              description: Average population expected in the defined area.
+          required:
+            - maxPopulation
+            - minPopulation
+            - avgPopulation
+    ErrorInfo:
+      type: object
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          description: HTTP status code returned along with this error response.
+        code:
+          type: string
+          description: Code given to this error.
+        message:
+          type: string
+          description: Detailed error description.
+  responses:
+    RetrieveLocationBadRequest400:
+      description: >-
+        Problem with the client request. In addition to regular scenario of
+        `INVALID_ARGUMENT`, another scenarios may exist:
+          - The area is not a polygon shape or has an arbitrary complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or has an arbitrary complexity")
+          - The area or part of the area is outside the allowed area ("code": "POPULATION_DENSITY_DATA.OUTSIDE_ALLOWED_AREA", "message": " The area or part of the area is outside the allowed area")
+          - Indicated `startDate` is greater than the maximum allowed (365 days since the moment of the request) ("code": "POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED", "message": "Indicated startDate is greater than the maximum allowed (365 days since the moment of the request)")
+          - Indicated `startDate` is earlier than the minimum allowed (15 minutes since the moment of the request) ("code": "POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED", "message": "Indicated startDate is earlier than the minimum allowed (15 minutes since the moment of the request)")
+          - Indicated `endDate` is earlier than the `startDate` ("code": "POPULATION_DENSITY_DATA.INVALID_END_DATE", "message": "Indicated endDate is earlier than the startDate")
+          - Indicated time period is greater than the maximum allowed (More than XX minutes between startDate and endDate) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than XX minutes between startDate and endDate)")
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          examples:
+            InvalidArgument:
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: Invalid input
+            InvalidAreaIssue:
+              value:
+                status: 400
+                code: POPULATION_DENSITY_INFORMATION.INVALID_AREA
+                message: The area is not a polygon shape or has an arbitrary complexity
+            OutsideAllowedAreaIssue:
+              value:
+                status: 400
+                code: POPULATION_DENSITY_DATA.OUTSIDE_ALLOWED_AREA
+                message: The area or part of the area is outside the allowed area
+            MaxStartDateIssue:
+              value:
+                status: 400
+                code: POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED
+                message: >-
+                  Indicated startDate is greater than the maximum allowed (365
+                  days since the moment of the request)
+            MinStartDateIssue:
+              value:
+                status: 400
+                code: POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED
+                message: >-
+                  Indicated startDate is earlier than the minimum allowed (15
+                  minutes since the moment of the request)
+            InvalidEndDateIssue:
+              value:
+                status: 400
+                code: POPULATION_DENSITY_DATA.INVALID_END_DATE
+                message: Indicated endDate is earlier than the startDate
+            MaxDurationIssue:
+              value:
+                status: 400
+                code: POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED
+                message: >-
+                  Indicated time period is greater than the maximum allowed
+                  (More than XX minutes between startDate and endDate)
+    Generic401:
+      description: Unauthorized
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 401
+            code: UNAUTHENTICATED
+            message: 'Authorization failed: ...'
+    Generic403:
+      description: Forbidden
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 403
+            code: PERMISSION_DENIED
+            message: 'Operation not allowed: ...'
+    Generic404:
+      description: Not found
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 404
+            code: NOT_FOUND
+            message: The specified resource is not found
+    Generic500:
+      description: Internal server error
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 500
+            code: INTERNAL
+            message: Internal server error
+    Generic503:
+      description: Service unavailable
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 503
+            code: UNAVAILABLE
+            message: Service unavailable
+  examples:
+    BoundaryResponse:
+      value:
+        - cellType: "BOUNDARY_CELL"
+          boundary:
+          - latitude: 39.699938
+            longitude: -2.777067
+          - latitude: 39.699938
+            longitude: -2.777067
+          - latitude: 39.699938
+            longitude: -2.777067
+          - latitude: 39.699938
+            longitude: -2.777067
+          timePopulationData:
+            - startTime: "2024-01-03T10:00:00Z"
+              endTime: "2024-01-03T11:00:00Z"
+              populationData:
+                dataType: DENSITY_ESTIMATION
+                maxPopulation: 100
+                minPopulation: 20
+                avgPopulation: 60
+            - startTime: "2024-01-03T11:00:00Z"
+              endTime: "2024-01-03T12:00:00Z"
+              populationData:
+                dataType: DENSITY_ESTIMATION
+                maxPopulation: 150
+                minPopulation: 30
+                avgPopulation: 60
+        - cellType: "BOUNDARY_CELL"
+          boundary:
+          - latitude: 39.699938
+            longitude: -2.777067
+          - latitude: 39.699938
+            longitude: -2.777067
+          - latitude: 39.699938
+            longitude: -2.777067
+          - latitude: 39.699938
+            longitude: -2.777067
+          timePopulationData:
+            - startTime: "2024-01-03T10:00:00Z"
+              endTime: "2024-01-03T11:00:00Z"
+              populationData:
+                dataType: DENSITY_ESTIMATION
+                maxPopulation: 100
+                minPopulation: 40
+                avgPopulation: 90
+            - startTime: "2024-01-03T11:00:00Z"
+              endTime: "2024-01-03T12:00:00Z"
+              populationData:
+                dataType: DENSITY_ESTIMATION
+                maxPopulation: 200
+                minPopulation: 40
+                avgPopulation: 100
+        - cellType: "BOUNDARY_CELL"
+          boundary:
+          - latitude: 39.699938
+            longitude: -2.777067
+          - latitude: 39.699938
+            longitude: -2.777067
+          - latitude: 39.699938
+            longitude: -2.777067
+          - latitude: 39.699938
+            longitude: -2.777067
+          timePopulationData:
+            - startTime: "2024-01-03T10:00:00Z"
+              endTime: "2024-01-03T11:00:00Z"
+              populationData:
+                dataType: "LOW_DENSITY"
+            - startTime: "2024-01-03T11:00:00Z"
+              endTime: "2024-01-03T12:00:00Z"
+              populationData:
+                dataType: DENSITY_ESTIMATION
+                maxPopulation: 200
+                minPopulation: 40
+                avgPopulation: 100
+    GeohashResponse:
+      value:
+        - cellType: "GEOHASH_CELL"
+          geohash: "ezdqemf"
+          timePopulationData:
+            - startTime: "2024-01-03T10:00:00Z"
+              endTime: "2024-01-03T11:00:00Z"
+              populationData:
+                dataType: DENSITY_ESTIMATION
+                maxPopulation: 100
+                minPopulation: 20
+                avgPopulation: 60
+            - startTime: "2024-01-03T11:00:00Z"
+              endTime: "2024-01-03T12:00:00Z"
+              populationData:
+                dataType: DENSITY_ESTIMATION
+                maxPopulation: 150
+                minPopulation: 30
+                avgPopulation: 60
+        - cellType: "GEOHASH_CELL"
+          geohash: "ezdqemg"
+          timePopulationData:
+            - startTime: "2024-01-03T10:00:00Z"
+              endTime: "2024-01-03T11:00:00Z"
+              populationData:
+                dataType: DENSITY_ESTIMATION
+                maxPopulation: 100
+                minPopulation: 40
+                avgPopulation: 90
+            - startTime: "2024-01-03T11:00:00Z"
+              endTime: "2024-01-03T12:00:00Z"
+              populationData:
+                dataType: DENSITY_ESTIMATION
+                maxPopulation: 200
+                minPopulation: 40
+                avgPopulation: 100
+        - cellType: "GEOHASH_CELL"
+          geohash: "ezdqemu"
+          timePopulationData:
+            - startTime: "2024-01-03T10:00:00Z"
+              endTime: "2024-01-03T11:00:00Z"
+              populationData:
+                dataType: "LOW_DENSITY"
+            - startTime: "2024-01-03T11:00:00Z"
+              endTime: "2024-01-03T12:00:00Z"
+              populationData:
+                dataType: DENSITY_ESTIMATION
+                maxPopulation: 200
+                minPopulation: 40
+                avgPopulation: 100
