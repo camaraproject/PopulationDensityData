@@ -122,10 +122,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/PopulationDensityResponse'
               examples:
-                geohashResponse:
-                  $ref: "#/components/examples/GeohashResponse"
-                boundaryResponse:
-                  $ref: "#/components/examples/BoundaryResponse"
+                PopulationDensityResponseExample:
+                  $ref: "#/components/examples/PopulationDensityResponseExample"          
         '400':
           $ref: '#/components/responses/RetrieveLocationBadRequest400'
         '401':
@@ -245,55 +243,19 @@ components:
       minItems: 1
     Cell:
       description: Represents a rectangular grid cell within the specified area, including its population density data.
-      properties:
-        cellType:
-            type: string
-            enum:
-              - 'BOUNDARY_CELL'
-              - 'GEOHASH_CELL'
+      properties:        
         timePopulationData:
           $ref: '#/components/schemas/TimePopulationDataArray'
-      required:
-         - cellType
-         - timePopulationData
-      discriminator:
-        propertyName: cellType
-        mapping:
-          BOUNDARY_CELL: '#/components/schemas/BoundaryCell'
-          GEOHASH_CELL: '#/components/schemas/GeohashCell'
-    BoundaryCell:
-      allOf:
-        - $ref: '#/components/schemas/Cell'
-        - type: object
-          description: Represents a rectangular grid cell specifying each of the vertices that form its boundary
-          properties:
-           boundary:
-              type: array
-              description: >-
-                Collection of points defining the outer perimeter of the cell,
-                forming a sequence of vertices connected by straight-line segments.
-              items:
-                $ref: '#/components/schemas/Point'
-              minItems: 4
-              maxItems: 4
-          required:
-            - boundary
-    GeohashCell:
-      allOf:
-        - $ref: '#/components/schemas/Cell'
-        - type: object
+        geohash:
+          type: string
           description: >-
-            Represents a rectangular grid cell using the Geohash system.
-          properties:
-            geohash:
-              type: string
-              description: >-
-                Coordinates of the cell representad as a string using the [Geohash system](https://en.wikipedia.org/wiki/Geohash).
-                Encoding a geographic location into a short string. The value length,
-                and thus the cell granularity, is determined by the implementation.
-              example: ezdmemd
-          required:
-            - geohash
+            Coordinates of the cell represented as a string using the [Geohash system](https://en.wikipedia.org/wiki/Geohash).
+            Encoding a geographic location into a short string. The value length, and thus the cell granularity,
+            is determined by the implementation.
+          example: ezdmemd
+      required:
+         - geohash
+         - timePopulationData
     TimePopulationDataArray:
       type: array
       description: >-
@@ -514,18 +476,9 @@ components:
             code: UNAVAILABLE
             message: Service unavailable
   examples:
-    BoundaryResponse:
+    PopulationDensityResponseExample:
       value:
-        - cellType: "BOUNDARY_CELL"
-          boundary:
-          - latitude: 39.699938
-            longitude: -2.777067
-          - latitude: 39.699938
-            longitude: -2.777067
-          - latitude: 39.699938
-            longitude: -2.777067
-          - latitude: 39.699938
-            longitude: -2.777067
+        - geohash: "ezdqemf"       
           timePopulationData:
             - startTime: "2024-01-03T10:00:00Z"
               endTime: "2024-01-03T11:00:00Z"
@@ -541,16 +494,7 @@ components:
                 maxPopulation: 150
                 minPopulation: 30
                 avgPopulation: 60
-        - cellType: "BOUNDARY_CELL"
-          boundary:
-          - latitude: 39.699938
-            longitude: -2.777067
-          - latitude: 39.699938
-            longitude: -2.777067
-          - latitude: 39.699938
-            longitude: -2.777067
-          - latitude: 39.699938
-            longitude: -2.777067
+        - geohash: "ezdqemg"   
           timePopulationData:
             - startTime: "2024-01-03T10:00:00Z"
               endTime: "2024-01-03T11:00:00Z"
@@ -566,66 +510,7 @@ components:
                 maxPopulation: 200
                 minPopulation: 40
                 avgPopulation: 100
-        - cellType: "BOUNDARY_CELL"
-          boundary:
-          - latitude: 39.699938
-            longitude: -2.777067
-          - latitude: 39.699938
-            longitude: -2.777067
-          - latitude: 39.699938
-            longitude: -2.777067
-          - latitude: 39.699938
-            longitude: -2.777067
-          timePopulationData:
-            - startTime: "2024-01-03T10:00:00Z"
-              endTime: "2024-01-03T11:00:00Z"
-              populationData:
-                dataType: "LOW_DENSITY"
-            - startTime: "2024-01-03T11:00:00Z"
-              endTime: "2024-01-03T12:00:00Z"
-              populationData:
-                dataType: DENSITY_ESTIMATION
-                maxPopulation: 200
-                minPopulation: 40
-                avgPopulation: 100
-    GeohashResponse:
-      value:
-        - cellType: "GEOHASH_CELL"
-          geohash: "ezdqemf"
-          timePopulationData:
-            - startTime: "2024-01-03T10:00:00Z"
-              endTime: "2024-01-03T11:00:00Z"
-              populationData:
-                dataType: DENSITY_ESTIMATION
-                maxPopulation: 100
-                minPopulation: 20
-                avgPopulation: 60
-            - startTime: "2024-01-03T11:00:00Z"
-              endTime: "2024-01-03T12:00:00Z"
-              populationData:
-                dataType: DENSITY_ESTIMATION
-                maxPopulation: 150
-                minPopulation: 30
-                avgPopulation: 60
-        - cellType: "GEOHASH_CELL"
-          geohash: "ezdqemg"
-          timePopulationData:
-            - startTime: "2024-01-03T10:00:00Z"
-              endTime: "2024-01-03T11:00:00Z"
-              populationData:
-                dataType: DENSITY_ESTIMATION
-                maxPopulation: 100
-                minPopulation: 40
-                avgPopulation: 90
-            - startTime: "2024-01-03T11:00:00Z"
-              endTime: "2024-01-03T12:00:00Z"
-              populationData:
-                dataType: DENSITY_ESTIMATION
-                maxPopulation: 200
-                minPopulation: 40
-                avgPopulation: 100
-        - cellType: "GEOHASH_CELL"
-          geohash: "ezdqemu"
+        - geohash: "ezdqemu"     
           timePopulationData:
             - startTime: "2024-01-03T10:00:00Z"
               endTime: "2024-01-03T11:00:00Z"
