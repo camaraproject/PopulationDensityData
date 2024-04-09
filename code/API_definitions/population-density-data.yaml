@@ -40,11 +40,11 @@ info:
 
     Once a developer specifies: (1) the area as a polygon shape, and (2) time interval
     in which they want to obtain the population density, the API will return a data
-    set consisting of a sequence of quadrangular objects containing the input polygon
-    subdivided into uniform cells.
+    set consisting of a sequence of time ranges each time range containing the
+    input polygon subdivided into equal sized cells.
 
 
-    In each of the cells of the grid, a series of estimated statistics will be
+    In each of the equal sized cells of the grid, a series of estimated statistics will be
     reported for each time slot within the range, these being: maximum expected
     population, minimum and average.
 
@@ -60,13 +60,21 @@ info:
     sides, complex shapes, etc.).
 
     - The polygon must be associated with a location where the telco provides
-    mobile connectivity services.
+    mobile connectivity services. Cells outside the area supported by the implementation
+    will not be returned. Therefore, if a polygon is located entirely outside the
+    supported area, an empty array will be returned.
 
 
-    **NOTE**: In order to ensure anonymised information, if the data relating to
+    **NOTE**: In order to ensure anonymized information, if the data relating to
     the cell in the required time interval is not sufficient to be displayed due
     to [k-anonymity](https://en.wikipedia.org/wiki/K-anonymity), no such data will
     be returned and the value of the dataType property will be `LOW_DENSITY`.
+
+    # Resources and Operations overview
+
+    The API provides one endpoint that accepts POST requests for retrieving population
+    density information in the specified area.
+
 
     # Further info and support
 
@@ -81,7 +89,6 @@ info:
 externalDocs:
   description: Product documentation at Camara.
   url: https://github.com/camaraproject/
-
 servers:
   - url: '{apiRoot}/population-density-data/v0'
     variables:
@@ -101,7 +108,7 @@ paths:
         Retrieves estimated statistics (maximum, minimum and average) related to
         expected population for a time slot for a given polygon as a data set
         consisting of a sequence of quadrangular objects containing the input
-        polygon subdivided into uniform cells.
+        polygon subdivided into equal sized cells.
       operationId: retrievePopulationDensity
       parameters:
         - $ref: '#/components/parameters/x-correlator'
@@ -123,7 +130,7 @@ paths:
                 $ref: '#/components/schemas/PopulationDensityResponse'
               examples:
                 PopulationDensityResponseExample:
-                  $ref: "#/components/examples/PopulationDensityResponseExample"          
+                  $ref: '#/components/examples/PopulationDensityResponseExample'
         '400':
           $ref: '#/components/responses/RetrieveLocationBadRequest400'
         '401':
@@ -139,7 +146,6 @@ paths:
       security:
         - openId:
           - population-density-data:read
-
 components:
   securitySchemes:
     openId:
@@ -163,6 +169,7 @@ components:
       description: >-
         Request object for retrieving population density data in a
         specified area at a future period of time.
+        **NOTE**: The difference between `startDate` and `endDate` cannot be greater than 7 days.
       properties:
         area:
           $ref: '#/components/schemas/Area'
@@ -173,6 +180,7 @@ components:
             Start date time in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
             (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z).
+            The minimum startDate is the time of the request.
         endDate:
           type: string
           format: date-time
@@ -180,6 +188,7 @@ components:
             End date time in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
             (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z).
+            The maximum endDate allowed is 3 months from the time of the request.
       required:
         - area
         - startDate
@@ -231,46 +240,40 @@ components:
       minimum: -180
       maximum: 180
     PopulationDensityResponse:
-      type: array
-      description: >-
-        Cartographic representation where population density values will
-        be represented for an croncrete area in time intervals. Each
-        element in the array corresponds to a grid cell, containing population
-        data. The implementation will determine the interval size, which could
-        potentially be configurable through input in future iterations.
-      items:
-        $ref: '#/components/schemas/Cell'
-      minItems: 1
-    Cell:
-      description: Represents a rectangular grid cell within the specified area, including its population density data.
-      properties:        
-        timePopulationData:
-          $ref: '#/components/schemas/TimePopulationDataArray'
-        geohash:
-          type: string
-          description: >-
-            Coordinates of the cell represented as a string using the [Geohash system](https://en.wikipedia.org/wiki/Geohash).
-            Encoding a geographic location into a short string. The value length, and thus the cell granularity,
-            is determined by the implementation.
-          example: ezdmemd
-      required:
-         - geohash
-         - timePopulationData
-    TimePopulationDataArray:
-      type: array
-      description: >-
-        Population density data of a cell in time intervals. Time interval length
-        is determined by the implementation. The request startDate or the request
-        endDate have to be fully covered by the intervals. For example, if the
-        intervals are 1-hour long and the input date range were [2024-01-03T11:25:00Z
-        to 2024-01-03T12:45:00Z] it would contain 2 intervals (Interval from 2024-01-03T11:00:00Z
-        to 2024-01-03T12:00:00Z and interval from 2024-01-03T12:00:00Z to 2024-01-03T13:00:00Z).
-      items:
-        $ref: '#/components/schemas/TimePopulationData'
-      minItems: 1
-    TimePopulationData:
       type: object
-      description: Population density data of a cell in a croncrete time range.
+      description: >-
+        Population density values will be represented in time intervals for different 
+        cells of the requested area. Each element in the array corresponds to a time
+        interval, containing population data for the grid cells. The intervals are 1 hour long.
+      properties:
+        timedPopulationData:
+          type: array
+          description: >-
+           Time ranges along with the population density data for the cells within it.
+            The request startDate or the request endDate have to be fully covered by the intervals.
+            For example, if the intervals are 1-hour long and the input date range were [2024-01-03T11:25:00Z
+            to 2024-01-03T12:45:00Z] it would contain 2 intervals (Interval from 2024-01-03T11:00:00Z
+            to 2024-01-03T12:00:00Z and interval from 2024-01-03T12:00:00Z to 2024-01-03T13:00:00Z).
+          items:
+            $ref: '#/components/schemas/TimedPopulationData'
+        status:
+          $ref: '#/components/schemas/ResponseStatus'
+      required:
+       - timedPopulationData
+       - status
+    ResponseStatus:
+      type: string
+      description: >-
+        Represents the state of the response for the input polygon defined in the request, the possible values are:
+          - `SUPPORTED_AREA`: The whole request area is supported. Population density data for the entire requested area is returned.
+          - `PART_OF_AREA_NOT_SUPPORTED`: Part of the requested area is outside the MNOs coverage area, the cells outside the coverage area are not returned.
+          - `AREA_NOT_SUPPORTED`: The whole requested area is outside the MNOs coverage area. No data will be returned.
+      enum:
+        - SUPPORTED_AREA
+        - PART_OF_AREA_NOT_SUPPORTED
+        - AREA_NOT_SUPPORTED
+    TimedPopulationData:
+      type: object
       properties:
         startTime:
           type: string
@@ -287,18 +290,41 @@ components:
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
             (i.e. which allows 2023-07-03T14:27:08+02:00 or 2023-07-03T12:27:08Z).
           example: '2024-01-03T13:00:00Z'
-        populationData:
-          $ref: '#/components/schemas/PopulationData'
+        cellPopulationData:
+          $ref: '#/components/schemas/CellPopulationDataArray'
       required:
         - startTime
         - endTime
+        - cellPopulationData
+    CellPopulationDataArray:
+      type: array
+      description: >-
+        Population data for the different cells in a concrete time range.
+      items:
+        $ref: '#/components/schemas/CellPopulationData'
+      minItems: 1
+    CellPopulationData:
+      type: object
+      description: Population density data of a cell in a concrete time range.
+      properties:
+        geohash:
+          type: string
+          description: >-
+            Coordinates of the cell represented as a string using the [Geohash system](https://en.wikipedia.org/wiki/Geohash).
+            Encoding a geographic location into a short string. The value length,
+            and thus the cell granularity, is determined by the implementation.
+          example: ezdmemd
+        populationData:
+          $ref: '#/components/schemas/PopulationData'
+      required:
+        - geohash
         - populationData
     PopulationData:
       description: >-
         Object that contains the maximum, minimum and average population in a
         cell for a specific interval. In case of insufficient data to guarantee an
-        anonymised prediction due to the k-anonymity within a specific cell and
-        time range, no population data will be returnet and the property dataType
+        anonymized prediction due to the k-anonymity within a specific cell and
+        time range, no population data will be returned and the property dataType
         value will be "LOW_DENSITY".
       properties:
         dataType:
@@ -356,11 +382,10 @@ components:
         Problem with the client request. In addition to regular scenario of
         `INVALID_ARGUMENT`, another scenarios may exist:
           - The area is not a polygon shape or has an arbitrary complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or has an arbitrary complexity")
-          - The area or part of the area is outside the allowed area ("code": "POPULATION_DENSITY_DATA.OUTSIDE_ALLOWED_AREA", "message": " The area or part of the area is outside the allowed area")
-          - Indicated `startDate` is greater than the maximum allowed (365 days since the moment of the request) ("code": "POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED", "message": "Indicated startDate is greater than the maximum allowed (365 days since the moment of the request)")
-          - Indicated `startDate` is earlier than the minimum allowed (15 minutes since the moment of the request) ("code": "POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED", "message": "Indicated startDate is earlier than the minimum allowed (15 minutes since the moment of the request)")
+          - Indicated `startDate` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED", "message": "Indicated startDate is greater than the maximum allowed")
+          - Indicated `startDate` is earlier than the minimum allowed ("code": "POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED", "message": "Indicated startDate is earlier than the minimum allowed")
           - Indicated `endDate` is earlier than the `startDate` ("code": "POPULATION_DENSITY_DATA.INVALID_END_DATE", "message": "Indicated endDate is earlier than the startDate")
-          - Indicated time period is greater than the maximum allowed (More than XX minutes between startDate and endDate) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than XX minutes between startDate and endDate)")
+          - Indicated time period is greater than the maximum allowed (More than maximum hours between startDate and endDate) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than maximum hours between startDate and endDate)")
       headers:
         x-correlator:
           $ref: '#/components/headers/x-correlator'
@@ -379,25 +404,18 @@ components:
                 status: 400
                 code: POPULATION_DENSITY_INFORMATION.INVALID_AREA
                 message: The area is not a polygon shape or has an arbitrary complexity
-            OutsideAllowedAreaIssue:
-              value:
-                status: 400
-                code: POPULATION_DENSITY_DATA.OUTSIDE_ALLOWED_AREA
-                message: The area or part of the area is outside the allowed area
             MaxStartDateIssue:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED
                 message: >-
-                  Indicated startDate is greater than the maximum allowed (365
-                  days since the moment of the request)
+                  Indicated startDate is greater than the maximum allowed
             MinStartDateIssue:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED
                 message: >-
-                  Indicated startDate is earlier than the minimum allowed (15
-                  minutes since the moment of the request)
+                  Indicated startDate is earlier than the minimum allowed
             InvalidEndDateIssue:
               value:
                 status: 400
@@ -409,7 +427,7 @@ components:
                 code: POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED
                 message: >-
                   Indicated time period is greater than the maximum allowed
-                  (More than XX minutes between startDate and endDate)
+                  (More than maximum hours between startDate and endDate)
     Generic401:
       description: Unauthorized
       headers:
@@ -478,48 +496,44 @@ components:
   examples:
     PopulationDensityResponseExample:
       value:
-        - geohash: "ezdqemf"       
-          timePopulationData:
-            - startTime: "2024-01-03T10:00:00Z"
-              endTime: "2024-01-03T11:00:00Z"
-              populationData:
-                dataType: DENSITY_ESTIMATION
-                maxPopulation: 100
-                minPopulation: 20
-                avgPopulation: 60
-            - startTime: "2024-01-03T11:00:00Z"
-              endTime: "2024-01-03T12:00:00Z"
-              populationData:
-                dataType: DENSITY_ESTIMATION
-                maxPopulation: 150
-                minPopulation: 30
-                avgPopulation: 60
-        - geohash: "ezdqemg"   
-          timePopulationData:
-            - startTime: "2024-01-03T10:00:00Z"
-              endTime: "2024-01-03T11:00:00Z"
-              populationData:
-                dataType: DENSITY_ESTIMATION
-                maxPopulation: 100
-                minPopulation: 40
-                avgPopulation: 90
-            - startTime: "2024-01-03T11:00:00Z"
-              endTime: "2024-01-03T12:00:00Z"
-              populationData:
-                dataType: DENSITY_ESTIMATION
-                maxPopulation: 200
-                minPopulation: 40
-                avgPopulation: 100
-        - geohash: "ezdqemu"     
-          timePopulationData:
-            - startTime: "2024-01-03T10:00:00Z"
-              endTime: "2024-01-03T11:00:00Z"
-              populationData:
-                dataType: "LOW_DENSITY"
-            - startTime: "2024-01-03T11:00:00Z"
-              endTime: "2024-01-03T12:00:00Z"
-              populationData:
-                dataType: DENSITY_ESTIMATION
-                maxPopulation: 200
-                minPopulation: 40
-                avgPopulation: 100
+        status: SUPPORTED_AREA
+        timedPopulationData:
+          - startTime: "2024-01-03T10:00:00Z"
+            endTime: "2024-01-03T11:00:00Z"
+            cellPopulationData:
+              - geohash: ezdqemf
+                populationData:
+                  dataType: DENSITY_ESTIMATION
+                  maxPopulation: 150
+                  minPopulation: 30
+                  avgPopulation: 60
+              - geohash: ezdqemg
+                populationData:
+                  dataType: DENSITY_ESTIMATION
+                  maxPopulation: 100
+                  minPopulation: 40
+                  avgPopulation: 90
+              - geohash: ezdqemu
+                populationData:
+                  dataType: "LOW_DENSITY"
+          - startTime: "2024-01-03T11:00:00Z"
+            endTime: "2024-01-03T12:00:00Z"
+            cellPopulationData:
+              - geohash: ezdqemf
+                populationData:
+                  dataType: DENSITY_ESTIMATION
+                  maxPopulation: 100
+                  minPopulation: 30
+                  avgPopulation: 70
+              - geohash: ezdqemg
+                populationData:
+                  dataType: DENSITY_ESTIMATION
+                  maxPopulation: 200
+                  minPopulation: 40
+                  avgPopulation: 100
+              - geohash: ezdqemu
+                populationData:
+                  dataType: DENSITY_ESTIMATION
+                  maxPopulation: 200
+                  minPopulation: 40
+                  avgPopulation: 100
