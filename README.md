@@ -22,7 +22,7 @@ Repository to describe, develop, document and test the Population Density Data A
 * Location: virtually  
 
 ## Meetings
-* Meetings are held virtually [Click here to join (MSTeams)](https://teams.microsoft.com/l/meetup-join/19%3ameeting_MTVjODg5OGUtMzEwYi00OTliLWI0YmUtZDhkODIzYWQ2NjZk%40thread.v2/0?context=%7b%22Tid%22%3a%229744600e-3e04-492e-baa1-25ec245c6f10%22%2c%22Oid%22%3a%22513e8b46-b8fc-417f-af4d-8d0846d5f626%22%7d)
+* Meetings are held virtually [Click here to join (Zoom)](https://zoom-lfx.platform.linuxfoundation.org/meeting/95956472717?password=e4e7e889-ffb8-4fac-9e9d-d9adcaf2e711)
 * Schedule: bi-weekly, Wednesday, 14:00 Europe/Amsterdam (CET) (13:00 UTC, 12:00 UTC during European DST).
 
   For date/time of next meeting see [previous meeting minutes](https://github.com/camaraproject/PopulationDensityData/tree/main/documentation/MeetingMinutes).
