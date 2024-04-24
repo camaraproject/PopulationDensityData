@@ -38,7 +38,7 @@ info:
     we simply wanted to provide examples of possible use cases.
 
 
-    Once a developer specifies: (1) the area as a polygon shape, and (2) time interval
+    Once a developer specifies: (1) the area as a polygon shape,(2) a precision level and (3) time interval
     in which they want to obtain the population density, the API will return a data
     set consisting of a sequence of time ranges each time range containing the
     input polygon subdivided into equal sized cells.
@@ -60,10 +60,14 @@ info:
     sides, complex shapes, etc.).
 
     - The polygon must be associated with a location where the telco provides
-    mobile connectivity services. Cells outside the area supported by the implementation
-    will not be returned. Therefore, if a polygon is located entirely outside the
+    mobile connectivity services. If a polygon is located entirely outside the
     supported area, an empty array will be returned.
-
+    
+    
+    The standard behaviour of the API will be synchronous, although for large
+    area requests the API may behave asynchronously. In case the `webhook` property
+    is in the request, the API behaviour will be asynchronous by sending a callback
+    to the `notificationUrl` provided with the result of the request.
 
     **NOTE**: In order to ensure anonymized information, if the data relating to
     the cell in the required time interval is not sufficient to be displayed due
@@ -117,7 +121,62 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PopulationDensityRequest'
+            example:
+                area:
+                  areaType: POLYGON
+                  boundary:
+                    - latitude: 45.754114
+                      longitude: 4.860374
+                    - latitude: 45.753845
+                      longitude: 4.863185
+                    - latitude: 45.75249
+                      longitude: 4.861876
+                    - latitude: 45.751224
+                      longitude: 4.861125
+                    - latitude: 45.751442
+                      longitude: 4.859827
+                startDate: '2024-04-23T14:44:18.165Z'
+                endDate: '2024-04-23T14:44:18.165Z'
+                precision: 7
         required: true
+      callbacks:
+        populationDensityDataCallback:
+          "{$request.body#/webhook/notificationUrl}":
+            post:
+              tags:
+                - Population Density Data
+              summary: "Population Density Data callback"
+              description: |
+                Important: this endpoint is to be implemented by the API consumer.
+                The Population Density Data server will call this endpoint when the request result is ready.
+              operationId: postNotification
+              parameters:
+                - $ref: '#/components/parameters/x-correlator'
+              requestBody:
+                description: Population density data result.
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/PopulationDensityResponse'
+                    examples:
+                      PopulationDensityResponseExample:
+                        $ref: '#/components/examples/PopulationDensityResponseExample'
+              responses:
+                "204":
+                  description: Successful notification
+                  headers:
+                    x-correlator:
+                      $ref: '#/components/headers/x-correlator'
+                "400":
+                  $ref: "#/components/responses/Generic400"
+                "401":
+                  $ref: "#/components/responses/Generic401"
+                "403":
+                  $ref: "#/components/responses/Generic403"
+                "500":
+                  $ref: "#/components/responses/Generic500"
+                "503":
+                  $ref: "#/components/responses/Generic503"
       responses:
         '200':
           description: Population density data result.
@@ -131,6 +190,11 @@ paths:
               examples:
                 PopulationDensityResponseExample:
                   $ref: '#/components/examples/PopulationDensityResponseExample'
+        '202':
+          description: Population density data requested. This response is returned when the behaviour of the API is asynchronous.
+          headers:
+            x-correlator:
+              $ref: '#/components/headers/x-correlator'
         '400':
           $ref: '#/components/responses/RetrieveLocationBadRequest400'
         '401':
@@ -177,56 +241,79 @@ components:
           type: string
           format: date-time
           description: >-
-            Start date time in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
-            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
-            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z).
+            Start date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
+            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ 
+            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
             The minimum startDate is the time of the request.
         endDate:
           type: string
           format: date-time
           description: >-
-            End date time in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
+            End date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
-            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z).
+            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
             The maximum endDate allowed is 3 months from the time of the request.
+        precision:
+          type: integer
+          description: >-
+            Precision required of response cells. The precision corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash)"
+            If not included the default precision level will be 7. In case of using a not supported level by the MNO, the API will return the error response `POPULATION_DENSITY_DATA.PRECISION_NOT_SUPPORTED`.
+          minimum: 1
+          maximum: 12
+          default: 7
+        webhook:
+            $ref: "#/components/schemas/Webhook"
       required:
         - area
         - startDate
         - endDate
     Area:
       type: object
-      description: >-
-        Geographical representation of a polygonal area defined
-        by a collection of coordinates forming a closed loop.
-      required:
-        - boundary
       properties:
-        boundary:
-          type: array
-          description: >-
-            Collection of points defining the outer perimeter of the
-            area, forming a sequence of vertices connected by straight-line
-            segments.
-          items:
-            $ref: '#/components/schemas/Point'
-          minItems: 3
-          maxItems: 15
+        areaType:
+          $ref: "#/components/schemas/AreaType"
+      required:
+        - areaType
+      discriminator:
+        propertyName: areaType
+        mapping:
+          POLYGON: "#/components/schemas/Polygon"
+    AreaType:
+      type: string
+      description: |
+        Type of this area.
+        POLYGON - The area is defined as a polygon.
+      enum:
+        - POLYGON
+    Polygon:
+      allOf:
+        - $ref: "#/components/schemas/Area"
+        - type: object
+          required:
+            - boundary
+          properties:
+            boundary:
+              $ref: "#/components/schemas/PointList"
+    PointList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Point"
+      minItems: 3
+      maxItems: 15
     Point:
       type: object
-      description: >-
-        Geographical coordinates (latitude, longitude) defining a location in a
-        map.
+      description: Coordinates (latitude, longitude) defining a location in a map
       required:
         - latitude
         - longitude
       properties:
         latitude:
-          $ref: '#/components/schemas/Latitude'
+          $ref: "#/components/schemas/Latitude"
         longitude:
-          $ref: '#/components/schemas/Longitude'
+          $ref: "#/components/schemas/Longitude"
       example:
-        latitude: 39.699938
-        longitude: -2.777067
+        latitude: 50.735851
+        longitude: 7.10066
     Latitude:
       description: Latitude component of a location.
       type: number
@@ -239,12 +326,27 @@ components:
       format: double
       minimum: -180
       maximum: 180
+    Webhook:
+      description: Webhook information
+      type: object
+      required:
+        - notificationUrl
+      properties:
+        notificationUrl:
+          type: string
+          example: https://application-server.com
+          description: https callback address where the result notification must be POST-ed
+        notificationAuthToken:
+          type: string
+          example: c8974e592c2fa383d4a3960714
+          description: |
+            OAuth2 token to be used by the callback API endpoint. It MUST be indicated within HTTP Authorization header e.g. Authorization: Bearer $notificationAuthToken
     PopulationDensityResponse:
       type: object
       description: >-
         Population density values will be represented in time intervals for different 
-        cells of the requested area. Each element in the array corresponds to a time
-        interval, containing population data for the grid cells. The intervals are 1 hour long.
+        cells of the requested area. Each element in `timedPopulationData` array corresponds 
+        to a time interval, containing population data for the grid cells. The intervals are 1 hour long.
       properties:
         timedPopulationData:
           type: array
@@ -266,7 +368,8 @@ components:
       description: >-
         Represents the state of the response for the input polygon defined in the request, the possible values are:
           - `SUPPORTED_AREA`: The whole request area is supported. Population density data for the entire requested area is returned.
-          - `PART_OF_AREA_NOT_SUPPORTED`: Part of the requested area is outside the MNOs coverage area, the cells outside the coverage area are not returned.
+          - `PART_OF_AREA_NOT_SUPPORTED`: Part of the requested area is outside the MNOs coverage area, the cells outside the coverage
+          area will have property `dataType` with value `NO_DATA`.
           - `AREA_NOT_SUPPORTED`: The whole requested area is outside the MNOs coverage area. No data will be returned.
       enum:
         - SUPPORTED_AREA
@@ -279,16 +382,16 @@ components:
           type: string
           format: date-time
           description: >-
-            Interval start time in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
+            Interval start time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
-            (i.e. which allows 2023-07-03T14:27:08+02:00 or 2023-07-03T12:27:08Z).
+            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
         endTime:
           type: string
           format: date-time
           description: >-
-            Interval end time in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
+            Interval end time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
-            (i.e. which allows 2023-07-03T14:27:08+02:00 or 2023-07-03T12:27:08Z).
+            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
           example: '2024-01-03T13:00:00Z'
         cellPopulationData:
           $ref: '#/components/schemas/CellPopulationDataArray'
@@ -312,7 +415,7 @@ components:
           description: >-
             Coordinates of the cell represented as a string using the [Geohash system](https://en.wikipedia.org/wiki/Geohash).
             Encoding a geographic location into a short string. The value length,
-            and thus the cell granularity, is determined by the implementation.
+            and thus the cell granularity, will be determined by the request body property `precision`.
           example: ezdmemd
         populationData:
           $ref: '#/components/schemas/PopulationData'
@@ -324,12 +427,14 @@ components:
         Object that contains the maximum, minimum and average population in a
         cell for a specific interval. In case of insufficient data to guarantee an
         anonymized prediction due to the k-anonymity within a specific cell and
-        time range, no population data will be returned and the property dataType
-        value will be "LOW_DENSITY".
+        time range, no population data will be returned and the property `dataType`
+        value will be "LOW_DENSITY". In case of a cell not supported `dataType`
+        value will be "NO_DATA"
       properties:
         dataType:
           type: string
           enum:
+            - NO_DATA
             - LOW_DENSITY
             - DENSITY_ESTIMATION
       required:
@@ -337,6 +442,7 @@ components:
       discriminator:
         propertyName: dataType
         mapping:
+          NO_DATA: '#/components/schemas/PopulationData'
           LOW_DENSITY: '#/components/schemas/PopulationData'
           DENSITY_ESTIMATION: '#/components/schemas/DensityEstimationPopulationData'
     DensityEstimationPopulationData:
@@ -386,6 +492,7 @@ components:
           - Indicated `startDate` is earlier than the minimum allowed ("code": "POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED", "message": "Indicated startDate is earlier than the minimum allowed")
           - Indicated `endDate` is earlier than the `startDate` ("code": "POPULATION_DENSITY_DATA.INVALID_END_DATE", "message": "Indicated endDate is earlier than the startDate")
           - Indicated time period is greater than the maximum allowed (More than maximum hours between startDate and endDate) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than maximum hours between startDate and endDate)")
+          - Indicated cell precision (Geohash length) is not supported ("code": "POPULATION_DENSITY_DATA.PRECISION_NOT_SUPPORTED", "message": "Indicated cell precision(Geohash length) is not supported")
       headers:
         x-correlator:
           $ref: '#/components/headers/x-correlator'
@@ -428,6 +535,25 @@ components:
                 message: >-
                   Indicated time period is greater than the maximum allowed
                   (More than maximum hours between startDate and endDate)
+            PrecisionNotSupportedIssue:
+              value:
+                status: 400
+                code: POPULATION_DENSITY_DATA.PRECISION_NOT_SUPPORTED
+                message: >-
+                  Indicated cell precision(Geohash length) is not supported
+    Generic400:
+      description: Problem with the client request
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          example:
+            status: 400
+            code: "INVALID_ARGUMENT"
+            message: "Client specified an invalid argument, request body or query param"
     Generic401:
       description: Unauthorized
       headers:
