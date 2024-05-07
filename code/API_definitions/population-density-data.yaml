@@ -69,6 +69,15 @@ info:
     is in the request, the API behaviour will be asynchronous by sending a callback
     to the `notificationUrl` provided with the result of the request.
 
+
+    For requests with a combination of `area`, `precision`, `startDate` and `endDate`
+    properties involving an amount of processing that cannot be done synchronously,
+    the API will return the error response `POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE`.
+
+    For requests with a combination of `area`, `precision`, `startDate` and `endDate`
+    properties too big for both synchronous and asynchronous behaviour, the API will
+    return the error response `POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST`.
+
     **NOTE**: In order to ensure anonymized information, if the data relating to
     the cell in the required time interval is not sufficient to be displayed due
     to [k-anonymity](https://en.wikipedia.org/wiki/K-anonymity), no such data will
@@ -257,7 +266,7 @@ components:
           type: integer
           description: >-
             Precision required of response cells. The precision corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash)"
-            If not included the default precision level will be 7. In case of using a not supported level by the MNO, the API will return the error response `POPULATION_DENSITY_DATA.PRECISION_NOT_SUPPORTED`.
+            If not included the default precision level will be 7. In case of using a not supported level by the MNO, the API will return the error response `POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`.
           minimum: 1
           maximum: 12
           default: 7
@@ -488,11 +497,13 @@ components:
         Problem with the client request. In addition to regular scenario of
         `INVALID_ARGUMENT`, another scenarios may exist:
           - The area is not a polygon shape or has an arbitrary complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or has an arbitrary complexity")
+          - Indicated combination of area, time interval and precision is too big ("code": "POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big")
           - Indicated `startDate` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED", "message": "Indicated startDate is greater than the maximum allowed")
           - Indicated `startDate` is earlier than the minimum allowed ("code": "POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED", "message": "Indicated startDate is earlier than the minimum allowed")
           - Indicated `endDate` is earlier than the `startDate` ("code": "POPULATION_DENSITY_DATA.INVALID_END_DATE", "message": "Indicated endDate is earlier than the startDate")
           - Indicated time period is greater than the maximum allowed (More than maximum hours between startDate and endDate) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than maximum hours between startDate and endDate)")
-          - Indicated cell precision (Geohash length) is not supported ("code": "POPULATION_DENSITY_DATA.PRECISION_NOT_SUPPORTED", "message": "Indicated cell precision(Geohash length) is not supported")
+          - Indicated cell precision (Geohash length) is not supported ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION", "message": "Indicated cell precision (Geohash length) is not supported")
+          - Indicated combination of area, time interval and precision is too big for a sync response ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE", "message": "Indicated combination of area, time interval and precision is too big for a sync response")
       headers:
         x-correlator:
           $ref: '#/components/headers/x-correlator'
@@ -509,8 +520,13 @@ components:
             InvalidAreaIssue:
               value:
                 status: 400
-                code: POPULATION_DENSITY_INFORMATION.INVALID_AREA
+                code: POPULATION_DENSITY_DATA.INVALID_AREA
                 message: The area is not a polygon shape or has an arbitrary complexity
+            UnsupportedRequestIssue:
+              value:
+                status: 400
+                code: POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST
+                message: Indicated combination of area, time interval and precision is too big
             MaxStartDateIssue:
               value:
                 status: 400
@@ -538,9 +554,15 @@ components:
             PrecisionNotSupportedIssue:
               value:
                 status: 400
-                code: POPULATION_DENSITY_DATA.PRECISION_NOT_SUPPORTED
+                code: POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION
                 message: >-
                   Indicated cell precision(Geohash length) is not supported
+            UnsupportedSyncResponseIssue:
+              value:
+                status: 400
+                code: POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE
+                message: >-
+                  Indicated combination of area, time interval and precision is too big for a sync response
     Generic400:
       description: Problem with the client request
       headers:
