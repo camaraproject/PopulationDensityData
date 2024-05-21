@@ -45,8 +45,8 @@ info:
 
 
     In each of the equal sized cells of the grid, a series of estimated statistics will be
-    reported for each time slot within the range, these being: maximum expected
-    population, minimum and average.
+    reported for each time slot within the range, these being: maximum, minimum and average expected
+    people/km2.
 
 
     These KPIs per geographic unit are an estimate relative to the future and
@@ -462,15 +462,15 @@ components:
             maxPopulation:
               type: number
               format: double
-              description: Maximum population expected in the defined area.
+              description: Maximum people/km2 expected in the defined area.
             minPopulation:
               type: number
               format: double
-              description: Minimum population expected in the defined area.
+              description: Maximum people/km2 expected in the defined area.
             avgPopulation:
               type: number
               format: double
-              description: Average population expected in the defined area.
+              description: Average people/km2 expected in the defined area.
           required:
             - maxPopulation
             - minPopulation
