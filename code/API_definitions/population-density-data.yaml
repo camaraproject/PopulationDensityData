@@ -459,22 +459,22 @@ components:
         - $ref: '#/components/schemas/PopulationDensityData'
         - type: object
           properties:
-            maxPopulation:
+            maxPplDensity:
               type: number
               format: double
               description: Maximum people/km2 expected in the defined area.
-            minPopulation:
+            minPplDensity:
               type: number
               format: double
-              description: Maximum people/km2 expected in the defined area.
-            avgPopulation:
+              description: Minimum people/km2 expected in the defined area.
+            pplDensity:
               type: number
               format: double
-              description: Average people/km2 expected in the defined area.
+              description: People/km2 expected in the defined area.
           required:
-            - maxPopulation
-            - minPopulation
-            - avgPopulation
+            - maxPplDensity
+            - minPplDensity
+            - pplDensity
     ErrorInfo:
       type: object
       required:
@@ -652,15 +652,15 @@ components:
               - geohash: ezdqemf
                 populationDensityData:
                   dataType: DENSITY_ESTIMATION
-                  maxPopulation: 150
-                  minPopulation: 30
-                  avgPopulation: 60
+                  maxPplDensity: 150
+                  minPplDensity: 30
+                  pplDensity: 60
               - geohash: ezdqemg
                 populationDensityData:
                   dataType: DENSITY_ESTIMATION
-                  maxPopulation: 100
-                  minPopulation: 40
-                  avgPopulation: 90
+                  maxPplDensity: 100
+                  minPplDensity: 40
+                  pplDensity: 90
               - geohash: ezdqemu
                 populationDensityData:
                   dataType: "LOW_DENSITY"
@@ -670,18 +670,18 @@ components:
               - geohash: ezdqemf
                 populationDensityData:
                   dataType: DENSITY_ESTIMATION
-                  maxPopulation: 100
-                  minPopulation: 30
-                  avgPopulation: 70
+                  maxPplDensity: 100
+                  minPplDensity: 30
+                  pplDensity: 70
               - geohash: ezdqemg
                 populationDensityData:
                   dataType: DENSITY_ESTIMATION
-                  maxPopulation: 200
-                  minPopulation: 40
-                  avgPopulation: 100
+                  maxPplDensity: 200
+                  minPplDensity: 40
+                  pplDensity: 100
               - geohash: ezdqemu
                 populationDensityData:
                   dataType: DENSITY_ESTIMATION
-                  maxPopulation: 200
-                  minPopulation: 40
-                  avgPopulation: 100
+                  maxPplDensity: 200
+                  minPplDensity: 40
+                  pplDensity: 100
