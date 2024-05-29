@@ -354,10 +354,10 @@ components:
       type: object
       description: >-
         Population density values will be represented in time intervals for different 
-        cells of the requested area. Each element in `timedPopulationData` array corresponds 
-        to a time interval, containing population data for the grid cells. The intervals are 1 hour long.
+        cells of the requested area. Each element in `timedPopulationDensityData` array corresponds 
+        to a time interval, containing population density data for the grid cells. The intervals are 1 hour long.
       properties:
-        timedPopulationData:
+        timedPopulationDensityData:
           type: array
           description: >-
            Time ranges along with the population density data for the cells within it.
@@ -366,11 +366,11 @@ components:
             to 2024-01-03T12:45:00Z] it would contain 2 intervals (Interval from 2024-01-03T11:00:00Z
             to 2024-01-03T12:00:00Z and interval from 2024-01-03T12:00:00Z to 2024-01-03T13:00:00Z).
           items:
-            $ref: '#/components/schemas/TimedPopulationData'
+            $ref: '#/components/schemas/TimedPopulationDensityData'
         status:
           $ref: '#/components/schemas/ResponseStatus'
       required:
-       - timedPopulationData
+       - timedPopulationDensityData
        - status
     ResponseStatus:
       type: string
@@ -384,7 +384,7 @@ components:
         - SUPPORTED_AREA
         - PART_OF_AREA_NOT_SUPPORTED
         - AREA_NOT_SUPPORTED
-    TimedPopulationData:
+    TimedPopulationDensityData:
       type: object
       properties:
         startTime:
@@ -402,20 +402,20 @@ components:
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
             (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
           example: '2024-01-03T13:00:00Z'
-        cellPopulationData:
-          $ref: '#/components/schemas/CellPopulationDataArray'
+        cellPopulationDensityData:
+          $ref: '#/components/schemas/CellPopulationDensityDataArray'
       required:
         - startTime
         - endTime
-        - cellPopulationData
-    CellPopulationDataArray:
+        - cellPopulationDensityData
+    CellPopulationDensityDataArray:
       type: array
       description: >-
-        Population data for the different cells in a concrete time range.
+        Population density data for the different cells in a concrete time range.
       items:
-        $ref: '#/components/schemas/CellPopulationData'
+        $ref: '#/components/schemas/CellPopulationDensityData'
       minItems: 1
-    CellPopulationData:
+    CellPopulationDensityData:
       type: object
       description: Population density data of a cell in a concrete time range.
       properties:
@@ -426,17 +426,17 @@ components:
             Encoding a geographic location into a short string. The value length,
             and thus the cell granularity, will be determined by the request body property `precision`.
           example: ezdmemd
-        populationData:
-          $ref: '#/components/schemas/PopulationData'
+        populationDensityData:
+          $ref: '#/components/schemas/PopulationDensityData'
       required:
         - geohash
-        - populationData
-    PopulationData:
+        - populationDensityData
+    PopulationDensityData:
       description: >-
         Object that contains the maximum, minimum and average population in a
         cell for a specific interval. In case of insufficient data to guarantee an
         anonymized prediction due to the k-anonymity within a specific cell and
-        time range, no population data will be returned and the property `dataType`
+        time range, no population density data will be returned and the property `dataType`
         value will be "LOW_DENSITY". In case of a cell not supported `dataType`
         value will be "NO_DATA"
       properties:
@@ -451,12 +451,12 @@ components:
       discriminator:
         propertyName: dataType
         mapping:
-          NO_DATA: '#/components/schemas/PopulationData'
-          LOW_DENSITY: '#/components/schemas/PopulationData'
-          DENSITY_ESTIMATION: '#/components/schemas/DensityEstimationPopulationData'
-    DensityEstimationPopulationData:
+          NO_DATA: '#/components/schemas/PopulationDensityData'
+          LOW_DENSITY: '#/components/schemas/PopulationDensityData'
+          DENSITY_ESTIMATION: '#/components/schemas/DensityEstimationPopulationDensityData'
+    DensityEstimationPopulationDensityData:
       allOf:
-        - $ref: '#/components/schemas/PopulationData'
+        - $ref: '#/components/schemas/PopulationDensityData'
         - type: object
           properties:
             maxPopulation:
@@ -645,42 +645,42 @@ components:
     PopulationDensityResponseExample:
       value:
         status: SUPPORTED_AREA
-        timedPopulationData:
+        timedPopulationDensityData:
           - startTime: "2024-01-03T10:00:00Z"
             endTime: "2024-01-03T11:00:00Z"
-            cellPopulationData:
+            cellPopulationDensityData:
               - geohash: ezdqemf
-                populationData:
+                populationDensityData:
                   dataType: DENSITY_ESTIMATION
                   maxPopulation: 150
                   minPopulation: 30
                   avgPopulation: 60
               - geohash: ezdqemg
-                populationData:
+                populationDensityData:
                   dataType: DENSITY_ESTIMATION
                   maxPopulation: 100
                   minPopulation: 40
                   avgPopulation: 90
               - geohash: ezdqemu
-                populationData:
+                populationDensityData:
                   dataType: "LOW_DENSITY"
           - startTime: "2024-01-03T11:00:00Z"
             endTime: "2024-01-03T12:00:00Z"
-            cellPopulationData:
+            cellPopulationDensityData:
               - geohash: ezdqemf
-                populationData:
+                populationDensityData:
                   dataType: DENSITY_ESTIMATION
                   maxPopulation: 100
                   minPopulation: 30
                   avgPopulation: 70
               - geohash: ezdqemg
-                populationData:
+                populationDensityData:
                   dataType: DENSITY_ESTIMATION
                   maxPopulation: 200
                   minPopulation: 40
                   avgPopulation: 100
               - geohash: ezdqemu
-                populationData:
+                populationDensityData:
                   dataType: DENSITY_ESTIMATION
                   maxPopulation: 200
                   minPopulation: 40
