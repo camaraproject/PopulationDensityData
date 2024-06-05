@@ -44,9 +44,9 @@ info:
     input polygon subdivided into equal sized cells.
 
 
-    In each of the equal sized cells of the grid, a series of estimated statistics will be
-    reported for each time slot within the range, these being: maximum, minimum and average expected
-    people/km2.
+    In each of the equal sized cells of the grid, an estimated population density will be
+    reported for each time slot within the range, this includes: estimated population density people/km2, and a range for this estimation - [minimum, maximum]
+    (exact definitions of minimum and maximum are estimation algorithm specific).
 
 
     These KPIs per geographic unit are an estimate relative to the future and
@@ -98,7 +98,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.1.0-wip
+  version: 0.1.0-rc
 externalDocs:
   description: Product documentation at Camara.
   url: https://github.com/camaraproject/
@@ -118,8 +118,8 @@ paths:
         - Population Density Data
       summary: Retrieves population density information in the specified area
       description: >-
-        Retrieves estimated statistics (maximum, minimum and average) related to
-        expected population for a time slot for a given polygon as a data set
+        Retrieves population density estimation together with the estimation range related 
+        for a time slot for a given polygon as a data set
         consisting of a sequence of quadrangular objects containing the input
         polygon subdivided into equal sized cells.
       operationId: retrievePopulationDensity
@@ -433,7 +433,7 @@ components:
         - populationDensityData
     PopulationDensityData:
       description: >-
-        Object that contains the maximum, minimum and average population in a
+        Object that contains the estimated population density and an estimation range in a
         cell for a specific interval. In case of insufficient data to guarantee an
         anonymized prediction due to the k-anonymity within a specific cell and
         time range, no population density data will be returned and the property `dataType`
@@ -459,22 +459,22 @@ components:
         - $ref: '#/components/schemas/PopulationDensityData'
         - type: object
           properties:
-            maxPopulation:
+            maxPplDensity:
               type: number
               format: double
-              description: Maximum people/km2 expected in the defined area.
-            minPopulation:
+              description: Maximum people/km2 estimated for the defined area.
+            minPplDensity:
               type: number
               format: double
-              description: Maximum people/km2 expected in the defined area.
-            avgPopulation:
+              description: Minimum people/km2 estimated for the defined area.
+            pplDensity:
               type: number
               format: double
-              description: Average people/km2 expected in the defined area.
+              description: people/km2 estimation for the defined area.
           required:
-            - maxPopulation
-            - minPopulation
-            - avgPopulation
+            - maxPplDensity
+            - minPplDensity
+            - pplDensity
     ErrorInfo:
       type: object
       required:
@@ -652,15 +652,15 @@ components:
               - geohash: ezdqemf
                 populationDensityData:
                   dataType: DENSITY_ESTIMATION
-                  maxPopulation: 150
-                  minPopulation: 30
-                  avgPopulation: 60
+                  maxPplDensity: 150
+                  minPplDensity: 30
+                  pplDensity: 60
               - geohash: ezdqemg
                 populationDensityData:
                   dataType: DENSITY_ESTIMATION
-                  maxPopulation: 100
-                  minPopulation: 40
-                  avgPopulation: 90
+                  maxPplDensity: 100
+                  minPplDensity: 40
+                  pplDensity: 90
               - geohash: ezdqemu
                 populationDensityData:
                   dataType: "LOW_DENSITY"
@@ -670,18 +670,18 @@ components:
               - geohash: ezdqemf
                 populationDensityData:
                   dataType: DENSITY_ESTIMATION
-                  maxPopulation: 100
-                  minPopulation: 30
-                  avgPopulation: 70
+                  maxPplDensity: 100
+                  minPplDensity: 30
+                  pplDensity: 70
               - geohash: ezdqemg
                 populationDensityData:
                   dataType: DENSITY_ESTIMATION
-                  maxPopulation: 200
-                  minPopulation: 40
-                  avgPopulation: 100
+                  maxPplDensity: 200
+                  minPplDensity: 40
+                  pplDensity: 100
               - geohash: ezdqemu
                 populationDensityData:
                   dataType: DENSITY_ESTIMATION
-                  maxPopulation: 200
-                  minPopulation: 40
-                  avgPopulation: 100
+                  maxPplDensity: 200
+                  minPplDensity: 40
+                  pplDensity: 100
