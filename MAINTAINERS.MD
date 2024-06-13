@@ -1,6 +1,5 @@
-| Org                    | Name                                                |
-| -----------------------| ----------------------------------------------------|
-| Telefonica | Jorge Garcia Hospital |
-| Vodafone | Sachin Kumar |
-| Verizon | Mahesh Chapalamadugu |
-
+| Org                    | Name                     | GitHub Username           |
+| -----------------------| -------------------------|---------------------------|
+| Telefonica | Jorge Garcia Hospital | jgarciahospital |
+| Vodafone | Sachin Kumar | sachinvodafone |
+| Verizon | Mahesh Chapalamadugu | maheshc01 |
