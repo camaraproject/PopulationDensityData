@@ -89,6 +89,7 @@ info:
     density information in the specified area.
 
     # Authorization and Authentication
+    
     CAMARA guidelines defines a set of authorization flows which can grant API clients access
     to the API functionality, as outlined in the document [CAMARA-API-access-and-user-consent.md](https://github.com/camaraproject/IdentityAndConsentManagement/blob/main/documentation/CAMARA-API-access-and-user-consent.md).
     Which specific authorization flows are to be used will be determined during
@@ -103,7 +104,7 @@ info:
 
     Population Density Data API ensures the usage of anonymized information and do not treat
     personal data neither as input nor output. 
-    Therefore, the acceess to Population Density Data API is defined as 
+    Therefore, the access to Population Density Data API is defined as 
     Client Credentials - 2-legged as described in [CAMARA-API-access-and-user-consent.md - Client Credentials](https://github.com/camaraproject/IdentityAndConsentManagement/blob/main/documentation/CAMARA-API-access-and-user-consent.md#client-credentials)
 
     # Further info and support
@@ -185,8 +186,12 @@ paths:
                     schema:
                       $ref: '#/components/schemas/PopulationDensityResponse'
                     examples:
-                      PopulationDensityResponseExample:
-                        $ref: '#/components/examples/PopulationDensityResponseExample'
+                      PopulationDensitySupportedAreaResponseExample:
+                        $ref: '#/components/examples/PopulationDensitySupportedAreaResponseExample'
+                      PopulationDensityAreaNotSupportedResponseExample:
+                        $ref: '#/components/examples/PopulationDensityAreaNotSupportedResponseExample'
+                      PopulationDensityPartOfAreaNotSupportedResponseExample:
+                        $ref: '#/components/examples/PopulationDensityPartOfAreaNotSupportedResponseExample'   
               responses:
                 "204":
                   description: Successful notification
@@ -214,8 +219,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PopulationDensityResponse'
               examples:
-                PopulationDensityResponseExample:
-                  $ref: '#/components/examples/PopulationDensityResponseExample'
+                PopulationDensitySupportedAreaResponseExample:
+                  $ref: '#/components/examples/PopulationDensitySupportedAreaResponseExample'
+                PopulationDensityAreaNotSupportedResponseExample:
+                  $ref: '#/components/examples/PopulationDensityAreaNotSupportedResponseExample'
+                PopulationDensityPartOfAreaNotSupportedResponseExample:
+                  $ref: '#/components/examples/PopulationDensityPartOfAreaNotSupportedResponseExample'               
+                
         '202':
           description: Population density data requested. This response is returned when the behaviour of the API is asynchronous.
           headers:
@@ -659,7 +669,7 @@ components:
             code: UNAVAILABLE
             message: Service unavailable
   examples:
-    PopulationDensityResponseExample:
+    PopulationDensitySupportedAreaResponseExample:
       value:
         status: SUPPORTED_AREA
         timedPopulationDensityData:
@@ -680,7 +690,7 @@ components:
                   pplDensity: 90
               - geohash: ezdqemu
                 populationDensityData:
-                  dataType: "LOW_DENSITY"
+                  dataType: LOW_DENSITY
           - startTime: "2024-01-03T11:00:00Z"
             endTime: "2024-01-03T12:00:00Z"
             cellPopulationDensityData:
@@ -702,3 +712,47 @@ components:
                   maxPplDensity: 200
                   minPplDensity: 40
                   pplDensity: 100
+    PopulationDensityPartOfAreaNotSupportedResponseExample:
+      value:
+        status: PART_OF_AREA_NOT_SUPPORTED
+        timedPopulationDensityData:
+          - startTime: "2024-01-03T10:00:00Z"
+            endTime: "2024-01-03T11:00:00Z"
+            cellPopulationDensityData:
+              - geohash: ezdqemf
+                populationDensityData:
+                  dataType: DENSITY_ESTIMATION
+                  maxPplDensity: 150
+                  minPplDensity: 30
+                  pplDensity: 60
+              - geohash: ezdqemg
+                populationDensityData:
+                  dataType: DENSITY_ESTIMATION
+                  maxPplDensity: 100
+                  minPplDensity: 40
+                  pplDensity: 90
+              - geohash: ezdqemu
+                populationDensityData:
+                  dataType: NO_DATA
+          - startTime: "2024-01-03T11:00:00Z"
+            endTime: "2024-01-03T12:00:00Z"
+            cellPopulationDensityData:
+              - geohash: ezdqemf
+                populationDensityData:
+                  dataType: DENSITY_ESTIMATION
+                  maxPplDensity: 100
+                  minPplDensity: 30
+                  pplDensity: 70
+              - geohash: ezdqemg
+                populationDensityData:
+                  dataType: DENSITY_ESTIMATION
+                  maxPplDensity: 200
+                  minPplDensity: 40
+                  pplDensity: 100
+              - geohash: ezdqemu
+                populationDensityData:
+                  dataType: NO_DATA
+    PopulationDensityAreaNotSupportedResponseExample:
+      value:
+        status: AREA_NOT_SUPPORTED
+        timedPopulationDensityData: []
