@@ -30,11 +30,11 @@ Repository to describe, develop, document and test the Population Density Data A
 ## Status and released versions
 
 * Note: Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until a new release is created. For example, changes may be reverted before a release is created. **For best results, use the latest available release**.
-* **This API is under Work In Progress, no Alpha or stable releases are available by this time** 
-- WIP API definition **with inline documentation**:
-  - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/main/code/API_definitions/population-density-data.yaml)
-  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/main/code/API_definitions/population-density-data.yaml&nocors)
-  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/main/code/API_definitions/population-density-data.yaml)
+* Release 0.1.0 of the API family is available within the [release-v0.1.0](https://github.com/camaraproject/PopulationDensityData/tree/release-v0.1.0) branch.
+- 0.1.0 Population Density Data API definition **with inline documentation**:
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/release-v0.1.0/code/API_definitions/population-density-data.yaml)
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/release-v0.1.0/code/API_definitions/population-density-data.yaml&nocors)
+  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/release-v0.1.0/code/API_definitions/population-density-data.yaml)
 
 ## Contributorship and mailing list
 * To subscribe / unsubscribe to the mailing list of this Sub Project and thus be / resign as Contributor please visit <https://lists.camaraproject.org/g/sp-pdd>.
