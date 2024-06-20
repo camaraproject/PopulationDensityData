@@ -121,7 +121,7 @@ externalDocs:
   description: Product documentation at Camara.
   url: https://github.com/camaraproject/
 servers:
-  - url: '{apiRoot}/population-density-data/v0'
+  - url: '{apiRoot}/population-density-data/v0.1'
     variables:
       apiRoot:
         default: http://localhost:9091
