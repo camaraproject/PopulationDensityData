@@ -22,6 +22,7 @@ The API definition(s) are based on
 
 **population-density-data v0.1.1-rc.1 is the 1st release candidate of the version 0.1.1**
 
+v0.1.1 will be a patch release of v0.1.0 which includes only changes of the info object in alignment with Commonalities 0.4.0.
 - API definition **with inline documentation**:
   - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/release-v0.1.1-rc1.1/code/API_definitions/population-density-data.yaml)
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/release-v0.1.1-rc1.1/code/API_definitions/population-density-data.yaml&nocors)
