@@ -14,5 +14,5 @@ Checklist for population-density-data 0.1.1-rc.1 in release r1.1
 |  8 | Enhanced API test cases & documentation      |   O   |         O         |    O    |    M   |   N  |  |
 |  9 | Test result statement                        |   O   |         O         |    O    |    M   |   N  |  |
 | 10 | API release numbering convention applied     |   M   |         M         |    M    |    M   |   Y  |      |
-| 11 | Change log updated                           |   M   |         M         |    M    |    M   |   Y  | [link](https://github.com/camaraproject/NumberVerification/pull/121) |
+| 11 | Change log updated                           |   M   |         M         |    M    |    M   |   Y  | [link](/CHANGELOG.md) |
 | 12 | Previous public release was certified        |   O   |         O         |    O    |    M   |   N  |      |
