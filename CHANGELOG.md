@@ -35,7 +35,7 @@ The API definition(s) are based on
 ### Fixed
 
 ### Removed
-* Remove `terms of service` and `contact` by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/
+* Remove `terms of service` and `contact` by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/41
 
 
 # v0.1.0
