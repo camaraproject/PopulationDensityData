@@ -28,7 +28,7 @@ The API definition(s) are based on
   - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/release-v0.1.1-rc1.1/code/API_definitions/population-density-data.yaml)
 
 ### Added
-* Include  `x-camara-commonalities` by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/
+* Include  `x-camara-commonalities` by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/41
 
 ### Changed
 
