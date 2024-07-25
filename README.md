@@ -34,7 +34,7 @@ Repository to describe, develop, document and test the Population Density Data A
 - 0.1.1-rc.1 Population Density Data API definition **with inline documentation**:
   - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r1.1/code/API_definitions/population-density-data.yaml)
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r1.1/code/API_definitions/population-density-data.yaml&nocors)
-  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/release-v0.1.1-rc1.1/code/API_definitions/population-density-data.yaml)
+  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r1.1/code/API_definitions/population-density-data.yaml)
 
 ## Contributorship and mailing list
 * To subscribe / unsubscribe to the mailing list of this Sub Project and thus be / resign as Contributor please visit <https://lists.camaraproject.org/g/sp-pdd>.
