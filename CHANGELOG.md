@@ -32,6 +32,8 @@ v0.1.1 will be a patch release of v0.1.0 which includes only changes of the info
 * Include  `x-camara-commonalities` by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/41
 
 ### Changed
+* Updated Authorization and authentication section according to I&CM last release (v0.2.0-rc1) by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/41
+* Updated API and error descriptions by @gregory1g in https://github.com/camaraproject/PopulationDensityData/pull/42
 
 ### Fixed
 
