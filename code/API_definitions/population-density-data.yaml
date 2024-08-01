@@ -2,20 +2,23 @@ openapi: 3.0.3
 info:
   title: Population Density Data
   description: >-
-    Allows developers with the capability to get population density estimations
-    for a specific area at a future period of time, considering historical
-    anonymized information of the network connected devices in the requested
-    area.
+    Population Density Data API exposes population density estimations
+    for a specified area for a specified time interval.
 
     # Introduction
 
-    This API allows estimates of population density to be obtained for a specific
-    area in a future time period. This functionality can be used for multiple use
-    cases, some of the possible use cases for this API are shown below.
+    With the Population Density Data API the customer can retrieve population density estimations
+    for a specific area at the current or a future period of time. The estimation considers historical
+    anonymized information of the network connected devices in the requested
+    area.
+
+    
+    This functionality can be used for multiple use
+    cases, some of the possible use cases for this API are:
 
 
-    - Providing BVLOS (Beyond Visual Line of Sight) flights with the
-    information to meet SORA 2.5 (Specific Operation Risk Assessment)
+    - Supporting BVLOS (Beyond Visual Line of Sight) flights with the
+    information needed to meet SORA 2.5 (Specific Operation Risk Assessment)
     requirements in terms of intrinsic Ground Risk Class (iGRC).
     More information in [Specific Operations Risk Assessment](https://www.easa.europa.eu/en/domains/civil-drones-rpas/specific-category-civil-drones/specific-operations-risk-assessment-sora)
 
@@ -23,65 +26,66 @@ info:
     a given drone flight path is acceptable for the time of the flight, or an
     alternative time should be considered to lower the risk.
 
-    - Sustainable Urban Planning. Enabling urban planners to specify the area of
-    interest and a future time period.
+    - Sustainable Urban Planning. 
 
     - Environmental monitoring at mass events, such as concerts or festivals.
 
+    
+    The list above is just a few examples, the API can be used for other use cases as well.
+
+
     # Relevant terms and definitions
 
-    * **Population Density**: refers to the number of people in a concrete area.
+    * **Population Density**: refers to the number of people in a given area divided by the total size of the area.
 
     # API Functionality
 
-    This API can be used for use cases that are not specified in this description,
-    we simply wanted to provide examples of possible use cases.
+    Once a developer specifies (1) the area as a polygon shape,(2) a precision level and (3) time interval
+    in which they want to obtain the population density, the API returns a data
+    set consisting of a sequence of time ranges, with each time range containing the
+    input polygon subdivided into equal-sized grid cells.
 
 
-    Once a developer specifies: (1) the area as a polygon shape,(2) a precision level and (3) time interval
-    in which they want to obtain the population density, the API will return a data
-    set consisting of a sequence of time ranges each time range containing the
-    input polygon subdivided into equal sized cells.
-
-
-    In each of the equal sized cells of the grid, an estimated population density will be
+    For each of the equal-sized cells of the grid, an estimated population density is
     reported for each time slot within the range, this includes: estimated population density people/km2, and a range for this estimation - [minimum, maximum]
     (exact definitions of minimum and maximum are estimation algorithm specific).
 
 
-    These KPIs per geographic unit are an estimate relative to the future and
-    based on calculations with historical data and/or prediction models trained
-    on such data.  The polygon provided must comply with certain restrictions,
+    These values are an calculated based on historical data and/or prediction models trained
+    on such data.
+    
+    
+    The polygon specifying an area of interest must comply with certain restrictions,
     which must be previously validated by the developer:
 
-    - The polygon will not be able to exceed a certain area.
+    - The polygon may not exceed a certain area.
 
-    - The polygon cannot have an arbitrary complexity (unlimited number of
-    sides, complex shapes, etc.).
+    - The polygon may not contain more that 15 vertexes.
 
-    - The polygon must be associated with a location where the telco provides
+    - The polygon must be associated with a location where the MNO provides
     mobile connectivity services. If a polygon is located entirely outside the
-    supported area, an empty array will be returned.
+    supported area, an empty array is  returned.
     
     
-    The standard behaviour of the API will be synchronous, although for large
-    area requests the API may behave asynchronously. In case the `webhook` property
-    is in the request, the API behaviour will be asynchronous by sending a callback
+    The standard behaviour of the API is synchronous, although for large
+    area requests the API may behave asynchronously. An API invoker can enforce
+    asynchronous behaviour by providing `webhook` property
+    is in the request, in this case the API sends a callback
     to the `notificationUrl` provided with the result of the request.
 
 
     For requests with a combination of `area`, `precision`, `startDate` and `endDate`
-    properties involving an amount of processing that cannot be done synchronously,
-    the API will return the error response `POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE`.
+    properties involving an amount of processing that cannot be processed synchronously,
+    the API returns the error response `POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE`.
 
     For requests with a combination of `area`, `precision`, `startDate` and `endDate`
-    properties too big for both synchronous and asynchronous behaviour, the API will
-    return the error response `POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST`.
+    properties too big for both synchronous and asynchronous processing, the API
+    returns the error response `POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST`.
 
     **NOTE**: In order to ensure anonymized information, if the data relating to
-    the cell in the required time interval is not sufficient to be displayed due
-    to [k-anonymity](https://en.wikipedia.org/wiki/K-anonymity), no such data will
-    be returned and the value of the dataType property will be `LOW_DENSITY`.
+    a grid cell in the required time interval is not sufficient to be exposed due
+    to [k-anonymity](https://en.wikipedia.org/wiki/K-anonymity), no such data is 
+    returned by the API and the value of the dataType property is `LOW_DENSITY`.
 
     # Resources and Operations overview
 
@@ -92,8 +96,8 @@ info:
     
     CAMARA guidelines defines a set of authorization flows which can grant API clients access
     to the API functionality, as outlined in the document [CAMARA-API-access-and-user-consent.md](https://github.com/camaraproject/IdentityAndConsentManagement/blob/main/documentation/CAMARA-API-access-and-user-consent.md).
-    Which specific authorization flows are to be used will be determined during
-    onboarding process, happening between the API Client and the Telco Operator
+    Which specific authorization flows are to be used is determined during
+    onboarding process, happening between the API Client and the MNO 
     exposing the API, taking into account the declared purpose for accessing the API,
     while also being subject to the prevailing legal framework dictated by local legislation.
     It is important to remark that in cases where personal user data is processed by the API,
@@ -110,7 +114,7 @@ info:
     # Further info and support
 
     (FAQs will be added in a later version of the documentation)
-    
+
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
@@ -134,12 +138,12 @@ paths:
     post:
       tags:
         - Population Density Data
-      summary: Retrieves population density information in the specified area
+      summary: Retrieves population density information in a specified area
       description: >-
         Retrieves population density estimation together with the estimation range related 
-        for a time slot for a given polygon as a data set
-        consisting of a sequence of quadrangular objects containing the input
-        polygon subdivided into equal sized cells.
+        for a time slot for a given area (described as a polygon) as a data set
+        consisting of a sequence of equally-sized objects covering the input
+        polygon area.
       operationId: retrievePopulationDensity
       parameters:
         - $ref: '#/components/parameters/x-correlator'
@@ -268,7 +272,7 @@ components:
       type: object
       description: >-
         Request object for retrieving population density data in a
-        specified area at a future period of time.
+        specified area.
         **NOTE**: The difference between `startDate` and `endDate` cannot be greater than 7 days.
       properties:
         area:
@@ -292,8 +296,8 @@ components:
         precision:
           type: integer
           description: >-
-            Precision required of response cells. The precision corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash)"
-            If not included the default precision level will be 7. In case of using a not supported level by the MNO, the API will return the error response `POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`.
+            Precision required of response cells. Precision defines a geohash level and corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash)"
+            If not included the default precision level 7 is used by default. In case of using a not supported level by the MNO, the API returns the error response `POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`.
           minimum: 1
           maximum: 12
           default: 7
@@ -380,7 +384,7 @@ components:
     PopulationDensityResponse:
       type: object
       description: >-
-        Population density values will be represented in time intervals for different 
+        Population density values is represented in time intervals for different 
         cells of the requested area. Each element in `timedPopulationDensityData` array corresponds 
         to a time interval, containing population density data for the grid cells. The intervals are 1 hour long.
       properties:
@@ -451,7 +455,7 @@ components:
           description: >-
             Coordinates of the cell represented as a string using the [Geohash system](https://en.wikipedia.org/wiki/Geohash).
             Encoding a geographic location into a short string. The value length,
-            and thus the cell granularity, will be determined by the request body property `precision`.
+            and thus the cell granularity, is determined by the request body property `precision`.
           example: ezdmemd
         populationDensityData:
           $ref: '#/components/schemas/PopulationDensityData'
@@ -461,11 +465,11 @@ components:
     PopulationDensityData:
       description: >-
         Object that contains the estimated population density and an estimation range in a
-        cell for a specific interval. In case of insufficient data to guarantee an
+        cell for a specific time interval. In case of insufficient data to guarantee an
         anonymized prediction due to the k-anonymity within a specific cell and
-        time range, no population density data will be returned and the property `dataType`
-        value will be "LOW_DENSITY". In case of a cell not supported `dataType`
-        value will be "NO_DATA"
+        time range, no population density data is returned and the property `dataType`
+        value is "LOW_DENSITY". In case of a cell not supported `dataType`
+        value is "NO_DATA"
       properties:
         dataType:
           type: string
@@ -523,13 +527,13 @@ components:
       description: >-
         Problem with the client request. In addition to regular scenario of
         `INVALID_ARGUMENT`, another scenarios may exist:
-          - The area is not a polygon shape or has an arbitrary complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or has an arbitrary complexity")
+          - The area is not a polygon shape or exceeds supported complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or exceeds supported complexity")
           - Indicated combination of area, time interval and precision is too big ("code": "POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big")
           - Indicated `startDate` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED", "message": "Indicated startDate is greater than the maximum allowed")
           - Indicated `startDate` is earlier than the minimum allowed ("code": "POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED", "message": "Indicated startDate is earlier than the minimum allowed")
           - Indicated `endDate` is earlier than the `startDate` ("code": "POPULATION_DENSITY_DATA.INVALID_END_DATE", "message": "Indicated endDate is earlier than the startDate")
           - Indicated time period is greater than the maximum allowed (More than maximum hours between startDate and endDate) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than maximum hours between startDate and endDate)")
-          - Indicated cell precision (Geohash length) is not supported ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION", "message": "Indicated cell precision (Geohash length) is not supported")
+          - Indicated cell precision (Geohash level) is not supported ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION", "message": "Indicated cell precision (Geohash level) is not supported")
           - Indicated combination of area, time interval and precision is too big for a sync response ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE", "message": "Indicated combination of area, time interval and precision is too big for a sync response")
       headers:
         x-correlator:
