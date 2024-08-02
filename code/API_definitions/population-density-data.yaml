@@ -94,37 +94,31 @@ info:
 
     # Authorization and Authentication
     
-    CAMARA guidelines defines a set of authorization flows which can grant API clients access
-    to the API functionality, as outlined in the document [CAMARA-API-access-and-user-consent.md](https://github.com/camaraproject/IdentityAndConsentManagement/blob/main/documentation/CAMARA-API-access-and-user-consent.md).
-    Which specific authorization flows are to be used is determined during
-    onboarding process, happening between the API Client and the MNO 
-    exposing the API, taking into account the declared purpose for accessing the API,
-    while also being subject to the prevailing legal framework dictated by local legislation.
-    It is important to remark that in cases where personal user data is processed by the API,
-    and users can exercise their rights through mechanisms such as opt-in and/or opt-out,
-    the use of 3-legged access tokens becomes mandatory. This measure ensures that the API remains
-    in strict compliance with user privacy preferences and regulatory obligations, upholding the 
-    principles of transparency and user-centric data control.
+    The "Camara Security and Interoperability Profile" provides details on how a client requests an access token. Please refer to Identify and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the Profile.
 
-    Population Density Data API ensures the usage of anonymized information and do not treat
-    personal data neither as input nor output. 
-    Therefore, the access to Population Density Data API is defined as 
-    Client Credentials - 2-legged as described in [CAMARA-API-access-and-user-consent.md - Client Credentials](https://github.com/camaraproject/IdentityAndConsentManagement/blob/main/documentation/CAMARA-API-access-and-user-consent.md#client-credentials)
+    Which specific authorization flows are to be used will be determined during onboarding process, happening between the API Client and the Telco Operator exposing the API, taking into account the declared purpose for accessing the API, while also being subject to the prevailing legal framework dictated by local legislation.
+
+    It is important to remark that in cases where personal user data is processed by the API, and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of 3-legged access tokens becomes mandatory. This measure ensures that the API remains in strict compliance with user privacy preferences and regulatory obligations, upholding the principles of transparency and user-centric data control.
+
+    Population Density Data API ensures the usage of anonymized information and do not treat personal data neither as input nor output. 
+    Therefore, the access to Population Density Data API is defined as Client Credentials - 2-legged. Please refer to Identify and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the latest detailed specification of this authentication/authorization flow.
+
 
     # Further info and support
 
-  termsOfService: http://swagger.io/terms/
-  contact:
-    email: project-email@sample.com
+    (FAQs will be added in a later version of the documentation)
+
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.1.0
+  version: 0.1.1-rc.1
+
+  x-camara-commonalities: 0.4.0
 externalDocs:
   description: Product documentation at Camara.
   url: https://github.com/camaraproject/
 servers:
-  - url: '{apiRoot}/population-density-data/v0.1'
+  - url: '{apiRoot}/population-density-data/v0.1rc1'
     variables:
       apiRoot:
         default: http://localhost:9091
