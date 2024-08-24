@@ -3,7 +3,7 @@
 Checklist for population-density-data 0.1.1 in release r1.2
 
 | Nr | API release assets  | alpha | release-candidate |  initial<br>public | stable<br> public | Status | Comments |
-|----|----------------------------------------------|:-----:|:-----------------:|:-------:|:------:|:----:|:----:|
+|----|----------------------------------------------|:-----:|:-----------------:|:-------:|:------:|:----:|------|
 |  1 | API definition                               |   M   |         M         |    M    |    M   |  Y   | [link](/code/API_definitions/population-density-data.yaml) |
 |  2 | Design guidelines from Commonalities applied |   O   |         M         |    M    |    M   |  Y   |      |
 |  3 | Guidelines from ICM applied                  |   O   |         M         |    M    |    M   |  Y   |      |
