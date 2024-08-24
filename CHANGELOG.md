@@ -23,7 +23,7 @@ The API definition(s) are based on
 
 **population-density-data v0.1.1 is the public release of the version 0.1.1**
 
-v0.1.1 will be a patch release of v0.1.0 which includes only changes of the info object in alignment with Commonalities 0.4.0, completing the alignement with Commonalities v0.4.0 and Consent Management v0.2.0 guidelines included in the CAMARA Fall24 meta-release. Test cases are included for API validation. No new features were included.
+v0.1.1 is a patch release of v0.1.0 which includes only changes of the info object in alignment with Commonalities 0.4.0, completing the alignment with Commonalities v0.4.0 and Consent Management v0.2.0 guidelines included in the CAMARA Fall24 meta-release. Test cases are included for API validation. No new features were included.
 
 - API definition **with inline documentation**:
   - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r1.2/code/API_definitions/population-density-data.yaml)
