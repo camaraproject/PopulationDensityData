@@ -31,16 +31,19 @@ v0.1.1 is a patch release of v0.1.0 which includes only changes of the info obje
   - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r1.2/code/API_definitions/population-density-data.yaml)
 
 ### Added
+* Include  `x-camara-commonalities` by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/41
 * Include testing definitions in .feature file for Fall24 meta-release by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/44
 
 ### Changed
-* N/A
+* Updated Authorization and authentication section according to I&CM last release (v0.2.0-rc1) by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/41
+* Updated API and error descriptions by @gregory1g in https://github.com/camaraproject/PopulationDensityData/pull/42
+* 
 
 ### Fixed
 * N/A
 
 ### Removed
-* N/A
+* Remove `terms of service` and `contact` by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/41
 
 
 # r1.1
