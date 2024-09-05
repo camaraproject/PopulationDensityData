@@ -85,7 +85,8 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the request property "$.sinkCredentials.credentialType" is set to "ACCESSTOKEN"
         And the request property "$.sinkCredentials.accessTokenType" is set to "bearer"
         And the request property "$.sinkCredentials.accessToken" is set to a valid access token accepted by the events receiver
-        And the request property "$.sinkCredentials.accessTokenExpiresUtc" is set to a value long enough in the future        When the request "retrievePopulationDensity" is sent
+        And the request property "$.sinkCredentials.accessTokenExpiresUtc" is set to a value long enough in the future        
+        When the request "retrievePopulationDensity" is sent
         Then the response status code is 202
         And the response header "Content-Type" is "application/json"
         And the response header "x-correlator" has same value as the request header "x-correlator"
