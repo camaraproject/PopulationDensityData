@@ -38,6 +38,8 @@ info:
 
     * **Population Density**: refers to the number of people in a given area divided by the total size of the area.
 
+    * **Notification URL and token**: Developers may provide a callback URL (`sink`) for receiving an async response. This is an optional parameter. If `sink` is included, it is RECOMMENDED for the client to provide as well the `sinkCredential` property to protect the notification endpoint. In the current version,`sinkCredential.credentialType` MUST be set to `ACCESSTOKEN` if provided.
+
     # API Functionality
 
     Once a developer specifies (1) the area as a polygon shape, (2) a precision level and (3) time interval
@@ -71,7 +73,7 @@ info:
     area requests the API may behave asynchronously. An API invoker can enforce
     asynchronous behaviour by providing a callback URL (`sink`)
     is in the request, in this case the API sends a callback
-    to the `notificationUrl` provided with the result of the request. If `sink` is
+    to the callback URL provided with the result of the request. If `sink` is
     included, it is RECOMMENDED for the client to provide as well the `sinkCredential`
     property to protect the notification endpoint. In the current version,`sinkCredential.credentialType`
     MUST be set to `ACCESSTOKEN` if provided.
@@ -206,6 +208,8 @@ paths:
                   $ref: '#/components/responses/Generic401'
                 '403':
                   $ref: '#/components/responses/Generic403'
+                '410':
+                  $ref: '#/components/responses/Generic410'
                 '500':
                   $ref: '#/components/responses/Generic500'
                 '503':
@@ -612,8 +616,8 @@ components:
   responses:
     RetrieveLocationBadRequest400:
       description: >-
-        Problem with the client request. In addition to regular scenario of
-        `INVALID_ARGUMENT`, another scenarios may exist:
+        Problem with the client request. In addition to generic scenarios of
+        `INVALID_ARGUMENT`, `INVALID_CREDENTIAL`, `INVALID_TOKEN`, another scenarios may exist:
           - The area is not a polygon shape or exceeds supported complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or exceeds supported complexity")
           - Indicated combination of area, time interval and precision is too big ("code": "POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big")
           - Indicated `startDate` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED", "message": "Indicated startDate is greater than the maximum allowed")
@@ -635,6 +639,16 @@ components:
                 status: 400
                 code: INVALID_ARGUMENT
                 message: Invalid input
+            GENERIC_400_INVALID_CREDENTIAL:
+              value:
+                status: 400
+                code: "INVALID_CREDENTIAL"
+                message: "Only Access token is supported"
+            GENERIC_400_INVALID_TOKEN:
+              value:
+                status: 400
+                code: "INVALID_TOKEN"
+                message: "Only bearer token is supported"
             InvalidAreaIssue:
               value:
                 status: 400
@@ -733,6 +747,22 @@ components:
             status: 404
             code: NOT_FOUND
             message: The specified resource is not found
+    Generic410:
+      description: Gone
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_410_GONE:
+              description: Use in notifications flow to allow API Consumer to indicate that its callback is no longer available
+              value:
+                status: 410
+                code: GONE
+                message: Access to the target resource is no longer available.
     Generic500:
       description: Internal server error
       headers:
