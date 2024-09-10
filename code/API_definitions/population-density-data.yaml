@@ -12,7 +12,7 @@ info:
     anonymized information of the network connected devices in the requested
     area.
 
-    
+
     This functionality can be used for multiple use
     cases, some of the possible use cases for this API are:
 
@@ -30,7 +30,7 @@ info:
 
     - Environmental monitoring at mass events, such as concerts or festivals.
 
-    
+
     The list above is just a few examples, the API can be used for other use cases as well.
 
 
@@ -38,9 +38,11 @@ info:
 
     * **Population Density**: refers to the number of people in a given area divided by the total size of the area.
 
+    * **Notification URL and token**: Developers may provide a callback URL (`sink`) for receiving an async response. This is an optional parameter. If `sink` is included, it is RECOMMENDED for the client to provide as well the `sinkCredential` property to protect the notification endpoint. In the current version,`sinkCredential.credentialType` MUST be set to `ACCESSTOKEN` if provided.
+
     # API Functionality
 
-    Once a developer specifies (1) the area as a polygon shape,(2) a precision level and (3) time interval
+    Once a developer specifies (1) the area as a polygon shape, (2) a precision level and (3) time interval
     in which they want to obtain the population density, the API returns a data
     set consisting of a sequence of time ranges, with each time range containing the
     input polygon subdivided into equal-sized grid cells.
@@ -51,36 +53,41 @@ info:
     (exact definitions of minimum and maximum are estimation algorithm specific).
 
 
-    These values are an calculated based on historical data and/or prediction models trained
+    These values are calculated based on historical data and/or prediction models trained
     on such data.
-    
-    
+
+
     The polygon specifying an area of interest must comply with certain restrictions,
     which must be previously validated by the developer:
 
     - The polygon may not exceed a certain area.
 
-    - The polygon may not contain more that 15 vertexes.
+    - The polygon may not contain more than 15 vertexes.
 
     - The polygon must be associated with a location where the MNO provides
     mobile connectivity services. If a polygon is located entirely outside the
-    supported area, an empty array is  returned.
-    
-    
+    supported area, an empty array is returned.
+
+
     The standard behaviour of the API is synchronous, although for large
     area requests the API may behave asynchronously. An API invoker can enforce
-    asynchronous behaviour by providing `webhook` property
+    asynchronous behaviour by providing a callback URL (`sink`)
     is in the request, in this case the API sends a callback
-    to the `notificationUrl` provided with the result of the request.
+    to the callback URL provided with the result of the request. If `sink` is
+    included, it is RECOMMENDED for the client to provide as well the `sinkCredential`
+    property to protect the notification endpoint. In the current version,`sinkCredential.credentialType`
+    MUST be set to `ACCESSTOKEN` if provided.
 
 
     For requests with a combination of `area`, `precision`, `startDate` and `endDate`
     properties involving an amount of processing that cannot be processed synchronously,
     the API returns the error response `POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE`.
 
+
     For requests with a combination of `area`, `precision`, `startDate` and `endDate`
     properties too big for both synchronous and asynchronous processing, the API
     returns the error response `POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST`.
+
 
     **NOTE**: In order to ensure anonymized information, if the data relating to
     a grid cell in the required time interval is not sufficient to be exposed due
@@ -93,7 +100,7 @@ info:
     density information in the specified area.
 
     # Authorization and Authentication
-    
+
     The "Camara Security and Interoperability Profile" provides details on how a client requests an access token. Please refer to Identify and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the Profile.
 
     Which specific authorization flows are to be used will be determined during onboarding process, happening between the API Client and the Telco Operator exposing the API, taking into account the declared purpose for accessing the API, while also being subject to the prevailing legal framework dictated by local legislation.
@@ -111,14 +118,14 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.1.1-rc.1
+  version: wip
 
   x-camara-commonalities: 0.4.0
 externalDocs:
   description: Product documentation at Camara.
   url: https://github.com/camaraproject/
 servers:
-  - url: '{apiRoot}/population-density-data/v0.1rc1'
+  - url: '{apiRoot}/population-density-data/vwip'
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -146,30 +153,30 @@ paths:
             schema:
               $ref: '#/components/schemas/PopulationDensityRequest'
             example:
-                area:
-                  areaType: POLYGON
-                  boundary:
-                    - latitude: 45.754114
-                      longitude: 4.860374
-                    - latitude: 45.753845
-                      longitude: 4.863185
-                    - latitude: 45.75249
-                      longitude: 4.861876
-                    - latitude: 45.751224
-                      longitude: 4.861125
-                    - latitude: 45.751442
-                      longitude: 4.859827
-                startDate: '2024-04-23T14:44:18.165Z'
-                endDate: '2024-04-23T14:44:18.165Z'
-                precision: 7
+              area:
+                areaType: POLYGON
+                boundary:
+                  - latitude: 45.754114
+                    longitude: 4.860374
+                  - latitude: 45.753845
+                    longitude: 4.863185
+                  - latitude: 45.75249
+                    longitude: 4.861876
+                  - latitude: 45.751224
+                    longitude: 4.861125
+                  - latitude: 45.751442
+                    longitude: 4.859827
+              startDate: '2024-04-23T14:44:18.165Z'
+              endDate: '2024-04-23T14:44:18.165Z'
+              precision: 7
         required: true
       callbacks:
         populationDensityDataCallback:
-          "{$request.body#/webhook/notificationUrl}":
+          '{$request.body#/sink}':
             post:
               tags:
                 - Population Density Data
-              summary: "Population Density Data callback"
+              summary: 'Population Density Data callback'
               description: |
                 Important: this endpoint is to be implemented by the API consumer.
                 The Population Density Data server will call this endpoint when the request result is ready.
@@ -188,23 +195,28 @@ paths:
                       PopulationDensityAreaNotSupportedResponseExample:
                         $ref: '#/components/examples/PopulationDensityAreaNotSupportedResponseExample'
                       PopulationDensityPartOfAreaNotSupportedResponseExample:
-                        $ref: '#/components/examples/PopulationDensityPartOfAreaNotSupportedResponseExample'   
+                        $ref: '#/components/examples/PopulationDensityPartOfAreaNotSupportedResponseExample'
               responses:
-                "204":
+                '204':
                   description: Successful notification
                   headers:
                     x-correlator:
                       $ref: '#/components/headers/x-correlator'
-                "400":
-                  $ref: "#/components/responses/Generic400"
-                "401":
-                  $ref: "#/components/responses/Generic401"
-                "403":
-                  $ref: "#/components/responses/Generic403"
-                "500":
-                  $ref: "#/components/responses/Generic500"
-                "503":
-                  $ref: "#/components/responses/Generic503"
+                '400':
+                  $ref: '#/components/responses/Generic400'
+                '401':
+                  $ref: '#/components/responses/Generic401'
+                '403':
+                  $ref: '#/components/responses/Generic403'
+                '410':
+                  $ref: '#/components/responses/Generic410'
+                '500':
+                  $ref: '#/components/responses/Generic500'
+                '503':
+                  $ref: '#/components/responses/Generic503'
+              security:
+                - {}
+                - notificationsBearerAuth: []
       responses:
         '200':
           description: Population density data result.
@@ -221,8 +233,8 @@ paths:
                 PopulationDensityAreaNotSupportedResponseExample:
                   $ref: '#/components/examples/PopulationDensityAreaNotSupportedResponseExample'
                 PopulationDensityPartOfAreaNotSupportedResponseExample:
-                  $ref: '#/components/examples/PopulationDensityPartOfAreaNotSupportedResponseExample'               
-                
+                  $ref: '#/components/examples/PopulationDensityPartOfAreaNotSupportedResponseExample'
+
         '202':
           description: Population density data requested. This response is returned when the behaviour of the API is asynchronous.
           headers:
@@ -242,12 +254,17 @@ paths:
           $ref: '#/components/responses/Generic503'
       security:
         - openId:
-          - population-density-data:read
+            - population-density-data:read
 components:
   securitySchemes:
     openId:
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
+    notificationsBearerAuth:
+      description: Bearer authentication for notifications
+      type: http
+      scheme: bearer
+      bearerFormat: '{$request.body#sinkCredential.credentialType}'
   headers:
     x-correlator:
       description: Correlation id for the different services.
@@ -294,8 +311,15 @@ components:
           minimum: 1
           maximum: 12
           default: 7
-        webhook:
-            $ref: "#/components/schemas/Webhook"
+        sink:
+          type: string
+          format: url
+          description: The address to which events about all status changes of the session (e.g. session termination) shall be delivered, using the HTTP protocol.
+          example: 'https://endpoint.example.com/sink'
+        sinkCredential:
+          description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
+          allOf:
+            - $ref: '#/components/schemas/SinkCredential'
       required:
         - area
         - startDate
@@ -304,13 +328,13 @@ components:
       type: object
       properties:
         areaType:
-          $ref: "#/components/schemas/AreaType"
+          $ref: '#/components/schemas/AreaType'
       required:
         - areaType
       discriminator:
         propertyName: areaType
         mapping:
-          POLYGON: "#/components/schemas/Polygon"
+          POLYGON: '#/components/schemas/Polygon'
     AreaType:
       type: string
       description: |
@@ -320,17 +344,17 @@ components:
         - POLYGON
     Polygon:
       allOf:
-        - $ref: "#/components/schemas/Area"
+        - $ref: '#/components/schemas/Area'
         - type: object
           required:
             - boundary
           properties:
             boundary:
-              $ref: "#/components/schemas/PointList"
+              $ref: '#/components/schemas/PointList'
     PointList:
       type: array
       items:
-        $ref: "#/components/schemas/Point"
+        $ref: '#/components/schemas/Point'
       minItems: 3
       maxItems: 15
     Point:
@@ -341,9 +365,9 @@ components:
         - longitude
       properties:
         latitude:
-          $ref: "#/components/schemas/Latitude"
+          $ref: '#/components/schemas/Latitude'
         longitude:
-          $ref: "#/components/schemas/Longitude"
+          $ref: '#/components/schemas/Longitude'
       example:
         latitude: 50.735851
         longitude: 7.10066
@@ -359,21 +383,95 @@ components:
       format: double
       minimum: -180
       maximum: 180
-    Webhook:
-      description: Webhook information
+    SinkCredential:
       type: object
-      required:
-        - notificationUrl
       properties:
-        notificationUrl:
+        credentialType:
           type: string
-          example: https://application-server.com
-          description: https callback address where the result notification must be POST-ed
-        notificationAuthToken:
-          type: string
-          example: c8974e592c2fa383d4a3960714
-          description: |
-            OAuth2 token to be used by the callback API endpoint. It MUST be indicated within HTTP Authorization header e.g. Authorization: Bearer $notificationAuthToken
+          enum:
+            - PLAIN
+            - ACCESSTOKEN
+            - REFRESHTOKEN
+          description: 'The type of the credential. With the current API version the type MUST be set to `ACCESSTOKEN`'
+      discriminator:
+        propertyName: credentialType
+        mapping:
+          PLAIN: '#/components/schemas/PlainCredential'
+          ACCESSTOKEN: '#/components/schemas/AccessTokenCredential'
+          REFRESHTOKEN: '#/components/schemas/RefreshTokenCredential'
+      required:
+        - credentialType
+    PlainCredential:
+      type: object
+      description: A plain credential as a combination of an identifier and a secret.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          required:
+            - identifier
+            - secret
+          properties:
+            identifier:
+              description: The identifier might be an account or username.
+              type: string
+            secret:
+              description: The secret might be a password or passphrase.
+              type: string
+    AccessTokenCredential:
+      type: object
+      description: An access token credential.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          properties:
+            accessToken:
+              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
+              type: string
+            accessTokenExpiresUtc:
+              type: string
+              format: date-time
+              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
+            accessTokenType:
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)). For the current version of the API the type MUST be set to `Bearer`.
+              type: string
+              enum:
+                - bearer
+          required:
+            - accessToken
+            - accessTokenExpiresUtc
+            - accessTokenType
+    RefreshTokenCredential:
+      type: object
+      description: An access token credential with a refresh token.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          properties:
+            accessToken:
+              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
+              type: string
+            accessTokenExpiresUtc:
+              type: string
+              format: date-time
+              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
+            accessTokenType:
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
+              type: string
+              enum:
+                - bearer
+            refreshToken:
+              description: REQUIRED. An refresh token credential used to acquire access tokens.
+              type: string
+            refreshTokenEndpoint:
+              type: string
+              format: uri
+              description: REQUIRED. A URL at which the refresh token can be traded for an access token.
+      required:
+        - accessToken
+        - accessTokenExpiresUtc
+        - accessTokenType
+        - refreshToken
+        - refreshTokenEndpoint
     PopulationDensityResponse:
       type: object
       description: >-
@@ -384,18 +482,18 @@ components:
         timedPopulationDensityData:
           type: array
           description: >-
-           Time ranges along with the population density data for the cells within it.
-            The request startDate or the request endDate have to be fully covered by the intervals.
-            For example, if the intervals are 1-hour long and the input date range were [2024-01-03T11:25:00Z
-            to 2024-01-03T12:45:00Z] it would contain 2 intervals (Interval from 2024-01-03T11:00:00Z
-            to 2024-01-03T12:00:00Z and interval from 2024-01-03T12:00:00Z to 2024-01-03T13:00:00Z).
+            Time ranges along with the population density data for the cells within it.
+             The request startDate or the request endDate have to be fully covered by the intervals.
+             For example, if the intervals are 1-hour long and the input date range were [2024-01-03T11:25:00Z
+             to 2024-01-03T12:45:00Z] it would contain 2 intervals (Interval from 2024-01-03T11:00:00Z
+             to 2024-01-03T12:00:00Z and interval from 2024-01-03T12:00:00Z to 2024-01-03T13:00:00Z).
           items:
             $ref: '#/components/schemas/TimedPopulationDensityData'
         status:
           $ref: '#/components/schemas/ResponseStatus'
       required:
-       - timedPopulationDensityData
-       - status
+        - timedPopulationDensityData
+        - status
     ResponseStatus:
       type: string
       description: >-
@@ -448,7 +546,7 @@ components:
           description: >-
             Coordinates of the cell represented as a string using the [Geohash system](https://en.wikipedia.org/wiki/Geohash).
             Encoding a geographic location into a short string. The value length,
-            and thus the cell granularity, is determined by the request body property `precision`.
+            and thus, the cell granularity, is determined by the request body property `precision`.
           example: ezdmemd
         populationDensityData:
           $ref: '#/components/schemas/PopulationDensityData'
@@ -518,8 +616,8 @@ components:
   responses:
     RetrieveLocationBadRequest400:
       description: >-
-        Problem with the client request. In addition to regular scenario of
-        `INVALID_ARGUMENT`, another scenarios may exist:
+        Problem with the client request. In addition to generic scenarios of
+        `INVALID_ARGUMENT`, `INVALID_CREDENTIAL`, `INVALID_TOKEN`, another scenarios may exist:
           - The area is not a polygon shape or exceeds supported complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or exceeds supported complexity")
           - Indicated combination of area, time interval and precision is too big ("code": "POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big")
           - Indicated `startDate` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED", "message": "Indicated startDate is greater than the maximum allowed")
@@ -541,6 +639,16 @@ components:
                 status: 400
                 code: INVALID_ARGUMENT
                 message: Invalid input
+            GENERIC_400_INVALID_CREDENTIAL:
+              value:
+                status: 400
+                code: "INVALID_CREDENTIAL"
+                message: "Only Access token is supported"
+            GENERIC_400_INVALID_TOKEN:
+              value:
+                status: 400
+                code: "INVALID_TOKEN"
+                message: "Only bearer token is supported"
             InvalidAreaIssue:
               value:
                 status: 400
@@ -580,7 +688,7 @@ components:
                 status: 400
                 code: POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION
                 message: >-
-                  Indicated cell precision(Geohash length) is not supported
+                  Indicated cell precision (Geohash length) is not supported
             UnsupportedSyncResponseIssue:
               value:
                 status: 400
@@ -595,11 +703,11 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorInfo"
+            $ref: '#/components/schemas/ErrorInfo'
           example:
             status: 400
-            code: "INVALID_ARGUMENT"
-            message: "Client specified an invalid argument, request body or query param"
+            code: 'INVALID_ARGUMENT'
+            message: 'Client specified an invalid argument, request body or query param'
     Generic401:
       description: Unauthorized
       headers:
@@ -639,6 +747,22 @@ components:
             status: 404
             code: NOT_FOUND
             message: The specified resource is not found
+    Generic410:
+      description: Gone
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_410_GONE:
+              description: Use in notifications flow to allow API Consumer to indicate that its callback is no longer available
+              value:
+                status: 410
+                code: GONE
+                message: Access to the target resource is no longer available.
     Generic500:
       description: Internal server error
       headers:
@@ -670,8 +794,8 @@ components:
       value:
         status: SUPPORTED_AREA
         timedPopulationDensityData:
-          - startTime: "2024-01-03T10:00:00Z"
-            endTime: "2024-01-03T11:00:00Z"
+          - startTime: '2024-01-03T10:00:00Z'
+            endTime: '2024-01-03T11:00:00Z'
             cellPopulationDensityData:
               - geohash: ezdqemf
                 populationDensityData:
@@ -688,8 +812,8 @@ components:
               - geohash: ezdqemu
                 populationDensityData:
                   dataType: LOW_DENSITY
-          - startTime: "2024-01-03T11:00:00Z"
-            endTime: "2024-01-03T12:00:00Z"
+          - startTime: '2024-01-03T11:00:00Z'
+            endTime: '2024-01-03T12:00:00Z'
             cellPopulationDensityData:
               - geohash: ezdqemf
                 populationDensityData:
@@ -713,8 +837,8 @@ components:
       value:
         status: PART_OF_AREA_NOT_SUPPORTED
         timedPopulationDensityData:
-          - startTime: "2024-01-03T10:00:00Z"
-            endTime: "2024-01-03T11:00:00Z"
+          - startTime: '2024-01-03T10:00:00Z'
+            endTime: '2024-01-03T11:00:00Z'
             cellPopulationDensityData:
               - geohash: ezdqemf
                 populationDensityData:
@@ -731,8 +855,8 @@ components:
               - geohash: ezdqemu
                 populationDensityData:
                   dataType: NO_DATA
-          - startTime: "2024-01-03T11:00:00Z"
-            endTime: "2024-01-03T12:00:00Z"
+          - startTime: '2024-01-03T11:00:00Z'
+            endTime: '2024-01-03T12:00:00Z'
             cellPopulationDensityData:
               - geohash: ezdqemf
                 populationDensityData:
