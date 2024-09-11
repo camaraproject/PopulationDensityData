@@ -33,14 +33,15 @@ v0.1.1 is a patch release of v0.1.0 which includes only changes of the info obje
 ### Added
 * Include  `x-camara-commonalities` by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/41
 * Include testing definitions in .feature file for Fall24 meta-release by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/44
+* Included documentation for the initial posible implementation algorithm by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/25
+* Included API test plan for Population Density Data by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/44
 
 ### Changed
 * Updated Authorization and authentication section according to I&CM last release (v0.2.0-rc1) by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/41
 * Updated API and error descriptions by @gregory1g in https://github.com/camaraproject/PopulationDensityData/pull/42
-* 
 
 ### Fixed
-* N/A
+* Align with Commonalities subscription-model by using sink and sinkCredentials by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/47
 
 ### Removed
 * Remove `terms of service` and `contact` by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/41
