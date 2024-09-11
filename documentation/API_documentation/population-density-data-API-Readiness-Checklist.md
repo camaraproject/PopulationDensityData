@@ -10,7 +10,7 @@ Checklist for population-density-data 0.1.1 in release r1.2
 |  4 | API versioning convention applied            |   M   |         M         |    M    |    M   |  Y   |      |
 |  5 | API documentation                            |   M   |         M         |    M    |    M   |  Y   | Embed documentation into API spec - [link](/code/API_definitions/population-density-data.yaml) |
 |  6 | User stories                                 |   O   |         O         |    O    |    M   |  N   |      |
-|  7 | Basic API test cases & documentation         |   O   |         M         |    M    |    M   |  Y  | Included in Test PR#44 |
+|  7 | Basic API test cases & documentation         |   O   |         M         |    M    |    M   |  Y   | [link](/code/Test_definitions/population-density-data.feature) |
 |  8 | Enhanced API test cases & documentation      |   O   |         O         |    O    |    M   |   N  |  |
 |  9 | Test result statement                        |   O   |         O         |    O    |    M   |   N  |  |
 | 10 | API release numbering convention applied     |   M   |         M         |    M    |    M   |   Y  |      |
