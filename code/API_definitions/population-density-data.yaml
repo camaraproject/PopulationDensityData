@@ -26,7 +26,7 @@ info:
     a given drone flight path is acceptable for the time of the flight, or an
     alternative time should be considered to lower the risk.
 
-    - Sustainable Urban Planning. 
+    - Sustainable Urban Planning.
 
     - Environmental monitoring at mass events, such as concerts or festivals.
 
@@ -91,7 +91,7 @@ info:
 
     **NOTE**: In order to ensure anonymized information, if the data relating to
     a grid cell in the required time interval is not sufficient to be exposed due
-    to [k-anonymity](https://en.wikipedia.org/wiki/K-anonymity), no such data is 
+    to [k-anonymity](https://en.wikipedia.org/wiki/K-anonymity), no such data is
     returned by the API and the value of the dataType property is `LOW_DENSITY`.
 
     # Resources and Operations overview
@@ -107,7 +107,7 @@ info:
 
     It is important to remark that in cases where personal user data is processed by the API, and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of 3-legged access tokens becomes mandatory. This measure ensures that the API remains in strict compliance with user privacy preferences and regulatory obligations, upholding the principles of transparency and user-centric data control.
 
-    Population Density Data API ensures the usage of anonymized information and do not treat personal data neither as input nor output. 
+    Population Density Data API ensures the usage of anonymized information and do not treat personal data neither as input nor output.
     Therefore, the access to Population Density Data API is defined as Client Credentials - 2-legged. Please refer to Identify and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the latest detailed specification of this authentication/authorization flow.
 
 
@@ -140,7 +140,7 @@ paths:
         - Population Density Data
       summary: Retrieves population density information in a specified area
       description: >-
-        Retrieves population density estimation together with the estimation range related 
+        Retrieves population density estimation together with the estimation range related
         for a time slot for a given area (described as a polygon) as a data set
         consisting of a sequence of equally-sized objects covering the input
         polygon area.
@@ -292,7 +292,7 @@ components:
           format: date-time
           description: >-
             Start date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
-            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ 
+            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
             (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
             The minimum startDate is the time of the request.
         endDate:
@@ -475,8 +475,8 @@ components:
     PopulationDensityResponse:
       type: object
       description: >-
-        Population density values is represented in time intervals for different 
-        cells of the requested area. Each element in `timedPopulationDensityData` array corresponds 
+        Population density values is represented in time intervals for different
+        cells of the requested area. Each element in `timedPopulationDensityData` array corresponds
         to a time interval, containing population density data for the grid cells. The intervals are 1 hour long.
       properties:
         timedPopulationDensityData:
