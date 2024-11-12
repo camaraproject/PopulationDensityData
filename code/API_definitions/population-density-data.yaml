@@ -79,12 +79,12 @@ info:
     MUST be set to `ACCESSTOKEN` if provided.
 
 
-    For requests with a combination of `area`, `precision`, `startDate` and `endDate`
+    For requests with a combination of `area`, `precision`, `startTime` and `endTime`
     properties involving an amount of processing that cannot be processed synchronously,
     the API returns the error response `POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE`.
 
 
-    For requests with a combination of `area`, `precision`, `startDate` and `endDate`
+    For requests with a combination of `area`, `precision`, `startTime` and `endTime`
     properties too big for both synchronous and asynchronous processing, the API
     returns the error response `POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST`.
 
@@ -118,14 +118,14 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.1.1
+  version: wip
 
   x-camara-commonalities: 0.4.0
 externalDocs:
   description: Product documentation at Camara.
   url: https://github.com/camaraproject/
 servers:
-  - url: '{apiRoot}/population-density-data/v0.1'
+  - url: '{apiRoot}/population-density-data/vwip'
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -166,8 +166,8 @@ paths:
                     longitude: 4.861125
                   - latitude: 45.751442
                     longitude: 4.859827
-              startDate: '2024-04-23T14:44:18.165Z'
-              endDate: '2024-04-23T14:44:18.165Z'
+              startTime: '2024-04-23T14:44:18.165Z'
+              endTime: '2024-04-23T14:44:18.165Z'
               precision: 7
         required: true
       callbacks:
@@ -283,26 +283,26 @@ components:
       description: >-
         Request object for retrieving population density data in a
         specified area.
-        **NOTE**: The difference between `startDate` and `endDate` cannot be greater than 7 days.
+        **NOTE**: The difference between `startTime` and `endTime` cannot be greater than 7 days.
       properties:
         area:
           $ref: '#/components/schemas/Area'
-        startDate:
+        startTime:
           type: string
           format: date-time
           description: >-
             Start date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ 
             (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
-            The minimum startDate is the time of the request.
-        endDate:
+            The minimum startTime is the time of the request.
+        endTime:
           type: string
           format: date-time
           description: >-
             End date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
             (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
-            The maximum endDate allowed is 3 months from the time of the request.
+            The maximum endTime allowed is 3 months from the time of the request.
         precision:
           type: integer
           description: >-
@@ -314,7 +314,7 @@ components:
         sink:
           type: string
           format: url
-          description: The address to which events about all status changes of the session (e.g. session termination) shall be delivered, using the HTTP protocol.
+          description: The URL where the API response will be asynchronously delivered, using the HTTP protocol.
           example: 'https://endpoint.example.com/sink'
         sinkCredential:
           description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
@@ -322,8 +322,8 @@ components:
             - $ref: '#/components/schemas/SinkCredential'
       required:
         - area
-        - startDate
-        - endDate
+        - startTime
+        - endTime
     Area:
       type: object
       properties:
@@ -483,7 +483,7 @@ components:
           type: array
           description: >-
             Time ranges along with the population density data for the cells within it.
-             The request startDate or the request endDate have to be fully covered by the intervals.
+             The request startTime or the request endTime have to be fully covered by the intervals.
              For example, if the intervals are 1-hour long and the input date range were [2024-01-03T11:25:00Z
              to 2024-01-03T12:45:00Z] it would contain 2 intervals (Interval from 2024-01-03T11:00:00Z
              to 2024-01-03T12:00:00Z and interval from 2024-01-03T12:00:00Z to 2024-01-03T13:00:00Z).
@@ -620,10 +620,10 @@ components:
         `INVALID_ARGUMENT`, `INVALID_CREDENTIAL`, `INVALID_TOKEN`, another scenarios may exist:
           - The area is not a polygon shape or exceeds supported complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or exceeds supported complexity")
           - Indicated combination of area, time interval and precision is too big ("code": "POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big")
-          - Indicated `startDate` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED", "message": "Indicated startDate is greater than the maximum allowed")
-          - Indicated `startDate` is earlier than the minimum allowed ("code": "POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED", "message": "Indicated startDate is earlier than the minimum allowed")
-          - Indicated `endDate` is earlier than the `startDate` ("code": "POPULATION_DENSITY_DATA.INVALID_END_DATE", "message": "Indicated endDate is earlier than the startDate")
-          - Indicated time period is greater than the maximum allowed (More than maximum hours between startDate and endDate) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than maximum hours between startDate and endDate)")
+          - Indicated `startTime` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED", "message": "Indicated startTime is greater than the maximum allowed")
+          - Indicated `startTime` is earlier than the minimum allowed ("code": "POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED", "message": "Indicated startTime is earlier than the minimum allowed")
+          - Indicated `endTime` is earlier than the `startTime` ("code": "POPULATION_DENSITY_DATA.INVALID_END_DATE", "message": "Indicated endTime is earlier than the startTime")
+          - Indicated time period is greater than the maximum allowed (More than maximum hours between startTime and endTime) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than maximum hours between startTime and endTime)")
           - Indicated cell precision (Geohash level) is not supported ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION", "message": "Indicated cell precision (Geohash level) is not supported")
           - Indicated combination of area, time interval and precision is too big for a sync response ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE", "message": "Indicated combination of area, time interval and precision is too big for a sync response")
       headers:
@@ -659,30 +659,30 @@ components:
                 status: 400
                 code: POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST
                 message: Indicated combination of area, time interval and precision is too big
-            MaxStartDateIssue:
+            MaxStartTimeIssue:
               value:
                 status: 400
-                code: POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED
+                code: POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED
                 message: >-
-                  Indicated startDate is greater than the maximum allowed
-            MinStartDateIssue:
+                  Indicated startTime is greater than the maximum allowed
+            MinStartTimeIssue:
               value:
                 status: 400
-                code: POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED
+                code: POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED
                 message: >-
-                  Indicated startDate is earlier than the minimum allowed
-            InvalidEndDateIssue:
+                  Indicated startTime is earlier than the minimum allowed
+            InvalidEndTimeIssue:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.INVALID_END_DATE
-                message: Indicated endDate is earlier than the startDate
+                message: Indicated endDate is earlier than the startTime
             MaxDurationIssue:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED
                 message: >-
                   Indicated time period is greater than the maximum allowed
-                  (More than maximum hours between startDate and endDate)
+                  (More than maximum hours between startTime and endTime)
             PrecisionNotSupportedIssue:
               value:
                 status: 400
