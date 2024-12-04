@@ -8,7 +8,7 @@ info:
     # Introduction
 
     With the Population Density Data API the customer can retrieve population density estimations
-    for a specific area at the current or a future period of time. The estimation considers historical
+    for a specific area at the current or a specified period of time. The estimation considers historical
     anonymized information of the network connected devices in the requested
     area.
 
@@ -53,8 +53,7 @@ info:
     (exact definitions of minimum and maximum are estimation algorithm specific).
 
 
-    These values are calculated based on historical data and/or prediction models trained
-    on such data.
+    These values are calculated based on historical data, prediction models, and population estimation models. The requested interval must either be completely in the future or in the past.
 
 
     The polygon specifying an area of interest must comply with certain restrictions,
@@ -294,7 +293,7 @@ components:
             Start date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
             (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
-            The minimum startTime is the time of the request.
+            The minimum startTime must cover at least 3 months before the request time.
         endTime:
           type: string
           format: date-time
@@ -623,6 +622,7 @@ components:
           - Indicated `startTime` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED", "message": "Indicated startTime is greater than the maximum allowed")
           - Indicated `startTime` is earlier than the minimum allowed ("code": "POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED", "message": "Indicated startTime is earlier than the minimum allowed")
           - Indicated `endTime` is earlier than the `startTime` ("code": "POPULATION_DENSITY_DATA.INVALID_END_DATE", "message": "Indicated endTime is earlier than the startTime")
+          - Indicated time period is partially in the past and partially in the future ("code": "POPULATION_DENSITY_DATA.INVALID_TIME_PERIOD", "message": "time period is partially in the past and partially in the future")
           - Indicated time period is greater than the maximum allowed (More than maximum hours between startTime and endTime) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than maximum hours between startTime and endTime)")
           - Indicated cell precision (Geohash level) is not supported ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION", "message": "Indicated cell precision (Geohash level) is not supported")
           - Indicated combination of area, time interval and precision is too big for a sync response ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE", "message": "Indicated combination of area, time interval and precision is too big for a sync response")
@@ -683,6 +683,12 @@ components:
                 message: >-
                   Indicated time period is greater than the maximum allowed
                   (More than maximum hours between startTime and endTime)
+            MaxDurationIssue:
+              value:
+                status: 400
+                code: POPULATION_DENSITY_DATA.INVALID_TIME_PERIOD
+                message: >-
+                  Indicated time period is partially in the past and partially in the future
             PrecisionNotSupportedIssue:
               value:
                 status: 400
