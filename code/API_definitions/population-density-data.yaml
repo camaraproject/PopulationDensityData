@@ -683,7 +683,7 @@ components:
                 message: >-
                   Indicated time period is greater than the maximum allowed
                   (More than maximum hours between startTime and endTime)
-            MaxDurationIssue:
+            InvalidPeriodIssue:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.INVALID_TIME_PERIOD
