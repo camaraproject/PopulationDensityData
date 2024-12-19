@@ -330,7 +330,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
     @population_density_data_retrievePopulationDensity_24_timeframe_crosses_request_time
     Scenario: Error 400 when startDate is set to a date in the past and the endDate is set to a date in the future
         Given the request body property "$.startDate" is set to a date in the past
-        And the request body property "$.endDate" is set to a date in teh future
+        And the request body property "$.endDate" is set to a date in the future
         When the request "retrievePopulationDensity" is sent
         Then the response status code is 400
         And the response header "Content-Type" is "application/json"
