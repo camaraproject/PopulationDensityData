@@ -539,7 +539,12 @@ components:
       minItems: 1
     CellPopulationDensityData:
       type: object
-      description: Population density data of a cell in a concrete time range.
+      description: >-
+        Population density data of a cell in a concrete time range. In case of 
+        insufficient data, to guarantee an anonymized prediction due to the 
+        k-anonymity within a specific cell and time range, no population density
+        data is returned and the property `dataType` value is "LOW_DENSITY". In
+        case of a cell not supported `dataType` value is "NO_DATA"
       properties:
         geohash:
           type: string
@@ -548,20 +553,6 @@ components:
             Encoding a geographic location into a short string. The value length,
             and thus, the cell granularity, is determined by the request body property `precision`.
           example: ezdmemd
-        populationDensityData:
-          $ref: '#/components/schemas/PopulationDensityData'
-      required:
-        - geohash
-        - populationDensityData
-    PopulationDensityData:
-      description: >-
-        Object that contains the estimated population density and an estimation range in a
-        cell for a specific time interval. In case of insufficient data to guarantee an
-        anonymized prediction due to the k-anonymity within a specific cell and
-        time range, no population density data is returned and the property `dataType`
-        value is "LOW_DENSITY". In case of a cell not supported `dataType`
-        value is "NO_DATA"
-      properties:
         dataType:
           type: string
           enum:
@@ -569,29 +560,33 @@ components:
             - LOW_DENSITY
             - DENSITY_ESTIMATION
       required:
+        - geohash
         - dataType
       discriminator:
         propertyName: dataType
         mapping:
-          NO_DATA: '#/components/schemas/PopulationDensityData'
-          LOW_DENSITY: '#/components/schemas/PopulationDensityData'
-          DENSITY_ESTIMATION: '#/components/schemas/DensityEstimationPopulationDensityData'
-    DensityEstimationPopulationDensityData:
+          NO_DATA: '#/components/schemas/NO_DATA'
+          LOW_DENSITY: '#/components/schemas/LOW_DENSITY'
+          DENSITY_ESTIMATION: '#/components/schemas/DENSITY_ESTIMATION'
+    NO_DATA:
       allOf:
-        - $ref: '#/components/schemas/PopulationDensityData'
+        - $ref: '#/components/schemas/CellPopulationDensityData'
+    LOW_DENSITY:
+      allOf:
+        - $ref: '#/components/schemas/CellPopulationDensityData'
+    DENSITY_ESTIMATION:
+      allOf:
+        - $ref: '#/components/schemas/CellPopulationDensityData'
         - type: object
           properties:
             maxPplDensity:
-              type: number
-              format: double
+              type: integer
               description: Maximum people/km2 estimated for the defined area.
             minPplDensity:
-              type: number
-              format: double
+              type: integer
               description: Minimum people/km2 estimated for the defined area.
             pplDensity:
-              type: number
-              format: double
+              type: integer
               description: people/km2 estimation for the defined area.
           required:
             - maxPplDensity
@@ -798,41 +793,35 @@ components:
             endTime: '2024-01-03T11:00:00Z'
             cellPopulationDensityData:
               - geohash: ezdqemf
-                populationDensityData:
-                  dataType: DENSITY_ESTIMATION
-                  maxPplDensity: 150
-                  minPplDensity: 30
-                  pplDensity: 60
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 150
+                minPplDensity: 30
+                pplDensity: 60
               - geohash: ezdqemg
-                populationDensityData:
-                  dataType: DENSITY_ESTIMATION
-                  maxPplDensity: 100
-                  minPplDensity: 40
-                  pplDensity: 90
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 100
+                minPplDensity: 40
+                pplDensity: 90
               - geohash: ezdqemu
-                populationDensityData:
-                  dataType: LOW_DENSITY
+                dataType: LOW_DENSITY
           - startTime: '2024-01-03T11:00:00Z'
             endTime: '2024-01-03T12:00:00Z'
             cellPopulationDensityData:
               - geohash: ezdqemf
-                populationDensityData:
-                  dataType: DENSITY_ESTIMATION
-                  maxPplDensity: 100
-                  minPplDensity: 30
-                  pplDensity: 70
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 100
+                minPplDensity: 30
+                pplDensity: 70
               - geohash: ezdqemg
-                populationDensityData:
-                  dataType: DENSITY_ESTIMATION
-                  maxPplDensity: 200
-                  minPplDensity: 40
-                  pplDensity: 100
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 200
+                minPplDensity: 40
+                pplDensity: 100
               - geohash: ezdqemu
-                populationDensityData:
-                  dataType: DENSITY_ESTIMATION
-                  maxPplDensity: 200
-                  minPplDensity: 40
-                  pplDensity: 100
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 200
+                minPplDensity: 40
+                pplDensity: 100
     PopulationDensityPartOfAreaNotSupportedResponseExample:
       value:
         status: PART_OF_AREA_NOT_SUPPORTED
@@ -841,38 +830,32 @@ components:
             endTime: '2024-01-03T11:00:00Z'
             cellPopulationDensityData:
               - geohash: ezdqemf
-                populationDensityData:
-                  dataType: DENSITY_ESTIMATION
-                  maxPplDensity: 150
-                  minPplDensity: 30
-                  pplDensity: 60
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 150
+                minPplDensity: 30
+                pplDensity: 60
               - geohash: ezdqemg
-                populationDensityData:
-                  dataType: DENSITY_ESTIMATION
-                  maxPplDensity: 100
-                  minPplDensity: 40
-                  pplDensity: 90
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 100
+                minPplDensity: 40
+                pplDensity: 90
               - geohash: ezdqemu
-                populationDensityData:
-                  dataType: NO_DATA
+                dataType: NO_DATA
           - startTime: '2024-01-03T11:00:00Z'
             endTime: '2024-01-03T12:00:00Z'
             cellPopulationDensityData:
               - geohash: ezdqemf
-                populationDensityData:
-                  dataType: DENSITY_ESTIMATION
-                  maxPplDensity: 100
-                  minPplDensity: 30
-                  pplDensity: 70
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 100
+                minPplDensity: 30
+                pplDensity: 70
               - geohash: ezdqemg
-                populationDensityData:
-                  dataType: DENSITY_ESTIMATION
-                  maxPplDensity: 200
-                  minPplDensity: 40
-                  pplDensity: 100
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 200
+                minPplDensity: 40
+                pplDensity: 100
               - geohash: ezdqemu
-                populationDensityData:
-                  dataType: NO_DATA
+                dataType: NO_DATA
     PopulationDensityAreaNotSupportedResponseExample:
       value:
         status: AREA_NOT_SUPPORTED
