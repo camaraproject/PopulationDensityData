@@ -188,14 +188,14 @@ paths:
                 content:
                   application/json:
                     schema:
-                      $ref: '#/components/schemas/PopulationDensityResponse'
+                      $ref: '#/components/schemas/PopulationDensityAsyncResponse'
                     examples:
-                      PopulationDensitySupportedAreaResponseExample:
-                        $ref: '#/components/examples/PopulationDensitySupportedAreaResponseExample'
-                      PopulationDensityAreaNotSupportedResponseExample:
-                        $ref: '#/components/examples/PopulationDensityAreaNotSupportedResponseExample'
-                      PopulationDensityPartOfAreaNotSupportedResponseExample:
-                        $ref: '#/components/examples/PopulationDensityPartOfAreaNotSupportedResponseExample'
+                      PopulationDensitySupportedAreaAsyncResponseExample:
+                        $ref: '#/components/examples/PopulationDensitySupportedAreaAsyncResponseExample'
+                      PopulationDensityAreaNotSupportedAsyncResponseExample:
+                        $ref: '#/components/examples/PopulationDensityAreaNotSupportedAsyncResponseExample'
+                      PopulationDensityPartOfAreaNotSupportedAsyncResponseExample:
+                        $ref: '#/components/examples/PopulationDensityPartOfAreaNotSupportedAsyncResponseExample'
               responses:
                 '204':
                   description: Successful notification
@@ -240,6 +240,10 @@ paths:
           headers:
             x-correlator:
               $ref: '#/components/headers/x-correlator'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcceptedAsyncResponse'
         '400':
           $ref: '#/components/responses/RetrieveLocationBadRequest400'
         '401':
@@ -494,6 +498,25 @@ components:
       required:
         - timedPopulationDensityData
         - status
+    AcceptedAsyncResponse:
+      type: object
+      properties:
+        operationId:
+          $ref: '#/components/schemas/OperationId'
+      required:
+        - operationId
+    PopulationDensityAsyncResponse:
+      allOf:
+        - $ref: '#/components/schemas/PopulationDensityResponse'
+        - type: object
+          properties:
+            operationId:
+              $ref: '#/components/schemas/OperationId'
+          required:
+            - operationId
+    OperationId:
+      type: string
+      description: The unique identifier of the asynchronous operation that is returned when the operation is initiated.  
     ResponseStatus:
       type: string
       description: >-
@@ -860,3 +883,81 @@ components:
       value:
         status: AREA_NOT_SUPPORTED
         timedPopulationDensityData: []
+    PopulationDensitySupportedAreaAsyncResponseExample:
+      value:
+        status: SUPPORTED_AREA
+        timedPopulationDensityData:
+          - startTime: '2024-01-03T10:00:00Z'
+            endTime: '2024-01-03T11:00:00Z'
+            cellPopulationDensityData:
+              - geohash: ezdqemf
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 150
+                minPplDensity: 30
+                pplDensity: 60
+              - geohash: ezdqemg
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 100
+                minPplDensity: 40
+                pplDensity: 90
+              - geohash: ezdqemu
+                dataType: LOW_DENSITY
+          - startTime: '2024-01-03T11:00:00Z'
+            endTime: '2024-01-03T12:00:00Z'
+            cellPopulationDensityData:
+              - geohash: ezdqemf
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 100
+                minPplDensity: 30
+                pplDensity: 70
+              - geohash: ezdqemg
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 200
+                minPplDensity: 40
+                pplDensity: 100
+              - geohash: ezdqemu
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 200
+                minPplDensity: 40
+                pplDensity: 100
+        operationId: 2322f362-eaab-4cf3-86d2-efcbdf3a7cb4
+    PopulationDensityPartOfAreaNotSupportedAsyncResponseExample:
+      value:
+        status: PART_OF_AREA_NOT_SUPPORTED
+        timedPopulationDensityData:
+          - startTime: '2024-01-03T10:00:00Z'
+            endTime: '2024-01-03T11:00:00Z'
+            cellPopulationDensityData:
+              - geohash: ezdqemf
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 150
+                minPplDensity: 30
+                pplDensity: 60
+              - geohash: ezdqemg
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 100
+                minPplDensity: 40
+                pplDensity: 90
+              - geohash: ezdqemu
+                dataType: NO_DATA
+          - startTime: '2024-01-03T11:00:00Z'
+            endTime: '2024-01-03T12:00:00Z'
+            cellPopulationDensityData:
+              - geohash: ezdqemf
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 100
+                minPplDensity: 30
+                pplDensity: 70
+              - geohash: ezdqemg
+                dataType: DENSITY_ESTIMATION
+                maxPplDensity: 200
+                minPplDensity: 40
+                pplDensity: 100
+              - geohash: ezdqemu
+                dataType: NO_DATA
+        operationId: 2322f362-eaab-4cf3-86d2-efcbdf3a7cb4
+    PopulationDensityAreaNotSupportedAsyncResponseExample:
+      value:
+        status: AREA_NOT_SUPPORTED
+        timedPopulationDensityData: []
+        operationId: 2322f362-eaab-4cf3-86d2-efcbdf3a7cb4
