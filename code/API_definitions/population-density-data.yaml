@@ -542,8 +542,8 @@ components:
     CellPopulationDensityData:
       type: object
       description: >-
-        Population density data of a cell in a concrete time range. In case of 
-        insufficient data, to guarantee an anonymized prediction due to the 
+        Population density data of a cell in a concrete time range. In case of
+        insufficient data, to guarantee an anonymized prediction due to the
         k-anonymity within a specific cell and time range, no population density
         data is returned and the property `dataType` value is "LOW_DENSITY". In
         case of a cell not supported `dataType` value is "NO_DATA"
