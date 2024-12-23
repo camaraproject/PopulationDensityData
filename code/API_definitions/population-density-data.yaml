@@ -88,6 +88,9 @@ info:
     properties too big for both synchronous and asynchronous processing, the API
     returns the error response `POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST`.
 
+    If an error happens during the asynchronous processing of the request. The API callback
+    will have property `status` with value `OPERATION_NOT_COMPLETED` as an error cannot be returned in the callback.
+    The callback will also include the `statusInfo` property to add extra information about the error.
 
     **NOTE**: In order to ensure anonymized information, if the data relating to
     a grid cell in the required time interval is not sufficient to be exposed due
@@ -196,6 +199,8 @@ paths:
                         $ref: '#/components/examples/PopulationDensityAreaNotSupportedResponseExample'
                       PopulationDensityPartOfAreaNotSupportedResponseExample:
                         $ref: '#/components/examples/PopulationDensityPartOfAreaNotSupportedResponseExample'
+                      PopulationDensityOperationNotCompletedExample:
+                        $ref: '#/components/examples/PopulationDensityOperationNotCompletedExample'                        
               responses:
                 '204':
                   description: Successful notification
@@ -491,6 +496,10 @@ components:
             $ref: '#/components/schemas/TimedPopulationDensityData'
         status:
           $ref: '#/components/schemas/ResponseStatus'
+        statusInfo:
+          type: string
+          description: Information about the status, mandatory when property `status` is `OPERATION_NOT_COMPLETED` for adding extra information about the error.
+          example: Some error happened during the processing of the request
       required:
         - timedPopulationDensityData
         - status
@@ -502,10 +511,13 @@ components:
           - `PART_OF_AREA_NOT_SUPPORTED`: Part of the requested area is outside the MNOs coverage area, the cells outside the coverage
           area will have property `dataType` with value `NO_DATA`.
           - `AREA_NOT_SUPPORTED`: The whole requested area is outside the MNOs coverage area. No data will be returned.
+          - `OPERATION_NOT_COMPLETED`: An error happened during asynchronous processing of the request. This status will only be returned
+          in case the asynchronous API behaviour is used.
       enum:
         - SUPPORTED_AREA
         - PART_OF_AREA_NOT_SUPPORTED
         - AREA_NOT_SUPPORTED
+        - OPERATION_NOT_COMPLETED
     TimedPopulationDensityData:
       type: object
       properties:
@@ -860,3 +872,8 @@ components:
       value:
         status: AREA_NOT_SUPPORTED
         timedPopulationDensityData: []
+    PopulationDensityOperationNotCompletedExample:
+      value:
+        status: OPERATION_NOT_COMPLETED
+        timedPopulationDensityData: []
+        statusInfo: Some error happened during the processing of the request
