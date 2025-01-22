@@ -219,10 +219,8 @@ paths:
                   $ref: '#/components/responses/Generic403'
                 '410':
                   $ref: '#/components/responses/Generic410'
-                '500':
-                  $ref: '#/components/responses/Generic500'
-                '503':
-                  $ref: '#/components/responses/Generic503'
+                '429':
+                  $ref: '#/components/responses/Generic429'
               security:
                 - {}
                 - notificationsBearerAuth: []
@@ -263,10 +261,8 @@ paths:
           $ref: '#/components/responses/Generic404'
         '422':
           $ref: '#/components/responses/RetrieveLocationUnprocessableContent422'
-        '500':
-          $ref: '#/components/responses/Generic500'
-        '503':
-          $ref: '#/components/responses/Generic503'
+        '429':
+          $ref: '#/components/responses/Generic429'
       security:
         - openId:
             - population-density-data:read
@@ -665,9 +661,25 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+                      - INVALID_CREDENTIAL
+                      - INVALID_TOKEN
+                      - POPULATION_DENSITY_DATA.INVALID_AREA
+                      - POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED
+                      - POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED
+                      - POPULATION_DENSITY_DATA.INVALID_END_DATE
+                      - POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED
           examples:
-            InvalidArgument:
+            GENERIC_400_INVALID_ARGUMENT:
               value:
                 status: 400
                 code: INVALID_ARGUMENT
@@ -675,36 +687,36 @@ components:
             GENERIC_400_INVALID_CREDENTIAL:
               value:
                 status: 400
-                code: "INVALID_CREDENTIAL"
+                code: INVALID_CREDENTIAL
                 message: "Only Access token is supported"
             GENERIC_400_INVALID_TOKEN:
               value:
                 status: 400
-                code: "INVALID_TOKEN"
+                code: INVALID_TOKEN
                 message: "Only bearer token is supported"
-            InvalidAreaIssue:
+            POPULATION_DENSITY_DATA_400_INVALID_AREA:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.INVALID_AREA
                 message: The area is not a polygon shape or has an arbitrary complexity
-            MaxStartTimeIssue:
+            POPULATION_DENSITY_DATA_400_MAX_STARTTIME_EXCEEDED:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED
                 message: >-
                   Indicated startTime is greater than the maximum allowed
-            MinStartTimeIssue:
+            POPULATION_DENSITY_DATA_400_MIN_STARTTIME_EXCEEDED:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED
                 message: >-
                   Indicated startTime is earlier than the minimum allowed
-            InvalidEndTimeIssue:
+            POPULATION_DENSITY_DATA_400_INVALID_END_DATE:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.INVALID_END_DATE
                 message: Indicated endDate is earlier than the startTime
-            MaxDurationIssue:
+            POPULATION_DENSITY_DATA_400_MAX_TIME_PERIOD_EXCEEDED:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED
@@ -719,11 +731,23 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 400
-            code: 'INVALID_ARGUMENT'
-            message: 'Client specified an invalid argument, request body or query param'
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+          examples:
+            GENERIC_400_INVALID_ARGUMENT:
+              description: Invalid Argument. Generic Syntax Exception
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: Client specified an invalid argument, request body or query param.
     Generic401:
       description: Unauthorized
       headers:
@@ -732,11 +756,23 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 401
-            code: UNAUTHENTICATED
-            message: 'Authorization failed: ...'
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 401
+                  code:
+                    enum:
+                      - UNAUTHENTICATED
+          examples:
+            GENERIC_401_UNAUTHENTICATED:
+              description: Request cannot be authenticated
+              value:
+                status: 401
+                code: UNAUTHENTICATED
+                message: Request not authenticated due to missing, invalid, or expired credentials.
     Generic403:
       description: Forbidden
       headers:
@@ -745,11 +781,23 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 403
-            code: PERMISSION_DENIED
-            message: 'Operation not allowed: ...'
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
+              value:
+                status: 403
+                code: PERMISSION_DENIED
+                message: Client does not have sufficient permissions to perform this action.
     Generic404:
       description: Not found
       headers:
@@ -758,11 +806,23 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 404
-            code: NOT_FOUND
-            message: The specified resource is not found
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - NOT_FOUND
+          examples:
+            GENERIC_404_NOT_FOUND:
+              description: Resource is not found
+              value:
+                status: 404
+                code: NOT_FOUND
+                message: The specified resource is not found.
     Generic410:
       description: Gone
       headers:
@@ -771,7 +831,16 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorInfo"
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 410
+                  code:
+                    enum:
+                      - GONE
           examples:
             GENERIC_410_GONE:
               description: Use in notifications flow to allow API Consumer to indicate that its callback is no longer available
@@ -791,51 +860,68 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 422
+                  code:
+                    enum:
+                      - POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST
+                      - POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION
+                      - POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE
           examples:
-            UnsupportedRequestIssue:
+            POPULATION_DENSITY_DATA_422_UNSUPPPORTED_REQUEST:
               value:
                 status: 422
                 code: POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST
                 message: Indicated combination of area, time interval and precision is too big
-            PrecisionNotSupportedIssue:
+            POPULATION_DENSITY_DATA_422_UNSUPPORTED_PRECISION:
               value:
                 status: 422
                 code: POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION
                 message: >-
                   Indicated cell precision (Geohash length) is not supported
-            UnsupportedSyncResponseIssue:
+            POPULATION_DENSITY_DATA_422_UNSUPPORTED_SYNC_RESPONSE:
               value:
                 status: 422
                 code: POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE
                 message: >-
                   Indicated combination of area, time interval and precision is too big for a sync response
-    Generic500:
-      description: Internal server error
+    Generic429:
+      description: Too Many Requests
       headers:
         x-correlator:
-          $ref: '#/components/headers/x-correlator'
+          $ref: "#/components/headers/x-correlator"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 500
-            code: INTERNAL
-            message: Internal server error
-    Generic503:
-      description: Service unavailable
-      headers:
-        x-correlator:
-          $ref: '#/components/headers/x-correlator'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 503
-            code: UNAVAILABLE
-            message: Service unavailable
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 429
+                  code:
+                    enum:
+                      - QUOTA_EXCEEDED
+                      - TOO_MANY_REQUESTS
+          examples:
+            GENERIC_429_QUOTA_EXCEEDED:
+              description: Request is rejected due to exceeding a business quota limit
+              value:
+                status: 429
+                code: QUOTA_EXCEEDED
+                message: Either out of resource quota or reaching rate limiting.
+            GENERIC_429_TOO_MANY_REQUESTS:
+              description: API Server request limit is overpassed
+              value:
+                status: 429
+                code: TOO_MANY_REQUESTS
+                message: Either out of resource quota or reaching rate limiting.
   examples:
     PopulationDensitySupportedAreaResponseExample:
       value:
