@@ -336,16 +336,17 @@ components:
         - startTime
         - endTime
     Area:
+      description: Base schema for all areas
       type: object
       properties:
         areaType:
-          $ref: '#/components/schemas/AreaType'
+          $ref: "#/components/schemas/AreaType"
       required:
         - areaType
       discriminator:
         propertyName: areaType
         mapping:
-          POLYGON: '#/components/schemas/Polygon'
+          POLYGON: "#/components/schemas/Polygon"
     AreaType:
       type: string
       description: |
@@ -354,18 +355,20 @@ components:
       enum:
         - POLYGON
     Polygon:
+      description: Polygonal area. The Polygon should be a simple polygon, i.e. should not intersect itself.
       allOf:
-        - $ref: '#/components/schemas/Area'
+        - $ref: "#/components/schemas/Area"
         - type: object
           required:
             - boundary
           properties:
             boundary:
-              $ref: '#/components/schemas/PointList'
+              $ref: "#/components/schemas/PointList"
     PointList:
+      description: List of points defining a polygon
       type: array
       items:
-        $ref: '#/components/schemas/Point'
+        $ref: "#/components/schemas/Point"
       minItems: 3
       maxItems: 15
     Point:
@@ -376,20 +379,20 @@ components:
         - longitude
       properties:
         latitude:
-          $ref: '#/components/schemas/Latitude'
+          $ref: "#/components/schemas/Latitude"
         longitude:
-          $ref: '#/components/schemas/Longitude'
+          $ref: "#/components/schemas/Longitude"
       example:
         latitude: 50.735851
         longitude: 7.10066
     Latitude:
-      description: Latitude component of a location.
+      description: Latitude component of a location
       type: number
       format: double
       minimum: -90
       maximum: 90
     Longitude:
-      description: Longitude component of location.
+      description: Longitude component of location
       type: number
       format: double
       minimum: -180
