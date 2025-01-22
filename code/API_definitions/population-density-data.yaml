@@ -681,6 +681,7 @@ components:
                       - POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED
                       - POPULATION_DENSITY_DATA.INVALID_END_DATE
                       - POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED
+                      - POPULATION_DENSITY_DATA.INVALID_TIME_PERIOD
           examples:
             GENERIC_400_INVALID_ARGUMENT:
               value:
