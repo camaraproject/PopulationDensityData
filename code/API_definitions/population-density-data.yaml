@@ -730,7 +730,7 @@ components:
             POPULATION_DENSITY_DATA_400_INVALID_TIME_PERIOD:
               value:
                 status: 400
-                code: POPULATION_DENSITY_DATA_400_INVALID_TIME_PERIOD
+                code: POPULATION_DENSITY_DATA.INVALID_TIME_PERIOD
                 message: >-
                   Indicated time period is partially in the past and partially in the future
 
