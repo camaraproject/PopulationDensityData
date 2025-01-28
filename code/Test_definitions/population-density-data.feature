@@ -29,8 +29,8 @@ Feature: CAMARA Population Density Data API, v0.1.1
     @population_density_data_retrievePopulationDensity_01_supported_area_success_scenario
     Scenario: Validate success response for a supported area request
         Given the request body property "$.area" is set to a valid testing area within supported regions
-        And the request body property "$.startDate" is set to a valid testing future date
-        And the request body property "$.endDate" is set to a valid testing future date later than body property "$.startDate"
+        And the request body property "$.startDate" is set to a valid testing date
+        And the request body property "$.endDate" is set to a valid testing date later than body property "$.startDate"
         When the request "retrievePopulationDensity" is sent
         Then the response status code is 200
         And the response header "Content-Type" is "application/json"
@@ -106,9 +106,28 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response header "x-correlator" has same value as the request header "x-correlator"
         And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
 
+    @population_density_data_retrievePopulationDensity_06_supported_area_past_success_scenario
+    Scenario: Validate success response for a supported area request
+        Given the request body property "$.area" is set to a valid testing area within supported regions
+        And the request body property "$.startDate" is set to a valid testing date in the past
+        And the request body property "$.endDate" is set to a valid testing past date later than body property "$.startDate"
+        When the request "retrievePopulationDensity" is sent
+        Then the response status code is 200
+        And the response header "Content-Type" is "application/json"
+        And the response header "x-correlator" has same value as the request header "x-correlator"
+        And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+        And the response property "$.status" value is "SUPPORTED_AREA"
+        And the response property "$.timedPopulationDensityData[*].startTime" is equal to or later than request body property "$.startDate"
+        And the response property "$.timedPopulationDensityData[*].endTime" is equal to or earlier than request body property "$.endDate"
+        And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].populationDensityData[*].dataType" is equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
+        And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].populationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].populationDensityData[*].minPplDensity" is included in the response
+        And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].populationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].populationDensityData[*].pplDensity" is included in the response
+        And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].populationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].populationDensityData[*].maxPplDensity" is included in the response
+
+
     # Generic errors
 
-    @population_density_data_retrievePopulationDensity_06_missing_required_property
+    @population_density_data_retrievePopulationDensity_07_missing_required_property
     Scenario Outline: Error response for missing required property in request body
         Given the request body property "<required_property>" is not included
         When the request "retrievePopulationDensity" is sent
@@ -124,7 +143,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
             | $.startDate       |
             | $.endDate         |
 
-    @population_density_data_retrievePopulationDensity_07_invalid_date_format
+    @population_density_data_retrievePopulationDensity_08_invalid_date_format
     Scenario Outline: Error 400 when the datetime format is not RFC-3339
         Given the request body property "<date_property>" is not set to a valid RFC-3339 date-time
         When the request "retrievePopulationDensity" is sent
@@ -139,7 +158,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
             | $.startDate   |
             | $.endDate     |
 
-    @population_density_data_retrievePopulationDensity_08_invalid_precision
+    @population_density_data_retrievePopulationDensity_09_invalid_precision
     Scenario: Error 400 when precision is not a number between 1 and 12
         Given the request body property "$.precision" is not set to a number between 1 and 12
         When the request "retrievePopulationDensity" is sent
@@ -151,7 +170,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
 
 
     # PLAIN and REFRESHTOKEN are considered in the schema so INVALID_ARGUMENT is not expected
-    @population_density_data_retrievePopulationDensity_09_invalid_sink_credential
+    @population_density_data_retrievePopulationDensity_10_invalid_sink_credential
     Scenario Outline: Invalid credential
         Given the request body property  "$.sinkCredential.credentialType" is set to "<unsupported_credential_type>"
         When the request "retrievePopulationDensity" is sent
@@ -169,7 +188,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
 
     # Only "bearer" is considered in the schema so a generic schema validator may fail and generate a 400 INVALID_ARGUMENT without further distinction,
     # and both could be accepted
-    @population_density_data_retrievePopulationDensity_10_sink_credential_invalid_token
+    @population_density_data_retrievePopulationDensity_11_sink_credential_invalid_token
     Scenario: Invalid token
         Given the request body property  "$.sinkCredential.accessTokenType" is set to a value other than "bearer"
         When the request "retrievePopulationDensity" is sent
@@ -180,7 +199,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "INVALID_TOKEN" or "INVALID_ARGUMENT"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_10_expired_access_token
+    @population_density_data_retrievePopulationDensity_12_expired_access_token
     Scenario: Error response for expired access token
         Given an expired access token
         And the request body is set to a valid request body
@@ -191,7 +210,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "UNAUTHENTICATED"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_11_invalid_access_token
+    @population_density_data_retrievePopulationDensity_13_invalid_access_token
     Scenario: Error response for invalid access token
         Given an invalid access token
         And the request body is set to a valid request body
@@ -202,7 +221,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "UNAUTHENTICATED"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_12_missing_authorization_header
+    @population_density_data_retrievePopulationDensity_14_missing_authorization_header
     Scenario: Error response for no header "Authorization"
         Given the header "Authorization" is not sent
         And the request body is set to a valid request body
@@ -217,7 +236,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
     # API Specific Errors
 
     # An area that does not form a polygon is a straight line or a set of points with same coordinates.
-    @population_density_data_retrievePopulationDensity_13_non_polygonal_area
+    @population_density_data_retrievePopulationDensity_15_non_polygonal_area
     Scenario: Error 400 when the requested area is not a polygon
         Given the request body property "$.area.boundry" is set to an array of coordinates that does not form a polygon
         When the request "retrievePopulationDensity" is sent
@@ -227,7 +246,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "POPULATION_DENSITY_DATA.INVALID_AREA"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_14_too_complex_area
+    @population_density_data_retrievePopulationDensity_16_too_complex_area
     Scenario: Error 400 when the requested area is too complex
         Given the request body property "$.area.boundary" is set to an array of coordinates that form a too complex area
         When the request "retrievePopulationDensity" is sent
@@ -237,7 +256,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "POPULATION_DENSITY_DATA.INVALID_AREA"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_15_min_start_date_exceeded
+    @population_density_data_retrievePopulationDensity_17_min_start_date_exceeded
     Scenario: Error 400 when startDate is set to a date earlier than the minimum allowed
         Given the request body property "$.startDate" is set to a date earlier than the minimum allowed
         When the request "retrievePopulationDensity" is sent
@@ -247,7 +266,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_16_max_start_date_exceeded
+    @population_density_data_retrievePopulationDensity_18_max_start_date_exceeded
     Scenario: Error 400 when startDate is set to a date later than the maximum allowed
         Given the request body property "$.startDate" is set to a date later than the maximum allowed
         When the request "retrievePopulationDensity" is sent
@@ -257,7 +276,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_17_invalid_end_date
+    @population_density_data_retrievePopulationDensity_19_invalid_end_date
     Scenario: Error 400 when endDate is set to a date earlier than startDate
         Given the request body property "$.endDate" is set to a date earlier than request body property "$.startDate"
         When the request "retrievePopulationDensity" is sent
@@ -267,7 +286,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "POPULATION_DENSITY_DATA.INVALID_END_DATE"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_18_max_time_period_exceeded
+    @population_density_data_retrievePopulationDensity_20_max_time_period_exceeded
     Scenario: Error 400 when indicated time period is greater than the maximum allowed
         Given the request body property "$.startDate" is set to a valid testing future
         And the request body property "$.endDate" is set to a future date that exceeds the supported duration from the start date.
@@ -278,7 +297,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_19_unsupported_precision
+    @population_density_data_retrievePopulationDensity_21_unsupported_precision
     Scenario: Error 400 when precision is set to a valid but not supported value
         Given the request body property "$.precision" is set to a valid but not supported value
         When the request "retrievePopulationDensity" is sent
@@ -288,7 +307,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_20_too_big_synchronous_response
+    @population_density_data_retrievePopulationDensity_22_too_big_synchronous_response
     Scenario: Error 400 when the response is too big for a sync response
         Given the request body properties "$.area.boundry", "$.startDate", "$.endDate" and "$.precision" are set to valid values but generate a response too big for a synchronous response
         When the request "retrievePopulationDensity" is sent
@@ -298,7 +317,7 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE"
         And the response property "$.message" contains a user friendly text
 
-    @population_density_data_retrievePopulationDensity_21_too_big_request
+    @population_density_data_retrievePopulationDensity_23_too_big_request
     Scenario: Error 400 when the response is too big for a sync adn async response
         Given the request body properties "$.area.boundry", "$.startDate", "$.endDate" and "$.precision" are set to valid values but generate a response too big for a synchronous and asynchronous response
         When the request "retrievePopulationDensity" is sent
@@ -306,4 +325,15 @@ Feature: CAMARA Population Density Data API, v0.1.1
         And the response header "Content-Type" is "application/json"
         And the response property "$.status" is 400
         And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST"
+        And the response property "$.message" contains a user friendly text
+
+    @population_density_data_retrievePopulationDensity_24_timeframe_crosses_request_time
+    Scenario: Error 400 when startDate is set to a date in the past and the endDate is set to a date in the future
+        Given the request body property "$.startDate" is set to a date in the past
+        And the request body property "$.endDate" is set to a date in the future
+        When the request "retrievePopulationDensity" is sent
+        Then the response status code is 400
+        And the response header "Content-Type" is "application/json"
+        And the response property "$.status" is 400
+        And the response property "$.code" is "POPULATION_DENSITY_DATA.INVALID_TIME_PERIOD"
         And the response property "$.message" contains a user friendly text
