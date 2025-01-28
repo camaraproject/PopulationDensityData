@@ -24,7 +24,7 @@ The API definition(s) are based on
 
 **population-density-data v0.2.0-rc.1 is the 1st release candidate of the version 0.2.0**
 
-- 0.2.0-rc.1 Device Swap API definition **with inline documentation**:
+- 0.2.0-rc.1 Population Density Data API definition **with inline documentation**:
   - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r2.1/code/API_definitions/population-density-data.yaml)
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r2.1/code/API_definitions/population-density-data.yaml&nocors)
   - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r2.1/code/API_definitions/population-density-data.yaml)
