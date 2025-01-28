@@ -2,11 +2,58 @@
 
 ## Table of Contents
 
+- [r2.1](#r21)
 - **[r1.2](#r12)**
 - [r1.1](#r11)
 - [v0.1.0](#v010)
 
 **Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until it has been released. For example, changes may be reverted before a release is published. For the best results, use the latest published release.**
+
+# r2.1
+## Release Notes
+
+This release contains the definition and documentation of
+* population-density-data v0.2.0-rc.1
+
+The API definition(s) are based on
+* Commonalities v0.5.0-alpha.1
+* Identity and Consent Management v0.3.0-alpha.1
+
+
+## population-density-data v0.2.0-rc.1
+
+**population-density-data v0.2.0-rc.1 is the 1st release candidate of the version 0.2.0**
+
+- 0.2.0-rc.1 Device Swap API definition **with inline documentation**:
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r2.1/code/API_definitions/population-density-data.yaml)
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r2.1/code/API_definitions/population-density-data.yaml&nocors)
+  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r2.1/code/API_definitions/population-density-data.yaml)
+
+### Added
+* Include new description to the sink endpoint and included start/endtime references to align API input and output. by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/57
+* Include "OPERATION_NOT_COMPLETED" error for async operation by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/63
+* Include operation ID for the async mechanism by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/64
+* Add a pattern for x-correlator by @bigludo7 in https://github.com/camaraproject/PopulationDensityData/pull/71
+* Support time window in the past in the APIexposure of data in the past is added by @gregory1g in https://github.com/camaraproject/PopulationDensityData/pull/60
+
+
+### Changed
+* Simplify class management and change of density value formats by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/59
+* Update error with 422 by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/66
+* Align error code & definition as specified in Commonalities 0.5 by @bigludo7 in https://github.com/camaraproject/PopulationDensityData/pull/68
+* Align PPD API with areaType format by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/69
+* Align 429 messages by @bigludo7 in https://github.com/camaraproject/PopulationDensityData/pull/73
+
+### Fixed
+N/A
+
+### Removed
+N/A
+
+## New Contributors
+* @bigludo7 made their first contribution in https://github.com/camaraproject/PopulationDensityData/pull/68
+
+**Full Changelog**: https://github.com/camaraproject/PopulationDensityData/compare/r1.2...r2.1
 
 # r1.2
 ## Release Notes
