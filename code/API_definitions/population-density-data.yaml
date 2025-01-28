@@ -10,7 +10,8 @@ info:
     With the Population Density Data API the customer can retrieve population density estimations
     for a specific area at the current or a specified period of time. The estimation considers historical
     anonymized information of the network connected devices in the requested
-    area.
+    area. * Note that the data provided are estimations of population, based on past or future predicted data, for both past or future time ranges. 
+
 
 
     This functionality can be used for multiple use
