@@ -89,7 +89,7 @@ info:
 
     For requests with a combination of `area`, `precision`, `startTime` and `endTime`
     properties too big for both synchronous and asynchronous processing, the API
-    returns the error response `POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST`.
+    returns the error response `POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST`.
 
     If an error happens during the asynchronous processing of the request. The API callback
     will have property `status` with value `OPERATION_NOT_COMPLETED` as an error cannot be returned in the callback.
@@ -105,13 +105,13 @@ info:
     The API provides one endpoint that accepts POST requests for retrieving population
     density information in the specified area.
 
-    # Authorization and Authentication
+    # Authorization and authentication
 
-    The "Camara Security and Interoperability Profile" provides details on how a client requests an access token. Please refer to Identify and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the Profile.
+    The "Camara Security and Interoperability Profile" provides details of how an API consumer requests an access token. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the profile.
 
-    Which specific authorization flows are to be used will be determined during onboarding process, happening between the API Client and the Telco Operator exposing the API, taking into account the declared purpose for accessing the API, while also being subject to the prevailing legal framework dictated by local legislation.
+    The specific authorization flows to be used will be agreed upon during the onboarding process, happening between the API consumer and the API provider, taking into account the declared purpose for accessing the API, whilst also being subject to the prevailing legal framework dictated by local legislation.
 
-    It is important to remark that in cases where personal user data is processed by the API, and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of 3-legged access tokens becomes mandatory. This measure ensures that the API remains in strict compliance with user privacy preferences and regulatory obligations, upholding the principles of transparency and user-centric data control.
+    In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
 
     Population Density Data API ensures the usage of anonymized information and do not treat personal data neither as input nor output.
     Therefore, the access to Population Density Data API is defined as Client Credentials - 2-legged. Please refer to Identify and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the latest detailed specification of this authentication/authorization flow.
@@ -124,14 +124,14 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: wip
+  version: 0.2.0-rc.1
 
-  x-camara-commonalities: 0.4.0
+  x-camara-commonalities: 0.5
 externalDocs:
   description: Product documentation at Camara.
   url: https://github.com/camaraproject/
 servers:
-  - url: '{apiRoot}/population-density-data/vwip'
+  - url: '{apiRoot}/population-density-data/v0.2rc1'
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -657,7 +657,7 @@ components:
           - The area is not a polygon shape or exceeds supported complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or exceeds supported complexity")
           - Indicated `startTime` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED", "message": "Indicated startTime is greater than the maximum allowed")
           - Indicated `startTime` is earlier than the minimum allowed ("code": "POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED", "message": "Indicated startTime is earlier than the minimum allowed")
-          - Indicated `endTime` is earlier than the `startTime` ("code": "POPULATION_DENSITY_DATA.INVALID_END_DATE", "message": "Indicated endTime is earlier than the startTime")
+          - Indicated `endTime` is earlier than the `startTime` ("code": "POPULATION_DENSITY_DATA.INVALID_END_TIME", "message": "Indicated endTime is earlier than the startTime")
           - Indicated time period is partially in the past and partially in the future ("code": "POPULATION_DENSITY_DATA.INVALID_TIME_PERIOD", "message": "time period is partially in the past and partially in the future")
           - Indicated time period is greater than the maximum allowed (More than maximum hours between startTime and endTime) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than maximum hours between startTime and endTime)")
       headers:
@@ -681,7 +681,7 @@ components:
                       - POPULATION_DENSITY_DATA.INVALID_AREA
                       - POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED
                       - POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED
-                      - POPULATION_DENSITY_DATA.INVALID_END_DATE
+                      - POPULATION_DENSITY_DATA.INVALID_END_TIME
                       - POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED
                       - POPULATION_DENSITY_DATA.INVALID_TIME_PERIOD
           examples:
@@ -717,10 +717,10 @@ components:
                 code: POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED
                 message: >-
                   Indicated startTime is earlier than the minimum allowed
-            POPULATION_DENSITY_DATA_400_INVALID_END_DATE:
+            POPULATION_DENSITY_DATA_400_INVALID_END_TIME:
               value:
                 status: 400
-                code: POPULATION_DENSITY_DATA.INVALID_END_DATE
+                code: POPULATION_DENSITY_DATA.INVALID_END_TIME
                 message: Indicated endDate is earlier than the startTime
             POPULATION_DENSITY_DATA_400_MAX_TIME_PERIOD_EXCEEDED:
               value:
@@ -864,7 +864,7 @@ components:
     RetrieveLocationUnprocessableContent422:
       description: >-
         Problem with the client request. The following scenarios may exist:
-          - Indicated combination of area, time interval and precision is too big ("code": "POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big")
+          - Indicated combination of area, time interval and precision is too big ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big")
           - Indicated cell precision (Geohash level) is not supported ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION", "message": "Indicated cell precision (Geohash level) is not supported")
           - Indicated combination of area, time interval and precision is too big for a sync response ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE", "message": "Indicated combination of area, time interval and precision is too big for a sync response")
       headers:
@@ -882,14 +882,14 @@ components:
                       - 422
                   code:
                     enum:
-                      - POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST
+                      - POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST
                       - POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION
                       - POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE
           examples:
-            POPULATION_DENSITY_DATA_422_UNSUPPPORTED_REQUEST:
+            POPULATION_DENSITY_DATA_422_UNSUPPORTED_REQUEST:
               value:
                 status: 422
-                code: POPULATION_DENSITY_DATA.UNSUPPPORTED_REQUEST
+                code: POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST
                 message: Indicated combination of area, time interval and precision is too big
             POPULATION_DENSITY_DATA_422_UNSUPPORTED_PRECISION:
               value:
