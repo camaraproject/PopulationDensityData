@@ -41,7 +41,7 @@ The API definition(s) are based on
 * Simplify class management and change of density value formats by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/59
 * Update error with 422 by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/66
 * Align error code & definition as specified in Commonalities 0.5 by @bigludo7 in https://github.com/camaraproject/PopulationDensityData/pull/68
-* Align PPD API with areaType format by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/69
+* Align population-density-data API with areaType format by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/69
 * Align 429 messages by @bigludo7 in https://github.com/camaraproject/PopulationDensityData/pull/73
 * Update API test plan for Population Density Data including new features and alignement with commonalities by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/76
 
