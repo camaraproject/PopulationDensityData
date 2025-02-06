@@ -43,6 +43,7 @@ The API definition(s) are based on
 * Align error code & definition as specified in Commonalities 0.5 by @bigludo7 in https://github.com/camaraproject/PopulationDensityData/pull/68
 * Align PPD API with areaType format by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/69
 * Align 429 messages by @bigludo7 in https://github.com/camaraproject/PopulationDensityData/pull/73
+* Update API test plan for Population Density Data including new features and alignement with commonalities by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/76
 
 ### Fixed
 N/A
