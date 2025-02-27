@@ -23,7 +23,7 @@ The API definition(s) are based on
 
 ## population-density-data v0.2.0
 
-**population-density-data v0.2.0 is the 1st public release of the Population Density Data API**
+**population-density-data v0.2.0 is the public release of the Population Density Data API**
 
 - 0.2.0 Population Density Data API definition **with inline documentation**:
   - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r2.2/code/API_definitions/population-density-data.yaml)
