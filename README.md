@@ -31,7 +31,7 @@ Repository to describe, develop, document and test the Population Density Data A
 ## Status and released versions
 
 * Note: Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until a new release is created. For example, changes may be reverted before a release is created. **For best results, use the latest available release**.
-* The release r2.2 contains the version 0.2.0 of the Population Density Data API. The release tag is [r2.2](https://github.com/camaraproject/PopulationDensityData/tree/r2.2).
+* The public release r2.2 contains the version 0.2.0 of the Population Density Data API. The release tag is [r2.2](https://github.com/camaraproject/PopulationDensityData/tree/r2.2).
 - 0.2.0 Population Density Data API definition **with inline documentation**:
   - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r2.2/code/API_definitions/population-density-data.yaml)
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r2.2/code/API_definitions/population-density-data.yaml&nocors)
