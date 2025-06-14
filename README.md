@@ -5,9 +5,13 @@
 <a href="https://github.com/camaraproject/PopulationDensityData" title="Repo Size"><img src="https://img.shields.io/github/repo-size/camaraproject/PopulationDensityData?style=plastic"></a>
 <a href="https://github.com/camaraproject/PopulationDensityData/blob/main/LICENSE" title="License"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg?style=plastic"></a>
 <a href="https://github.com/camaraproject/PopulationDensityData/releases/latest" title="Latest Release"><img src="https://img.shields.io/github/release/camaraproject/PopulationDensityData?style=plastic"></a>
+<a href="https://github.com/camaraproject/Governance/blob/main/ProjectStructureAndRoles.md" title="Incubating API Repository"><img src="https://img.shields.io/badge/Incubating%20API%20Repository-green?style=plastic"></a>
 
 # Population Density Data
-Repository to describe, develop, document and test the Population Density Data APIs
+
+Incubating API Repository to evolve and maintain the definitions and documentation of {{repo_name}} Service API(s) within the Sub Project [Population Density Data](https://lf-camaraproject.atlassian.net/wiki/x/AgDe) <!-- To be updated when page is available -->
+
+* API Repository [wiki page](https://lf-camaraproject.atlassian.net/wiki/x/3DXe)
 
 ## Scope
 * Service APIs for “Population Density Data” (see APIBacklog.md)  
