@@ -9,7 +9,7 @@
 
 # PopulationDensityData
 
-Incubating API Repository to evolve and maintain the definitions and documentation of PopulationDensityData Service API(s) within the Sub Project [Population Density Data](https://lf-camaraproject.atlassian.net/wiki/spaces/CAM/pages/137363503/Population+Density+Data) <!-- To be updated when page is available -->
+Incubating API Repository to evolve and maintain the definitions and documentation of PopulationDensityData Service API(s) within the Sub Project [Population Density Data](https://lf-camaraproject.atlassian.net/wiki/x/LwAwC) 
 
 * API Repository [wiki page](https://lf-camaraproject.atlassian.net/wiki/x/3DXe)
 
