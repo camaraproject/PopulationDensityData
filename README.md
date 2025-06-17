@@ -25,17 +25,11 @@ Incubating API Repository to evolve and maintain the definitions and documentati
 * Describe, develop, document and test the APIs (with 1-2 Telcos)  
 * Started: December 2023
 
-## Meetings
-* Meetings are held virtually [Click here to join (Zoom)](https://zoom-lfx.platform.linuxfoundation.org/meeting/95956472717?password=e4e7e889-ffb8-4fac-9e9d-d9adcaf2e711)
-* Schedule: bi-weekly, Wednesday, 14:00 Europe/Amsterdam (CET) (13:00 UTC, 12:00 UTC during European DST).
-
-  For date/time of next meeting see [previous meeting minutes](https://github.com/camaraproject/PopulationDensityData/tree/main/documentation/MeetingMinutes).
-
 ## Status and released versions
 
 * Note: Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until a new release is created. For example, changes may be reverted before a release is created. **For best results, use the latest available release**.
 * The public release r2.2 contains the version 0.2.0 of the Population Density Data API. The release tag is [r2.2](https://github.com/camaraproject/PopulationDensityData/tree/r2.2).
-- 0.2.0 Population Density Data API definition **with inline documentation**:
+* 0.2.0 Population Density Data API definition **with inline documentation**:
   - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r2.2/code/API_definitions/population-density-data.yaml)
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r2.2/code/API_definitions/population-density-data.yaml&nocors)
   - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r2.2/code/API_definitions/population-density-data.yaml)
@@ -43,6 +37,12 @@ Incubating API Repository to evolve and maintain the definitions and documentati
 * Other releases of this sub project are available in https://github.com/camaraproject/PopulationDensityData/releases
 * For changes see [CHANGELOG.md](https://github.com/camaraproject/PopulationDensityData/blob/main/CHANGELOG.md)
 
-## Contributorship and mailing list
-* To subscribe / unsubscribe to the mailing list of this Sub Project and thus be / resign as Contributor please visit <https://lists.camaraproject.org/g/sp-pdd>.
-* A message to all Contributors of this Sub Project can be sent using <sp-pdd@lists.camaraproject.org>.
+## Contributing
+
+* Meetings are held virtually 
+  * Schedule: bi-weekly, Wednesday, 14:00 Europe/Amsterdam (CET) (13:00 UTC, 12:00 UTC during European DST).
+  * [Registration / Join](https://zoom-lfx.platform.linuxfoundation.org/meeting/95956472717?password=e4e7e889-ffb8-4fac-9e9d-d9adcaf2e711)
+  * For date/time of next meeting see previous [ meeting minutes](https://lf-camaraproject.atlassian.net/wiki/x/HwPe)
+* Mailing List
+  * Subscribe / Unsubscribe to the mailing list <https://lists.camaraproject.org/g/sp-pdd>.
+  * A message to the community of this Sub Project can be sent using <sp-pdd@lists.camaraproject.org>.
