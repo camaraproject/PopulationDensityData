@@ -9,7 +9,7 @@
 
 # PopulationDensityData
 
-Incubating API Repository to evolve and maintain the definitions and documentation of PopulationDensityData Service API(s) within the Sub Project [Population Density Data](https://lf-camaraproject.atlassian.net/wiki/x/AgDe) <!-- To be updated when page is available -->
+Incubating API Repository to evolve and maintain the definitions and documentation of PopulationDensityData Service API(s) within the Sub Project [Population Density Data](https://lf-camaraproject.atlassian.net/wiki/x/LwAwC) 
 
 * API Repository [wiki page](https://lf-camaraproject.atlassian.net/wiki/x/3DXe)
 
@@ -24,6 +24,7 @@ Incubating API Repository to evolve and maintain the definitions and documentati
   * NOTE: The scope of these APIs should be limited (at least at a first stage) to 4G and 5G.  
 * Describe, develop, document and test the APIs (with 1-2 Telcos)  
 * Started: December 2023
+* Incubating stage since: June 2025
 
 ## Meetings
 * Meetings are held virtually [Click here to join (Zoom)](https://zoom-lfx.platform.linuxfoundation.org/meeting/95956472717?password=e4e7e889-ffb8-4fac-9e9d-d9adcaf2e711)
