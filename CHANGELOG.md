@@ -32,7 +32,7 @@ The API definition(s) are based on
   - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r3.1/code/API_definitions/population-density-data.yaml)
 
 ### Added
-* Align with commonalities 0.6 and include Sink Error by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/
+* Align with commonalities 0.6 and include Sink Error by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/91
 
 ### Changed
 N/A
