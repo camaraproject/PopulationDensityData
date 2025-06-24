@@ -1,4 +1,4 @@
-Feature: CAMARA Population Density Data API, v0.3.0-rc1
+Feature: CAMARA Population Density Data API, v0.3.0-rc.1
     # Input to be provided by the implementation to the tester
     #
     # Implementation indications:
@@ -14,9 +14,9 @@ Feature: CAMARA Population Density Data API, v0.3.0-rc1
     # * An Area partially within the supported region
     # * An Area outside the supported region
     #
-    # References to OAS spec schemas refer to schemas specifies in population-density-data.yaml, version 0.3.0-rc1
+    # References to OAS spec schemas refer to schemas specifies in population-density-data.yaml, version 0.3.0-rc.1
 
-    Background: Common retrievePopulationDensity  setup
+    Background: Common retrievePopulationDensity setup
         Given an environment at "apiRoot"
         And the resource "/population-density-data/v0.3-rc1/retrieve"
         And the header "Content-Type" is set to "application/json"
