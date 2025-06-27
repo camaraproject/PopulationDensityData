@@ -922,7 +922,7 @@ components:
               value:
                 status: 422
                 code: POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST
-                message: Indicated combination of area, time interval and precision is too big
+                message: Indicated combination of area, time interval and precision is too big for both synchronous and asynchronous processing
             POPULATION_DENSITY_DATA_422_UNSUPPORTED_PRECISION:
               value:
                 status: 422
@@ -934,7 +934,8 @@ components:
                 status: 422
                 code: POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE
                 message: >-
-                  Indicated combination of area, time interval and precision is too big for a sync response
+                  Indicated combination of area, time interval and precision is too big for synchronous processing
+                  and asynchronous processing is not enabled
     Generic429:
       description: Too Many Requests
       headers:
