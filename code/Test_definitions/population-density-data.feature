@@ -18,7 +18,7 @@ Feature: CAMARA Population Density Data API, v0.3.0-rc.1
 
     Background: Common retrievePopulationDensity setup
         Given an environment at "apiRoot"
-        And the resource "/population-density-data/v0.3-rc1/retrieve"
+        And the resource "/population-density-data/v0.3rc1/retrieve"
         And the header "Content-Type" is set to "application/json"
         And the header "Authorization" is set to a valid access token
         And the header "x-correlator" is set to a UUID value
