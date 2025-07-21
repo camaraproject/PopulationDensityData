@@ -56,7 +56,7 @@ Feature: CAMARA Population Density Data API, v0.3.0-rc.1
         And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
         And the response property "$.status" value is "PART_OF_AREA_NOT_SUPPORTED"
         And the response property "$.timedPopulationDensityData[*].startTime" is equal to or later than request body property "$.startTime"
-        And the response property "$.timedPopulationDensityData[*].endTime" is equal to or earlier than request body property "$.startTime"
+        And the response property "$.timedPopulationDensityData[*].endTime" is equal to or earlier than request body property "$.endTime"
         And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].datatype" equal to "NO_DATA"
         And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].datatype" equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
         And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].minPplDensity" is included in the response
