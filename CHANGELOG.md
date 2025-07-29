@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [r3.1](#r31)
 - **[r2.2](#r22)**
 - [r2.1](#r21)
 - **[r1.2](#r12)**
@@ -9,6 +10,40 @@
 - [v0.1.0](#v010)
 
 **Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until it has been released. For example, changes may be reverted before a release is published. For the best results, use the latest published release.**
+
+# r3.1
+## Release Notes
+
+This release contains the definition and documentation of
+* population-density-data v0.3.0-rc.1
+
+The API definition(s) are based on
+* Commonalities v0.6.0-rc.1
+* Identity and Consent Management v0.4.0-rc.1
+
+
+## population-density-data v0.3.0-rc.1
+
+**population-density-data v0.3.0-rc.1 is the 1st release candidate of the version 0.3.0**
+
+- 0.3.0-rc.1 Population Density Data API definition **with inline documentation**:
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r3.1/code/API_definitions/population-density-data.yaml)
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r3.1/code/API_definitions/population-density-data.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r3.1/code/API_definitions/population-density-data.yaml)
+
+### Added
+* Align with commonalities 0.6 (XCorrelator pattern update, error text clarification for generic cases) and include Sink Error by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/91
+
+### Changed
+N/A
+
+### Fixed
+N/A
+
+### Removed
+N/A
+
+**Full Changelog**: https://github.com/camaraproject/PopulationDensityData/compare/r2.2...r3.1
 
 # r2.2
 ## Release Notes
