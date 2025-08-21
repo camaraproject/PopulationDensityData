@@ -5,8 +5,8 @@ Feature: CAMARA Population Density Data API, vwip
     # * Geohash precisions allowed
     # * Min start and end date-times allowed
     # * Max requested time period allowed
-    # * Max size of the response(Combination of area, startTime, endTime an precision requested) supported for a sync response
-    # * Max size of the response(Combination of area, startTime, endTime an precision requested) supported for an async response
+    # * Max size of the response(Combination of area, startTime, endTime and precision requested) supported for a sync response
+    # * Max size of the response(Combination of area, startTime, endTime and precision requested) supported for an async response
     # * Limitations about max complexity of requested area allowed
     #
     # Testing assets:
@@ -56,8 +56,8 @@ Feature: CAMARA Population Density Data API, vwip
         And the response property "$.status" value is "PART_OF_AREA_NOT_SUPPORTED"
         And the response property "$.timedPopulationDensityData[*].startTime" is equal to or later than request body property "$.startTime"
         And the response property "$.timedPopulationDensityData[*].endTime" is equal to or earlier than request body property "$.endTime"
-        And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].datatype" equal to "NO_DATA"
-        And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].datatype" equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
+        And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" equal to "NO_DATA"
+        And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
         And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].minPplDensity" is included in the response
         And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].pplDensity" is included in the response
         And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].maxPplDensity" is included in the response
@@ -92,7 +92,7 @@ Feature: CAMARA Population Density Data API, vwip
         And the response header "x-correlator" has same value as the request header "x-correlator"
         And the response includes property "$.operationId"
         And the request with the response body will be received at the address of the request property "$.sink"
-        And the request will have header "Authorization" set to "Bearer: " + the value of the request property "$.sinkCredential.accessToken"
+        And the request will have header "Authorization" set to "Bearer " + the value of the request property "$.sinkCredential.accessToken"
         And the request will have property "$.operationId" equal to response property "$.operationId"
         And the request body complies with the OAS schema at "/components/schemas/PopulationDensityAsyncResponse"
 
@@ -114,7 +114,7 @@ Feature: CAMARA Population Density Data API, vwip
         And the response includes property "$.operationId"
         And there have been some problem processing the request asynchronously
         And the request with the response body will be received at the address of the request property "$.sink"
-        And the request will have header "Authorization" set to "Bearer: " + the value of the request property "$.sinkCredential.accessToken"
+        And the request will have header "Authorization" set to "Bearer " + the value of the request property "$.sinkCredential.accessToken"
         And the request will have property "$.operationId" equal to response property "$.operationId"
         And the request body complies with the OAS schema at "/components/schemas/PopulationDensityAsyncResponse"
         And the request body will have property "$.status" equal to "OPERATION_NOT_COMPLETED"
@@ -200,7 +200,7 @@ Feature: CAMARA Population Density Data API, vwip
     # PLAIN and REFRESHTOKEN are considered in the schema so INVALID_ARGUMENT is not expected
     @population_density_data_400.04_invalid_sink_credential
     Scenario: Invalid credential
-        Given the request body property  "$.sinkCredential.credentialType" is not set to "ACCESSTOKEN"
+        Given the request body property "$.sinkCredential.credentialType" is not set to "ACCESSTOKEN"
         When the request "retrievePopulationDensity" is sent
         Then the response status code is 400
         And the response header "x-correlator" has same value as the request header "x-correlator"
@@ -213,7 +213,7 @@ Feature: CAMARA Population Density Data API, vwip
     # and both could be accepted
     @population_density_data_400.05_sink_credential_invalid_token
     Scenario: Invalid token
-        Given the request body property  "$.sinkCredential.accessTokenType" is set to a value other than "bearer"
+        Given the request body property "$.sinkCredential.accessTokenType" is set to a value other than "bearer"
         When the request "retrievePopulationDensity" is sent
         Then the response status code is 400
         And the response header "x-correlator" has same value as the request header "x-correlator"
@@ -286,7 +286,7 @@ Feature: CAMARA Population Density Data API, vwip
 
     @population_density_data_400.12_max_time_period_exceeded
     Scenario: Error 400 when indicated date-time period is greater than the maximum allowed
-        Given the request body property "$.startTime" is set to a valid testing future
+        Given the request body property "$.startTime" is set to a valid testing future date-time
         And the request body property "$.endTime" is set to a future date-time that exceeds the supported duration from the start time.
         When the request "retrievePopulationDensity" is sent
         Then the response status code is 400
@@ -344,7 +344,7 @@ Feature: CAMARA Population Density Data API, vwip
     # Error 403 scenarios
 
     @population_density_data_403.01_invalid_token_permissions
-    Scenario: Error response for no header "Authorization"
+    Scenario: Error response for invalid access token permissions
         # To test this scenario, it will be necessary to obtain a token without the required scope
         Given the header "Authorization" is set to an access token without the required scope
         And the request body is set to a valid request body
