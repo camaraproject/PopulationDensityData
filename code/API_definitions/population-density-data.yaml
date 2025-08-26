@@ -659,22 +659,24 @@ components:
             - maxPplDensity
             - minPplDensity
             - pplDensity
+
     ErrorInfo:
       type: object
       required:
+        - message
         - status
         - code
-        - message
       properties:
-        status:
-          type: integer
-          description: HTTP status code returned along with this error response.
-        code:
-          type: string
-          description: Code given to this error.
         message:
           type: string
-          description: Detailed error description.
+          description: A human-readable description of what the event represents
+        status:
+          type: integer
+          description: HTTP response status code
+        code:
+          type: string
+          description: A human-readable code to describe the error
+
   responses:
     RetrieveLocationBadRequest400:
       description: >-
@@ -1129,3 +1131,4 @@ components:
         timedPopulationDensityData: []
         statusInfo: Some error happened during the processing of the request
         operationId: 2322f362-eaab-4cf3-86d2-efcbdf3a7cb4
+
