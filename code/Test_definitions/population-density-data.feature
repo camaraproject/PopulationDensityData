@@ -25,7 +25,7 @@ Feature: CAMARA Population Density Data API, vwip
   # Happy path scenarios
 
   @population_density_data_01_supported_area_success_scenario
-  Scenario: Validate success response for a supported area request
+  Scenario Outline: Successfully request population density data for a future time
     Given the request body property "$.area" is set to a valid testing area within supported regions
     And the request body property "$.startTime" is set to a valid testing date-time
     And the request body property "$.endTime" is set to a valid testing date-time later than body property "$.startTime"
@@ -38,12 +38,16 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.timedPopulationDensityData[*].startTime" is equal to or later than request body property "$.startTime"
     And the response property "$.timedPopulationDensityData[*].endTime" is equal to or earlier than request body property "$.endTime"
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" is equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
-    And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].minPplDensity" is included in the response
-    And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].pplDensity" is included in the response
-    And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].maxPplDensity" is included in the response
+    And for items for which "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "<property>" is also present
+
+    Examples:
+      | property |
+      | $.timedPopulationDensityData[*].cellPopulationDensityData[*].minPplDensity |
+      | $.timedPopulationDensityData[*].cellPopulationDensityData[*].pplDensity    |
+      | $.timedPopulationDensityData[*].cellPopulationDensityData[*].maxPplDensity |
 
   @population_density_data_02_partial_area_success_scenario
-  Scenario: Validate success response for a partial supported area request
+  Scenario Outline: Validate success response for a partial supported area request
     Given the request body property "$.area" is set to a valid testing area partially within supported regions
     And the request body property "$.startTime" is set to a valid testing future date-time
     And the request body property "$.endTime" is set to a valid testing future date-time later than body property "$.startTime"
@@ -57,9 +61,13 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.timedPopulationDensityData[*].endTime" is equal to or earlier than request body property "$.endTime"
     And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].datatype" equal to "NO_DATA"
     And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].datatype" equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
-    And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].minPplDensity" is included in the response
-    And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].pplDensity" is included in the response
-    And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].maxPplDensity" is included in the response
+    And for items for which "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "<property>" is also present
+
+    Examples:
+      | property |
+      | $.timedPopulationDensityData[*].cellPopulationDensityData[*].minPplDensity |
+      | $.timedPopulationDensityData[*].cellPopulationDensityData[*].pplDensity    |
+      | $.timedPopulationDensityData[*].cellPopulationDensityData[*].maxPplDensity |
 
   @population_density_data_03_not_supported_area_success_scenario
   Scenario: Validate success response for unsupported area request
@@ -108,7 +116,7 @@ Feature: CAMARA Population Density Data API, vwip
     And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
 
   @population_density_data_06_supported_area_past_success_scenario
-  Scenario: Validate success response for a supported area request
+  Scenario Outline: Successfully request population density data for a past time
     Given the request body property "$.area" is set to a valid testing area within supported regions
     And the request body property "$.startTime" is set to a valid testing date-time in the past
     And the request body property "$.endTime" is set to a valid testing past date-time later than body property "$.startTime"
@@ -121,9 +129,13 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.timedPopulationDensityData[*].startTime" is equal to or later than request body property "$.startTime"
     And the response property "$.timedPopulationDensityData[*].endTime" is equal to or earlier than request body property "$.endTime"
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" is equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
-    And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].minPplDensity" is included in the response
-    And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].pplDensity" is included in the response
-    And for items with response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].maxPplDensity" is included in the response
+    And for items for which "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" == "DENSITY_ESTIMATION", the response property "<property>" is also present
+
+    Examples:
+      | property |
+      | $.timedPopulationDensityData[*].cellPopulationDensityData[*].minPplDensity |
+      | $.timedPopulationDensityData[*].cellPopulationDensityData[*].pplDensity    |
+      | $.timedPopulationDensityData[*].cellPopulationDensityData[*].maxPplDensity |
 
   # Generic errors
 
@@ -238,7 +250,7 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.message" contains a user friendly text
 
   @population_density_data_16_invalid_token_permissions
-  Scenario: Error response for no header "Authorization"
+  Scenario: Error response for invalid token permissions
     # To test this scenario, it will be necessary to obtain a token without the required scope
     Given the header "Authorization" is set to an access token without the required scope
     And the request body is set to a valid request body
@@ -346,7 +358,8 @@ Feature: CAMARA Population Density Data API, vwip
 
   @population_density_data_26_too_big_request
   Scenario: Error 400 when the response is too big for a sync adn async response
-    Given the request body properties "$.area.boundary", "$.startTime", "$.endTime" and "$.precision" are set to valid values but generate a response too big for a synchronous and asynchronous response
+    Given the request body properties "$.area.boundary", "$.startTime", "$.endTime" and "$.precision" are set to valid values
+    But the response would be too big for either a synchronous or asynchronous response
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 422
     And the response header "Content-Type" is "application/json"
