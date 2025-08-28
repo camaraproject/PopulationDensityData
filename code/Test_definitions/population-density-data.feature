@@ -182,7 +182,6 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-
   # PLAIN and REFRESHTOKEN are considered in the schema so INVALID_ARGUMENT is not expected
   @population_density_data_400.04_invalid_sink_credential
   Scenario: Invalid credential
