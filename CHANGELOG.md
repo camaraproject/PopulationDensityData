@@ -2,14 +2,49 @@
 
 ## Table of Contents
 
+- **[r3.2](#r32)**
 - [r3.1](#r31)
-- **[r2.2](#r22)**
+- [r2.2](#r22)
 - [r2.1](#r21)
-- **[r1.2](#r12)**
+- [r1.2](#r12)
 - [r1.1](#r11)
 - [v0.1.0](#v010)
 
 **Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until it has been released. For example, changes may be reverted before a release is published. For the best results, use the latest published release.**
+
+# r3.2
+## Release Notes
+This release contains the definition and documentation of
+* population-density-data v0.3.0
+
+The API definition(s) are based on
+* Commonalities v0.6.0
+* Identity and Consent Management v0.4.0
+
+## population-density-data v0.3.0
+
+This is the public release for the CAMARA Meta Release Fall25 release of the Population Density Data API, version v0.3.0. It contains mainly alignments with the Commonalities v0.6.0.
+
+- 0.3.0 Population Density Data API definition **with inline documentation**:
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r3.2/code/API_definitions/population-density-data.yaml)
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r3.2/code/API_definitions/population-density-data.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r3.2/code/API_definitions/population-density-data.yaml)
+
+In the following there is the list of the modifications with respect to the previous release.
+
+### Added
+N/A
+
+### Changed
+N/A
+
+### Fixed
+N/A
+
+### Removed
+N/A
+
+**Full Changelog**: https://github.com/camaraproject/PopulationDensityData/compare/r2.2...r3.2
 
 # r3.1
 ## Release Notes
@@ -25,6 +60,8 @@ The API definition(s) are based on
 ## population-density-data v0.3.0-rc.1
 
 **population-density-data v0.3.0-rc.1 is the 1st release candidate of the version 0.3.0**
+
+This is a pre-release candidate for the CAMARA Meta Release Fall25 release of the Population Density Data API, version v0.3.0-rc.1. It contains mainly alignments with the Commonalities v0.6.0-rc.1.
 
 - 0.3.0-rc.1 Population Density Data API definition **with inline documentation**:
   - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r3.1/code/API_definitions/population-density-data.yaml)
