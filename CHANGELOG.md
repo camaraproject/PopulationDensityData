@@ -33,7 +33,7 @@ This is the public release for the CAMARA Meta Release Fall25 release of the Pop
 In the following there is the list of the modifications with respect to the previous release.
 
 ### Added
-N/A
+* Alignment with Commonalities r3.3 by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/94
 
 ### Changed
 N/A
@@ -70,6 +70,7 @@ This is a pre-release candidate for the CAMARA Meta Release Fall25 release of th
 
 ### Added
 * Align with commonalities 0.6 (XCorrelator pattern update, error text clarification for generic cases) and include Sink Error by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/91
+* Migrate to centralized linting workflows by @hdamker-bot in https://github.com/camaraproject/PopulationDensityData/pull/95
 
 ### Changed
 N/A
@@ -79,6 +80,9 @@ N/A
 
 ### Removed
 N/A
+
+### New Contributors
+* @eric-murray made their first contribution in https://github.com/camaraproject/PopulationDensityData/pull/92
 
 **Full Changelog**: https://github.com/camaraproject/PopulationDensityData/compare/r2.2...r3.1
 
