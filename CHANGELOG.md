@@ -35,6 +35,7 @@ In the following there is the list of the modifications with respect to the prev
 ### Added
 * Alignment with Commonalities r3.3 by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/94
 * Migrate to centralized linting workflows by @hdamker-bot in https://github.com/camaraproject/PopulationDensityData/pull/95
+* Align with commonalities 0.6 (XCorrelator pattern update, error text clarification for generic cases) and include Sink Error by @jgarciahospital in https://github.com/camaraproject/PopulationDensityData/pull/91
 
 ### Changed
 N/A
