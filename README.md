@@ -29,11 +29,11 @@ Incubating API Repository to evolve and maintain the definitions and documentati
 ## Status and released versions
 
 * Note: Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until a new release is created. For example, changes may be reverted before a release is created. **For best results, use the latest available release**.
-* `NEW`: Pre-release r3.1 with version 0.3.0-rc.1 of the Population Density Data API is available in [r3.1](https://github.com/camaraproject/PopulationDensityData/tree/r3.1).
-* 0.3.0-rc.1 Population Density Data API definition **with inline documentation**:
-  - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r3.1/code/API_definitions/population-density-data.yaml)
-  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r3.1/code/API_definitions/population-density-data.yaml&nocors)
-  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r3.1/code/API_definitions/population-density-data.yaml)
+* **NEW**: public release of Population Density Data is [r3.2](https://github.com/camaraproject/PopulationDensityData/releases/tag/r3.2) and contains the version **0.3.0**.
+* 0.3.0 Population Density Data API definition **with inline documentation**:
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r3.2/code/API_definitions/population-density-data.yaml)
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r3.2/code/API_definitions/population-density-data.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r3.2/code/API_definitions/population-density-data.yaml)
 * The latest public release is available here: https://github.com/camaraproject/PopulationDensityData/releases/latest
 * Other releases of this sub project are available in https://github.com/camaraproject/PopulationDensityData/releases
 * For changes see [CHANGELOG.md](https://github.com/camaraproject/PopulationDensityData/blob/main/CHANGELOG.md)
