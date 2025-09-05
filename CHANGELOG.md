@@ -14,7 +14,7 @@
 
 # r3.2
 ## Release Notes
-This release contains the definition and documentation of
+This public release contains the definition and documentation of
 * population-density-data v0.3.0
 
 The API definition(s) are based on
