@@ -59,6 +59,8 @@ info:
 
     These values are calculated based on historical data, prediction models, and population estimation models. The requested interval must either be completely in the future or in the past.
 
+    The API has the following time constraints for requests: the minimum startTime must cover at least 3 months before the request time,
+    and the maximum endTime allowed is 3 months from the time of the request.
 
     The polygon specifying an area of interest must comply with certain restrictions,
     which must be previously validated by the developer:
