@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Population Density Data
   description: >-
-    Population Density Data API exposes population density estimations
+    The Population Density Data API exposes population density estimations
     for a specified area for a specified time interval.
 
     # Introduction
