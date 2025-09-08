@@ -141,7 +141,8 @@ externalDocs:
   url: https://github.com/camaraproject/PopulationDensityData
 
 servers:
-  - url: '{apiRoot}/population-density-data/v0.3.0'
+  - url: '{apiRoot}/population-density-data/v0.3'
+
     variables:
       apiRoot:
         default: http://localhost:9091
