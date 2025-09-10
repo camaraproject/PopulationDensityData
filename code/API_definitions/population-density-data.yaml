@@ -317,16 +317,14 @@ components:
           format: date-time
           description: >-
             Start date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
-            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
+            and must have time zone.
           example: "2023-07-03T12:27:08.312Z"
         endTime:
           type: string
           format: date-time
           description: >-
             End date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
-            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
-            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
-            The maximum endTime allowed is 3 months from the time of the request.
+            and must have time zone.
           example: "2023-07-03T12:27:08.312Z"
         precision:
           type: integer
@@ -465,7 +463,6 @@ components:
                 REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
                 If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
                 It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-                Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
               example: "2023-07-03T12:27:08.312Z"
             accessTokenType:
               description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)). For the current version of the API the type MUST be set to `Bearer`.
@@ -493,7 +490,6 @@ components:
                 REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
                 If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
                 It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-                Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
               example: "2023-07-03T12:27:08.312Z"
             accessTokenType:
               description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
@@ -581,16 +577,14 @@ components:
           format: date-time
           description: >-
             Interval start time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
-            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
-            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
+            and must have time zone.
           example: "2023-07-03T10:00:00Z"
         endTime:
           type: string
           format: date-time
           description: >-
             Interval end time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
-            and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
-            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
+            and must have time zone.
           example: "2023-07-03T11:00:00Z"
         cellPopulationDensityData:
           $ref: '#/components/schemas/CellPopulationDensityDataArray'
