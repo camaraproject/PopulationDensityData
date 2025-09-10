@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Population Density Data
   description: >-
-    Population Density Data API exposes population density estimations
+    The Population Density Data API exposes population density estimations
     for a specified area for a specified time interval.
 
     # Introduction
@@ -59,6 +59,8 @@ info:
 
     These values are calculated based on historical data, prediction models, and population estimation models. The requested interval must either be completely in the future or in the past.
 
+    The API has the following time constraints for requests: the minimum startTime must cover at least 3 months before the request time,
+    and the maximum endTime allowed is 3 months from the time of the request.
 
     The polygon specifying an area of interest must comply with certain restrictions,
     which must be previously validated by the developer:
@@ -131,7 +133,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: wip
+  version: 0.3.0
 
   x-camara-commonalities: 0.6
 externalDocs:
@@ -139,7 +141,8 @@ externalDocs:
   url: https://github.com/camaraproject/PopulationDensityData
 
 servers:
-  - url: '{apiRoot}/population-density-data/vwip'
+  - url: '{apiRoot}/population-density-data/v0.3'
+
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -315,8 +318,6 @@ components:
           description: >-
             Start date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
-            (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
-            The minimum startTime must cover at least 3 months before the request time.
           example: "2023-07-03T12:27:08.312Z"
         endTime:
           type: string
