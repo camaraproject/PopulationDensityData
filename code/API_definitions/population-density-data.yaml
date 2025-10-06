@@ -133,7 +133,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.3.0
+  version: 0.3.1
 
   x-camara-commonalities: 0.6
 externalDocs:
@@ -633,16 +633,16 @@ components:
       discriminator:
         propertyName: dataType
         mapping:
-          NO_DATA: '#/components/schemas/NO_DATA'
+          NO_DATA: '#/components/schemas/NoData'
           LOW_DENSITY: '#/components/schemas/LOW_DENSITY'
-          DENSITY_ESTIMATION: '#/components/schemas/DENSITY_ESTIMATION'
-    NO_DATA:
+          DENSITY_ESTIMATION: '#/components/schemas/DensityEstimation'
+    NoData:
       allOf:
         - $ref: '#/components/schemas/CellPopulationDensityData'
-    LOW_DENSITY:
+    LowDensity:
       allOf:
         - $ref: '#/components/schemas/CellPopulationDensityData'
-    DENSITY_ESTIMATION:
+    DensityEstimation:
       allOf:
         - $ref: '#/components/schemas/CellPopulationDensityData'
         - type: object
