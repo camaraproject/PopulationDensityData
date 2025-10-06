@@ -634,7 +634,7 @@ components:
         propertyName: dataType
         mapping:
           NO_DATA: '#/components/schemas/NoData'
-          LOW_DENSITY: '#/components/schemas/LOW_DENSITY'
+          LOW_DENSITY: '#/components/schemas/LowDensity'
           DENSITY_ESTIMATION: '#/components/schemas/DensityEstimation'
     NoData:
       allOf:
