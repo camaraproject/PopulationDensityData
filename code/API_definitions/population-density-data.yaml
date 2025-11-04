@@ -141,7 +141,7 @@ externalDocs:
   url: https://github.com/camaraproject/PopulationDensityData
 
 servers:
-  - url: '{apiRoot}/population-density-data/v0.3'
+  - url: '{apiRoot}/population-density-data/vwip'
 
     variables:
       apiRoot:
