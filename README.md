@@ -26,7 +26,7 @@ Incubating API Repository to evolve and maintain the definitions and documentati
 * Started: December 2023
 * Incubating stage since: June 2025
 
-## Status and released versions
+## Release Information
 
 * Note: Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until a new release is created. For example, changes may be reverted before a release is created. **For best results, use the latest available release**.
 * **NEW**: public release of Population Density Data is [r3.2](https://github.com/camaraproject/PopulationDensityData/releases/tag/r3.2) and contains the version **0.3.0**.
