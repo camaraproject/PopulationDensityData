@@ -46,10 +46,16 @@ info:
 
     # API Functionality
 
-    Once a developer specifies (1) the area as a polygon shape, (2) a precision level and (3) time interval
+    Once a developer specifies (1) the area (either as a polygon shape or as a list of geohashes),
+    (2) a precision level (only when the area is a polygon) and (3) time interval
     in which they want to obtain the population density, the API returns a data
     set consisting of a sequence of time ranges, with each time range containing the
-    input polygon subdivided into equal-sized grid cells.
+    requested area subdivided into equal-sized grid cells.
+
+
+    When the area is provided as a list of geohashes (`areaType: GEOHASHLIST`), the response
+    contains one cell per requested geohash; each geohash determines the granularity of its own
+    response cell, and the `precision` request property MUST NOT be included.
 
 
     For each of the equal-sized cells of the grid, an estimated population density is
@@ -72,6 +78,25 @@ info:
     - The polygon must be associated with a location where the MNO provides
     mobile connectivity services. If a polygon is located entirely outside the
     supported area, an empty array is returned.
+
+
+    When the area is specified as a list of geohashes (`areaType: GEOHASHLIST`):
+
+    - All MNOs must support the `POLYGON` area type; support for `GEOHASHLIST` is optional.
+    If the MNO does not support `GEOHASHLIST`, the API returns the error response
+    `POPULATION_DENSITY_DATA.UNSUPPORTED_AREA_TYPE`.
+
+    - The requested geohashes do not need to be adjacent or contiguous; the API
+    returns one cell per requested geohash.
+
+    - Geohashes within the same request may have different precisions (string lengths),
+    as long as the MNO supports all of them. If any geohash uses a precision not
+    supported by the MNO, the API returns the error response
+    `POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`.
+
+    - Geohashes within the list that fall outside the MNO coverage area are returned
+    with cell type `NO_DATA`. If the entire list is outside the coverage area, the
+    response will have `status` set to `AREA_NOT_SUPPORTED`.
 
 
     The standard behaviour of the API is synchronous, although for large
@@ -331,8 +356,10 @@ components:
         precision:
           type: integer
           description: >-
-            Precision required of response cells. Precision defines a geohash level and corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash)"
-            If not included the default precision level 7 is used by default. In case of using a not supported level by the MNO, the API returns the error response `POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`.
+            Precision required of response cells. Precision defines a geohash level and corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash).
+            If not included the default precision level 7 is used by default.
+            Values within the schema range (1–12) that are not supported by the MNO return the error response `422 POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`. Values outside the schema range are invalid per the OpenAPI definition and return `400 INVALID_ARGUMENT` via request validation.
+            This property MUST only be set when `area.areaType` is `POLYGON`. When `area.areaType` is `GEOHASHLIST`, each requested geohash determines the granularity of its own response cell; if `precision` is sent, the API returns a `400 INVALID_ARGUMENT` error.
           minimum: 1
           maximum: 12
           default: 7
@@ -362,13 +389,16 @@ components:
         propertyName: areaType
         mapping:
           POLYGON: "#/components/schemas/Polygon"
+          GEOHASHLIST: "#/components/schemas/GeohashList"
     AreaType:
       type: string
       description: |
         Type of this area.
         POLYGON - The area is defined as a polygon.
+        GEOHASHLIST - The area is defined as a list of geohashes.
       enum:
         - POLYGON
+        - GEOHASHLIST
     Polygon:
       description: Polygonal area. The Polygon should be a simple polygon, i.e. should not intersect itself.
       allOf:
@@ -412,6 +442,30 @@ components:
       format: double
       minimum: -180
       maximum: 180
+    GeohashList:
+      description: >-
+        Area defined as a list of geohashes. Geohashes do not need to be adjacent or contiguous and may have different precision levels (string lengths), as long as the MNO supports all of them. The `precision` request property MUST NOT be set when `areaType` is `GEOHASHLIST`; if set, the API returns a `400 INVALID_ARGUMENT` error.
+      allOf:
+        - $ref: "#/components/schemas/Area"
+        - type: object
+          required:
+            - geohashes
+          properties:
+            geohashes:
+              type: array
+              description: List of geohashes that define the area of interest.
+              minItems: 1
+              items:
+                $ref: "#/components/schemas/Geohash"
+    Geohash:
+      type: string
+      description: >-
+        Geohash string identifying a cell using the [Geohash system](https://en.wikipedia.org/wiki/Geohash),
+        encoding a geographic location into a short string. Characters are taken from the
+        base-32 geohash alphabet (`0-9` and `b-z` excluding `a`, `i`, `l`, `o`).
+        The length of the string determines the cell granularity (precision).
+      pattern: ^[0-9bcdefghjkmnpqrstuvwxyz]{1,12}$
+      example: ezdmemd
     SinkCredential:
       type: object
       properties:
@@ -615,12 +669,7 @@ components:
         case of a cell not supported `dataType` value is "NO_DATA"
       properties:
         geohash:
-          type: string
-          description: >-
-            Coordinates of the cell represented as a string using the [Geohash system](https://en.wikipedia.org/wiki/Geohash).
-            Encoding a geographic location into a short string. The value length,
-            and thus, the cell granularity, is determined by the request body property `precision`.
-          example: ezdmemd
+          $ref: '#/components/schemas/Geohash'
         dataType:
           type: string
           enum:
@@ -901,6 +950,7 @@ components:
           - Indicated combination of area, time interval and precision is too big ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big")
           - Indicated cell precision (Geohash level) is not supported ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION", "message": "Indicated cell precision (Geohash level) is not supported")
           - Indicated combination of area, time interval and precision is too big for a sync response ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE", "message": "Indicated combination of area, time interval and precision is too big for a sync response")
+          - The requested `areaType` is not supported by the MNO ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_AREA_TYPE", "message": "The requested areaType is not supported by the MNO")
       headers:
         x-correlator:
           $ref: '#/components/headers/x-correlator'
@@ -919,6 +969,7 @@ components:
                       - POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST
                       - POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION
                       - POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE
+                      - POPULATION_DENSITY_DATA.UNSUPPORTED_AREA_TYPE
           examples:
             POPULATION_DENSITY_DATA_422_UNSUPPORTED_REQUEST:
               value:
@@ -938,6 +989,11 @@ components:
                 message: >-
                   Indicated combination of area, time interval and precision is too big for synchronous processing
                   and asynchronous processing is not enabled
+            POPULATION_DENSITY_DATA_422_UNSUPPORTED_AREA_TYPE:
+              value:
+                status: 422
+                code: POPULATION_DENSITY_DATA.UNSUPPORTED_AREA_TYPE
+                message: The requested areaType is not supported by the MNO
     Generic429:
       description: Too Many Requests
       headers:
