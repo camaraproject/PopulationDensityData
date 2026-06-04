@@ -40,7 +40,7 @@ info:
 
     * **Notification URL and token**: Developers may provide a callback URL (`sink`) for receiving an async response.
     This is an optional parameter. If `sink` is included, it is RECOMMENDED for the client to provide as well the `sinkCredential`
-    property to protect the notification endpoint. In the current version,`sinkCredential.credentialType` MUST be set to `ACCESSTOKEN` if provided.
+    property to protect the notification endpoint. In the current version,`sinkCredential.credentialType` MUST be set to `ACCESSTOKEN` or `PRIVATE_KEY_JWT` if provided.
     When an asynchronous response is requested, the 202 response of the API will include an `operationId` property. This `operationId` property will
     also be sent in the callback notification. The purpose of the `operationId` is to correlate an asynchronous response with its corresponding request.
 
@@ -106,7 +106,7 @@ info:
     to the callback URL provided with the result of the request. If `sink` is
     included, it is RECOMMENDED for the client to provide as well the `sinkCredential`
     property to protect the notification endpoint. In the current version,`sinkCredential.credentialType`
-    MUST be set to `ACCESSTOKEN` if provided.
+    MUST be set to `ACCESSTOKEN` or `PRIVATE_KEY_JWT` if provided.
 
 
     For requests with a combination of `area`, `precision`, `startTime` and `endTime`
@@ -160,7 +160,7 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: wip
 
-  x-camara-commonalities: 0.6
+  x-camara-commonalities: 0.8.0
 externalDocs:
   description: Product documentation at CAMARA.
   url: https://github.com/camaraproject/PopulationDensityData
@@ -326,7 +326,9 @@ components:
   schemas:
     XCorrelator:
       type: string
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
     PopulationDensityRequest:
       type: object
@@ -340,6 +342,7 @@ components:
         startTime:
           type: string
           format: date-time
+          maxLength: 64
           description: >-
             Start date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
@@ -347,6 +350,7 @@ components:
         endTime:
           type: string
           format: date-time
+          maxLength: 64
           description: >-
             End date time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
@@ -355,6 +359,7 @@ components:
           example: "2023-07-03T12:27:08.312Z"
         precision:
           type: integer
+          format: int32
           description: >-
             Precision required of response cells. Precision defines a geohash level and corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash).
             If not included the default precision level 7 is used by default.
@@ -366,6 +371,7 @@ components:
         sink:
           type: string
           format: uri
+          maxLength: 2048
           description: The address where the API response will be asynchronously delivered, using the HTTP protocol.
           pattern: ^https:\/\/.+$
           example: 'https://endpoint.example.com/sink'
@@ -455,6 +461,7 @@ components:
               type: array
               description: List of geohashes that define the area of interest.
               minItems: 1
+              maxItems: 1000
               items:
                 $ref: "#/components/schemas/Geohash"
     Geohash:
@@ -465,108 +472,83 @@ components:
         base-32 geohash alphabet (`0-9` and `b-z` excluding `a`, `i`, `l`, `o`).
         The length of the string determines the cell granularity (precision).
       pattern: ^[0-9bcdefghjkmnpqrstuvwxyz]{1,12}$
+      maxLength: 12
       example: ezdmemd
     SinkCredential:
+      description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
       type: object
       properties:
         credentialType:
           type: string
           enum:
-            - PLAIN
             - ACCESSTOKEN
-            - REFRESHTOKEN
+            - PRIVATE_KEY_JWT
           description: |
-            The type of the credential.
-            Note: Type of the credential - MUST be set to ACCESSTOKEN for now
+            The type of the credential - MUST be set to ACCESSTOKEN or PRIVATE_KEY_JWT for now
       discriminator:
         propertyName: credentialType
         mapping:
-          PLAIN: '#/components/schemas/PlainCredential'
           ACCESSTOKEN: '#/components/schemas/AccessTokenCredential'
-          REFRESHTOKEN: '#/components/schemas/RefreshTokenCredential'
+          PRIVATE_KEY_JWT: '#/components/schemas/PrivateKeyJWTCredential'
       required:
         - credentialType
-    PlainCredential:
-      type: object
-      description: A plain credential as a combination of an identifier and a secret.
-      allOf:
-        - $ref: '#/components/schemas/SinkCredential'
-        - type: object
-          required:
-            - identifier
-            - secret
-          properties:
-            identifier:
-              description: The identifier might be an account or username.
-              type: string
-            secret:
-              description: The secret might be a password or passphrase.
-              type: string
     AccessTokenCredential:
       type: object
-      description: An access token credential.
+      description: An access token credential. This type of credential is meant to be used by API Consumers that have limited capabilities to handle authorization requests.
       allOf:
         - $ref: '#/components/schemas/SinkCredential'
         - type: object
           properties:
             accessToken:
-              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
+              description: REQUIRED. An access token is a token granting access to the target resource.
               type: string
+              maxLength: 4096
+              writeOnly: true
             accessTokenExpiresUtc:
               type: string
               format: date-time
+              maxLength: 64
               description: |
                 REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
                 If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
                 It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-                Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
               example: "2023-07-03T12:27:08.312Z"
             accessTokenType:
-              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)). For the current version of the API the type MUST be set to `Bearer`.
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
               type: string
+              writeOnly: true
               enum:
                 - bearer
           required:
             - accessToken
             - accessTokenExpiresUtc
             - accessTokenType
-    RefreshTokenCredential:
+    PrivateKeyJWTCredential:
       type: object
-      description: An access token credential with a refresh token.
+      description: Use PRIVATE_KEY_JWT to get an access token. This type of credential is to be used by clients that have an authorization server.
       allOf:
         - $ref: '#/components/schemas/SinkCredential'
         - type: object
           properties:
-            accessToken:
-              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
+            clientId:
+              description: The client ID used to authenticate when requesting an access token using PRIVATE_KEY_JWT.
               type: string
-            accessTokenExpiresUtc:
-              type: string
-              format: date-time
-              description: |
-                REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
-                If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
-                It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-                Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
-              example: "2023-07-03T12:27:08.312Z"
-            accessTokenType:
-              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
-              type: string
-              enum:
-                - bearer
-            refreshToken:
-              description: REQUIRED. An refresh token credential used to acquire access tokens.
-              type: string
-            refreshTokenEndpoint:
+              maxLength: 128
+              writeOnly: true
+            tokenUri:
+              description: The URI where to request an access token using PRIVATE_KEY_JWT.
               type: string
               format: uri
-              description: REQUIRED. A URL at which the refresh token can be traded for an access token.
-      required:
-        - accessToken
-        - accessTokenExpiresUtc
-        - accessTokenType
-        - refreshToken
-        - refreshTokenEndpoint
+              maxLength: 2048
+              pattern: ^https:\/\/.+$
+              writeOnly: true
+            jwksUri:
+              description: The URI used to request the public key to verify that the JWT assertion was signed by PRIVATE_KEY_JWT.
+              type: string
+              format: uri
+              maxLength: 2048
+              pattern: ^https:\/\/.+$
+              readOnly: true
     PopulationDensityResponse:
       type: object
       description: >-
@@ -584,10 +566,12 @@ components:
              to 2024-01-03T12:00:00Z and interval from 2024-01-03T12:00:00Z to 2024-01-03T13:00:00Z).
           items:
             $ref: '#/components/schemas/TimedPopulationDensityData'
+          maxItems: 168
         status:
           $ref: '#/components/schemas/ResponseStatus'
         statusInfo:
           type: string
+          maxLength: 512
           description: Information about the status, mandatory when property `status` is `OPERATION_NOT_COMPLETED` for adding extra information about the error.
           example: Some error happened during the processing of the request
       required:
@@ -611,6 +595,7 @@ components:
             - operationId
     OperationId:
       type: string
+      maxLength: 256
       description: The unique identifier of the asynchronous operation that is returned when the operation is initiated.
     ResponseStatus:
       type: string
@@ -633,6 +618,7 @@ components:
         startTime:
           type: string
           format: date-time
+          maxLength: 64
           description: >-
             Interval start time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
@@ -641,6 +627,7 @@ components:
         endTime:
           type: string
           format: date-time
+          maxLength: 64
           description: >-
             Interval end time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
@@ -659,6 +646,7 @@ components:
       items:
         $ref: '#/components/schemas/CellPopulationDensityData'
       minItems: 1
+      maxItems: 10000
     CellPopulationDensityData:
       type: object
       description: >-
@@ -698,12 +686,21 @@ components:
           properties:
             maxPplDensity:
               type: integer
+              format: int32
+              minimum: 0
+              maximum: 2147483647
               description: Maximum people/km2 estimated for the defined area.
             minPplDensity:
               type: integer
+              format: int32
+              minimum: 0
+              maximum: 2147483647
               description: Minimum people/km2 estimated for the defined area.
             pplDensity:
               type: integer
+              format: int32
+              minimum: 0
+              maximum: 2147483647
               description: people/km2 estimation for the defined area.
           required:
             - maxPplDensity
@@ -711,6 +708,7 @@ components:
             - pplDensity
     ErrorInfo:
       type: object
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
       required:
         - status
         - code
@@ -718,12 +716,17 @@ components:
       properties:
         status:
           type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: A human-readable code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human-readable description of what the event represents
   responses:
     RetrieveLocationBadRequest400:
