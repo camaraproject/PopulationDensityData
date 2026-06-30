@@ -8,25 +8,28 @@ Feature: CAMARA Population Density Data API, vwip
   # * Max size of the response(Combination of area, startTime, endTime and precision requested) supported for a sync response
   # * Max size of the response(Combination of area, startTime, endTime and precision requested) supported for an async response
   # * Limitations about max complexity of requested area allowed
+  # * Whether the GEOHASHLIST area type is supported
   #
   # Testing assets:
   # * An Area within the supported region
   # * An Area partially within the supported region
   # * An Area outside the supported region
+  #
+  # References to OAS spec schemas refer to schemas specified in population-density-data.yaml
 
   Background: Common retrievePopulationDensity setup
     Given an environment at "apiRoot"
     And the resource "/population-density-data/vwip/retrieve"
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
-    And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
+    And the header "x-correlator" complies with the schema at "../common/CAMARA_common.yaml#/components/schemas/XCorrelator"
     And the request body is set by default to a request body compliant with the schema
 
   # Happy path scenarios
 
-  @population_density_data_01_supported_area_success_scenario
+  @population_density_data_01_polygon_supported_area_success_scenario
   Scenario: Validate success response for a supported area request
-    Given the request body property "$.area" is set to a valid testing area within supported regions
+    Given the request body property "$.area" is set to a valid testing POLYGON area within supported regions
     And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 200
@@ -34,17 +37,16 @@ Feature: CAMARA Population Density Data API, vwip
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
     And the response property "$.status" value is "SUPPORTED_AREA"
-    And the response property "$.timedPopulationDensityData[*].startTime" is equal to or later than request body property "$.startTime"
-    And the response property "$.timedPopulationDensityData[*].endTime" is equal to or earlier than request body property "$.endTime"
+    And the response property "$.timedPopulationDensityData" intervals fully cover the requested time range from "$.startTime" to "$.endTime"
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].geohash" is a valid Geohash inside the request area
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" is equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
-    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" == "DENSITY_ESTIMATION" have property "minPplDensity"
-    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" == "DENSITY_ESTIMATION" have property "pplDensity"
-    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" == "DENSITY_ESTIMATION" have property "maxPplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "minPplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "pplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "maxPplDensity"
 
-  @population_density_data_02_partial_area_success_scenario
+  @population_density_data_02_polygon_partial_area_success_scenario
   Scenario: Validate success response for a partial supported area request
-    Given the request body property "$.area" is set to a valid testing area partially within supported regions
+    Given the request body property "$.area" is set to a valid testing POLYGON area partially within supported regions
     And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 200
@@ -52,17 +54,16 @@ Feature: CAMARA Population Density Data API, vwip
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
     And the response property "$.status" value is "PART_OF_AREA_NOT_SUPPORTED"
-    And the response property "$.timedPopulationDensityData[*].startTime" is equal to or later than request body property "$.startTime"
-    And the response property "$.timedPopulationDensityData[*].endTime" is equal to or earlier than request body property "$.endTime"
+    And the response property "$.timedPopulationDensityData" intervals fully cover the requested time range from "$.startTime" to "$.endTime"
     And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" equal to "NO_DATA"
     And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
-    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" == "DENSITY_ESTIMATION" have property "minPplDensity"
-    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" == "DENSITY_ESTIMATION" have property "pplDensity"
-    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" == "DENSITY_ESTIMATION" have property "maxPplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "minPplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "pplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "maxPplDensity"
 
-  @population_density_data_03_not_supported_area_success_scenario
+  @population_density_data_03_polygon_not_supported_area_success_scenario
   Scenario: Validate success response for unsupported area request
-    Given the request body property "$.area" is set to a valid testing area outside supported regions
+    Given the request body property "$.area" is set to a valid testing POLYGON area outside supported regions
     And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 200
@@ -72,7 +73,61 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.status" value is "AREA_NOT_SUPPORTED"
     And the response property "$.timedPopulationDensityData" is an empty array
 
-  @population_density_data_04_async_success_scenario
+  @population_density_data_04_geohashlist_supported_area_success_scenario
+  Scenario: Validate success response for a supported area request defined as a list of geohashes
+    Given the request body property "$.area.areaType" is set to "GEOHASHLIST"
+    And the request body property "$.area.geohashes" is set to a list of valid geohashes within supported regions, including geohashes of different precisions
+    And the request body property "$.precision" is not included
+    And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response property "$.status" value is "SUPPORTED_AREA"
+    And the response property "$.timedPopulationDensityData" intervals fully cover the requested time range from "$.startTime" to "$.endTime"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" contains one cell per geohash in the request property "$.area.geohashes"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].geohash" is a valid Geohash present in the request property "$.area.geohashes"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" is equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "minPplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "pplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "maxPplDensity"
+
+  @population_density_data_05_geohashlist_partial_area_success_scenario
+  Scenario: Validate success response for a list of geohashes partially within supported regions
+    Given the request body property "$.area.areaType" is set to "GEOHASHLIST"
+    And the request body property "$.area.geohashes" is set to a list of valid geohashes partially within supported regions
+    And the request body property "$.precision" is not included
+    And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response property "$.status" value is "PART_OF_AREA_NOT_SUPPORTED"
+    And the response property "$.timedPopulationDensityData" intervals fully cover the requested time range from "$.startTime" to "$.endTime"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" contains one cell per geohash in the request property "$.area.geohashes"
+    And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" equal to "NO_DATA"
+    And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "minPplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "pplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "maxPplDensity"
+
+  @population_density_data_06_geohashlist_not_supported_area_success_scenario
+  Scenario: Validate success response for a list of geohashes entirely outside supported regions
+    Given the request body property "$.area.areaType" is set to "GEOHASHLIST"
+    And the request body property "$.area.geohashes" is set to a list of valid geohashes outside supported regions
+    And the request body property "$.precision" is not included
+    And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response property "$.status" value is "AREA_NOT_SUPPORTED"
+    And the response property "$.timedPopulationDensityData" is an empty array
+
+  @population_density_data_07_async_success_scenario
   Scenario: Validate success async response for a request when sink is provided
     # Property "$.sink" is set with a valid public accessible HTTPs endpoint
     Given the request body property "$.area" is set to a valid testing area within supported regions
@@ -84,12 +139,11 @@ Feature: CAMARA Population Density Data API, vwip
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response includes property "$.operationId"
-    And the request with the response body will be received at the address of the request property "$.sink"
+    And the request with the response body will be received at the address of the request property "$.sink" with property "$.operationId" equal to response property "$.operationId"
     And the request will have header "Authorization" set to "Bearer " + the value of the request property "$.sinkCredential.accessToken"
-    And the request will have property "$.operationId" equal to response property "$.operationId"
     And the request body complies with the OAS schema at "/components/schemas/PopulationDensityAsyncResponse"
 
-  @population_density_data_05_async_operation_not_completed_scenario
+  @population_density_data_08_async_operation_not_completed_scenario
   Scenario: Validate async callback when operation fails
     # Property "$.sink" is set with a valid public accessible HTTPs endpoint
     Given the request body property "$.area" is set to a valid testing area within supported regions
@@ -102,15 +156,14 @@ Feature: CAMARA Population Density Data API, vwip
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response includes property "$.operationId"
     And there have been some problem processing the request asynchronously
-    And the request with the response body will be received at the address of the request property "$.sink"
+    And the request with the response body will be received at the address of the request property "$.sink" with property "$.operationId" equal to response property "$.operationId"
     And the request will have header "Authorization" set to "Bearer " + the value of the request property "$.sinkCredential.accessToken"
-    And the request will have property "$.operationId" equal to response property "$.operationId"
     And the request body complies with the OAS schema at "/components/schemas/PopulationDensityAsyncResponse"
     And the request body will have property "$.status" equal to "OPERATION_NOT_COMPLETED" and includes property "$.statusInfo"
 
-  @population_density_data_06_custom_precision_success_scenario
+  @population_density_data_09_custom_precision_success_scenario
   Scenario: Validate success response for a request specifying the precision of the geohashes
-    Given the request body property "$.area" is set to a valid testing area within supported regions
+    Given the request body property "$.area" is set to a valid testing POLYGON area within supported regions
     And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
     And the request body property "$.precision" is set to a valid precision for the geohash response cells
     When the request "retrievePopulationDensity" is sent
@@ -119,7 +172,7 @@ Feature: CAMARA Population Density Data API, vwip
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
 
-  @population_density_data_07_supported_area_past_success_scenario
+  @population_density_data_10_supported_area_past_success_scenario
   Scenario: Validate success response for a supported area in a past time period request
     Given the request body property "$.area" is set to a valid testing area within supported regions
     And the request body properties "$.startTime" and "$.endTime" are valid past date-times, with "$.endTime" later than "$.startTime"
@@ -129,13 +182,12 @@ Feature: CAMARA Population Density Data API, vwip
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
     And the response property "$.status" value is "SUPPORTED_AREA"
-    And the response property "$.timedPopulationDensityData[*].startTime" is equal to or later than request body property "$.startTime"
-    And the response property "$.timedPopulationDensityData[*].endTime" is equal to or earlier than request body property "$.endTime"
+    And the response property "$.timedPopulationDensityData" intervals fully cover the requested time range from "$.startTime" to "$.endTime"
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].geohash" is a valid Geohash inside the request area
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" is equal to "LOW_DENSITY" or "DENSITY_ESTIMATION"
-    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" == "DENSITY_ESTIMATION" have property "minPplDensity"
-    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" == "DENSITY_ESTIMATION" have property "pplDensity"
-    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" == "DENSITY_ESTIMATION" have property "maxPplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "minPplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "pplDensity"
+    And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "maxPplDensity"
 
   # Error scenarios
 
@@ -154,6 +206,7 @@ Feature: CAMARA Population Density Data API, vwip
     Examples:
       | required_property |
       | $.area            |
+      | $.area.areaType   |
       | $.startTime       |
       | $.endTime         |
 
@@ -174,7 +227,8 @@ Feature: CAMARA Population Density Data API, vwip
 
   @population_density_data_400.03_invalid_precision
   Scenario: Error 400 when precision is not a number between 1 and 12
-    Given the request body property "$.precision" is not set to a number between 1 and 12
+    Given the request body property "$.area.areaType" is set to "POLYGON"
+    And the request body property "$.precision" is not set to a number between 1 and 12
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "Content-Type" is "application/json"
@@ -182,17 +236,24 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  # PLAIN and REFRESHTOKEN are considered in the schema so INVALID_ARGUMENT is not expected
+  # Only "ACCESSTOKEN" and "PRIVATE_KEY_JWT" are considered in the SinkCredential schema, so a value outside that set
+  # may be rejected by the business logic as INVALID_CREDENTIAL or by a generic schema validator as INVALID_ARGUMENT,
+  # and both could be accepted
   @population_density_data_400.04_invalid_sink_credential
-  Scenario: Invalid credential
-    Given the request body property "$.sinkCredential.credentialType" is not set to "ACCESSTOKEN"
+  Scenario Outline: Invalid credential
+    Given the request body property "$.sinkCredential.credentialType" is set to "<unsupported_credential_type>"
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 400
-    And the response property "$.code" is "INVALID_CREDENTIAL"
+    And the response property "$.code" is "INVALID_CREDENTIAL" or "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
+
+    Examples:
+      | unsupported_credential_type |
+      | PLAIN                       |
+      | REFRESHTOKEN                |
 
   # Only "bearer" is considered in the schema so a generic schema validator may fail and generate a 400 INVALID_ARGUMENT without further distinction,
   # and both could be accepted
@@ -291,6 +352,94 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.code" is "POPULATION_DENSITY_DATA.INVALID_TIME_PERIOD"
     And the response property "$.message" contains a user friendly text
 
+  @population_density_data_400.14_precision_with_geohashlist
+  Scenario: Error 400 when precision is included together with a GEOHASHLIST area
+    Given the request body property "$.area.areaType" is set to "GEOHASHLIST"
+    And the request body property "$.area.geohashes" is set to a list of valid geohashes within supported regions
+    And the request body property "$.precision" is included
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 400
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @population_density_data_400.15_invalid_geohash_format
+  Scenario: Error 400 when a geohash in the list does not comply with the Geohash format
+    Given the request body property "$.area.areaType" is set to "GEOHASHLIST"
+    And the request body property "$.area.geohashes" contains a value that does not comply with the schema at "/components/schemas/Geohash"
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 400
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @population_density_data_400.16_unexpected_property
+  Scenario: Error 400 when the request body contains a property not defined in the schema
+    Given the request body contains a property not defined in the schema
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 400
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @population_density_data_400.17_schema_not_compliant
+  Scenario: Error 400 when the request body does not comply with the schema
+    Given the request body is not compliant with the OAS schema at "/components/schemas/PopulationDensityRequest"
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @population_density_data_400.18_no_request_body
+  Scenario: Error 400 when the request body is not provided
+    Given the request body is not included
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @population_density_data_400.19_empty_request_body
+  Scenario: Error 400 when the request body is an empty object
+    Given the request body is set to "{}"
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @population_density_data_400.20_empty_area_property
+  Scenario: Error 400 when the area property is an empty object
+    Given the request body property "$.area" is set to an empty object
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  # The x-correlator sent in the request is invalid, so the response is not expected to echo it back
+  @population_density_data_400.21_invalid_x_correlator
+  Scenario: Error 400 when the x-correlator header does not comply with the schema
+    Given the request header "x-correlator" is not compliant with the schema at "../common/CAMARA_common.yaml#/components/schemas/XCorrelator"
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 400
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
   # Error 401 scenarios
 
   @population_density_data_401.01_expired_access_token
@@ -344,7 +493,8 @@ Feature: CAMARA Population Density Data API, vwip
 
   @population_density_data_422.01_unsupported_precision
   Scenario: Error 422 when precision is set to a valid but not supported value
-    Given the request body property "$.precision" is set to a valid but not supported value
+    Given the request body property "$.area.areaType" is set to "POLYGON"
+    And the request body property "$.precision" is set to a valid but not supported value
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 422
     And the response header "Content-Type" is "application/json"
@@ -374,9 +524,35 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST"
     And the response property "$.message" contains a user friendly text
 
+  @population_density_data_422.04_unsupported_area_type
+  #To test this scenario the MNO must not support the GEOHASHLIST area type
+  Scenario: Error 422 when the requested areaType is not supported by the MNO
+    Given the request body property "$.area.areaType" is set to "GEOHASHLIST"
+    And the request body property "$.area.geohashes" is set to a list of valid geohashes within supported regions
+    And the request body property "$.precision" is not included
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 422
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 422
+    And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_AREA_TYPE"
+    And the response property "$.message" contains a user friendly text
+
+  @population_density_data_422.05_unsupported_geohash_precision
+  #To test this scenario at least one geohash must use a precision (length) not supported by the MNO
+  Scenario: Error 422 when a geohash in the list uses a precision not supported by the MNO
+    Given the request body property "$.area.areaType" is set to "GEOHASHLIST"
+    And the request body property "$.area.geohashes" contains a valid geohash whose precision (length) is not supported by the MNO
+    And the request body property "$.precision" is not included
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 422
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 422
+    And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION"
+    And the response property "$.message" contains a user friendly text
+
   # Error 429 scenarios
 
-  @population_density_data_429.01_too_Many_Requests
+  @population_density_data_429.01_too_many_requests
   #To test this scenario environment has to be configured to reject requests reaching the limit settled. N is a value defined by the Telco Operator
   Scenario: Request is rejected due to threshold policy
     Given that the environment is configured with a threshold policy of N transactions per second
