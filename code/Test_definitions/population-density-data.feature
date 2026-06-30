@@ -3,10 +3,10 @@ Feature: CAMARA Population Density Data API, vwip
   #
   # Implementation indications:
   # * Geohash precisions allowed
-  # * Min start and end dates allowed
+  # * Min start and end date-times allowed
   # * Max requested time period allowed
-  # * Max size of the response(Combination of area, startDate, endDate an precision requested) supported for a sync response
-  # * Max size of the response(Combination of area, startDate, endDate an precision requested) supported for an async response
+  # * Max size of the response(Combination of area, startTime, endTime and precision requested) supported for a sync response
+  # * Max size of the response(Combination of area, startTime, endTime and precision requested) supported for an async response
   # * Limitations about max complexity of requested area allowed
   # * Whether the GEOHASHLIST area type is supported
   #
@@ -17,7 +17,7 @@ Feature: CAMARA Population Density Data API, vwip
   #
   # References to OAS spec schemas refer to schemas specified in population-density-data.yaml
 
-  Background: Common retrievePopulationDensity  setup
+  Background: Common retrievePopulationDensity setup
     Given an environment at "apiRoot"
     And the resource "/population-density-data/vwip/retrieve"
     And the header "Content-Type" is set to "application/json"
@@ -147,13 +147,9 @@ Feature: CAMARA Population Density Data API, vwip
   Scenario: Validate async callback when operation fails
     # Property "$.sink" is set with a valid public accessible HTTPs endpoint
     Given the request body property "$.area" is set to a valid testing area within supported regions
-    And the request body property "$.startDate" is set to a valid testing future date
-    And the request body property "$.endDate" is set to a valid testing future date later than body property "$.startDate"
-    And the request property "$.sink" is set to a URL when events can be monitored
-    And the request property "$.sinkCredentials.credentialType" is set to "ACCESSTOKEN"
-    And the request property "$.sinkCredentials.accessTokenType" is set to "bearer"
-    And the request property "$.sinkCredentials.accessToken" is set to a valid access token accepted by the events receiver
-    And the request property "$.sinkCredentials.accessTokenExpiresUtc" is set to a value long enough in the future
+    And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
+    And the request body property "$.sink" is set to a valid HTTPS URL
+    And the request body property "$.sinkCredential" is set to a valid credential with property "$.sinkCredential.credentialType" set to "ACCESSTOKEN"
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 202
     And the response header "Content-Type" is "application/json"
@@ -195,7 +191,9 @@ Feature: CAMARA Population Density Data API, vwip
 
   # Error scenarios
 
-  @population_density_data_retrievePopulationDensity_06_missing_required_property
+  # Error 400 scenarios
+
+  @population_density_data_400.01_missing_required_property
   Scenario Outline: Error response for missing required property in request body
     Given the request body property "<required_property>" is not included
     When the request "retrievePopulationDensity" is sent
@@ -212,7 +210,7 @@ Feature: CAMARA Population Density Data API, vwip
       | $.startTime       |
       | $.endTime         |
 
-  @population_density_data_retrievePopulationDensity_07_invalid_date_format
+  @population_density_data_400.02_invalid_date_format
   Scenario Outline: Error 400 when the datetime format is not RFC-3339
     Given the request body property "<date_property>" is not set to a valid RFC-3339 date-time
     When the request "retrievePopulationDensity" is sent
@@ -224,10 +222,10 @@ Feature: CAMARA Population Density Data API, vwip
 
     Examples:
       | date_property |
-      | $.startDate   |
-      | $.endDate     |
+      | $.startTime   |
+      | $.endTime     |
 
-  @population_density_data_retrievePopulationDensity_08_invalid_precision
+  @population_density_data_400.03_invalid_precision
   Scenario: Error 400 when precision is not a number between 1 and 12
     Given the request body property "$.area.areaType" is set to "POLYGON"
     And the request body property "$.precision" is not set to a number between 1 and 12
@@ -259,9 +257,9 @@ Feature: CAMARA Population Density Data API, vwip
 
   # Only "bearer" is considered in the schema so a generic schema validator may fail and generate a 400 INVALID_ARGUMENT without further distinction,
   # and both could be accepted
-  @population_density_data_retrievePopulationDensity_10_sink_credential_invalid_token
+  @population_density_data_400.05_sink_credential_invalid_token
   Scenario: Invalid token
-    Given the request body property  "$.sinkCredential.accessTokenType" is set to a value other than "bearer"
+    Given the request body property "$.sinkCredential.accessTokenType" is set to a value other than "bearer"
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "x-correlator" has same value as the request header "x-correlator"
@@ -270,45 +268,21 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.code" is "INVALID_TOKEN" or "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @population_density_data_retrievePopulationDensity_10_expired_access_token
-  Scenario: Error response for expired access token
-    Given an expired access token
-    And the request body is set to a valid request body
+  @population_density_data_400.06_invalid_url
+  Scenario: Invalid sink
+    Given the request body property "$.sink" is not set to an url
     When the request "retrievePopulationDensity" is sent
-    Then the response status code is 401
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
-    And the response property "$.status" is 401
-    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_SINK"
     And the response property "$.message" contains a user friendly text
-
-  @population_density_data_retrievePopulationDensity_11_invalid_access_token
-  Scenario: Error response for invalid access token
-    Given an invalid access token
-    And the request body is set to a valid request body
-    When the request "retrievePopulationDensity" is sent
-    Then the response status code is 401
-    And the response header "Content-Type" is "application/json"
-    And the response property "$.status" is 401
-    And the response property "$.code" is "UNAUTHENTICATED"
-    And the response property "$.message" contains a user friendly text
-
-  @population_density_data_retrievePopulationDensity_12_missing_authorization_header
-  Scenario: Error response for no header "Authorization"
-    Given the header "Authorization" is not sent
-    And the request body is set to a valid request body
-    When the request "retrievePopulationDensity" is sent
-    Then the response status code is 401
-    And the response header "Content-Type" is "application/json"
-    And the response property "$.status" is 401
-    And the response property "$.code" is "UNAUTHENTICATED"
-    And the response property "$.message" contains a user friendly text
-
-  # API Specific Errors
 
   # An area that does not form a polygon is a straight line or a set of points with same coordinates.
-  @population_density_data_retrievePopulationDensity_13_non_polygonal_area
+  @population_density_data_400.07_non_polygonal_area
   Scenario: Error 400 when the requested area is not a polygon
-    Given the request body property "$.area.boundry" is set to an array of coordinates that does not form a polygon
+    Given the request body property "$.area.boundary" is set to an array of coordinates that does not form a polygon
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "Content-Type" is "application/json"
@@ -316,7 +290,7 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.code" is "POPULATION_DENSITY_DATA.INVALID_AREA"
     And the response property "$.message" contains a user friendly text
 
-  @population_density_data_retrievePopulationDensity_14_too_complex_area
+  @population_density_data_400.08_too_complex_area
   Scenario: Error 400 when the requested area is too complex
     Given the request body property "$.area.boundary" is set to an array of coordinates that form a too complex area
     When the request "retrievePopulationDensity" is sent
@@ -326,40 +300,40 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.code" is "POPULATION_DENSITY_DATA.INVALID_AREA"
     And the response property "$.message" contains a user friendly text
 
-  @population_density_data_retrievePopulationDensity_15_min_start_date_exceeded
-  Scenario: Error 400 when startDate is set to a date earlier than the minimum allowed
-    Given the request body property "$.startDate" is set to a date earlier than the minimum allowed
+  @population_density_data_400.09_min_start_time_exceeded
+  Scenario: Error 400 when startTime is set to a date-time earlier than the minimum allowed
+    Given the request body property "$.startTime" is set to a date-time earlier than the minimum allowed
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 400
-    And the response property "$.code" is "POPULATION_DENSITY_DATA.MIN_STARTDATE_EXCEEDED"
+    And the response property "$.code" is "POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED"
     And the response property "$.message" contains a user friendly text
 
-  @population_density_data_retrievePopulationDensity_16_max_start_date_exceeded
-  Scenario: Error 400 when startDate is set to a date later than the maximum allowed
-    Given the request body property "$.startDate" is set to a date later than the maximum allowed
+  @population_density_data_400.10_max_start_time_exceeded
+  Scenario: Error 400 when startTime is set to a date-time later than the maximum allowed
+    Given the request body property "$.startTime" is set to a date-time later than the maximum allowed
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 400
-    And the response property "$.code" is "POPULATION_DENSITY_DATA.MAX_STARTDATE_EXCEEDED"
+    And the response property "$.code" is "POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED"
     And the response property "$.message" contains a user friendly text
 
-  @population_density_data_retrievePopulationDensity_17_invalid_end_date
-  Scenario: Error 400 when endDate is set to a date earlier than startDate
-    Given the request body property "$.endDate" is set to a date earlier than request body property "$.startDate"
+  @population_density_data_400.11_invalid_end_time
+  Scenario: Error 400 when endTime is set to a date-time earlier than startTime
+    Given the request body property "$.endTime" is set to a date-time earlier than request body property "$.startTime"
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 400
-    And the response property "$.code" is "POPULATION_DENSITY_DATA.INVALID_END_DATE"
+    And the response property "$.code" is "POPULATION_DENSITY_DATA.INVALID_END_TIME"
     And the response property "$.message" contains a user friendly text
 
-  @population_density_data_retrievePopulationDensity_18_max_time_period_exceeded
-  Scenario: Error 400 when indicated time period is greater than the maximum allowed
-    Given the request body property "$.startDate" is set to a valid testing future
-    And the request body property "$.endDate" is set to a future date that exceeds the supported duration from the start date.
+  @population_density_data_400.12_max_time_period_exceeded
+  Scenario: Error 400 when indicated date-time period is greater than the maximum allowed
+    Given the request body property "$.startTime" is set to a valid testing future date-time
+    And the request body property "$.endTime" is set to a future date-time that exceeds the supported duration from the start time.
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "Content-Type" is "application/json"
@@ -367,9 +341,10 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.code" is "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED"
     And the response property "$.message" contains a user friendly text
 
-  @population_density_data_retrievePopulationDensity_19_unsupported_precision
-  Scenario: Error 400 when precision is set to a valid but not supported value
-    Given the request body property "$.precision" is set to a valid but not supported value
+  @population_density_data_400.13_timeframe_crosses_request_time
+  Scenario: Error 400 when startTime is set to a date-time in the past and the endTime is set to a date-time in the future
+    Given the request body property "$.startTime" is set to a date-time in the past
+    And the request body property "$.endTime" is set to a date-time in the future
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "Content-Type" is "application/json"
@@ -527,21 +502,23 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION"
     And the response property "$.message" contains a user friendly text
 
-  @population_density_data_retrievePopulationDensity_20_too_big_synchronous_response
-  Scenario: Error 400 when the response is too big for a sync response
-    Given the request body properties "$.area.boundry", "$.startDate", "$.endDate" and "$.precision" are set to valid values but generate a response too big for a synchronous response
+  @population_density_data_422.02_too_big_synchronous_response
+  #To test this scenario provided values for "$.area.boundary", "$.startTime", "$.endTime" and "$.precision" MUST generate a response too big for a synchronous response
+  Scenario: Error 422 when the response is too big for a sync response
+    Given the request body properties "$.area.boundary", "$.startTime", "$.endTime" and "$.precision" are set to valid values
     When the request "retrievePopulationDensity" is sent
-    Then the response status code is 400
+    Then the response status code is 422
     And the response header "Content-Type" is "application/json"
-    And the response property "$.status" is 400
+    And the response property "$.status" is 422
     And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE"
     And the response property "$.message" contains a user friendly text
 
-  @population_density_data_retrievePopulationDensity_21_too_big_request
-  Scenario: Error 400 when the response is too big for a sync adn async response
-    Given the request body properties "$.area.boundry", "$.startDate", "$.endDate" and "$.precision" are set to valid values but generate a response too big for a synchronous and asynchronous response
+  @population_density_data_422.03_too_big_request
+  #To test this scenario provided values for "$.area.boundary", "$.startTime", "$.endTime" and "$.precision" MUST generate a too big response in both sync and async scenarios
+  Scenario: Error 422 when the response is too big for a sync and async response
+    Given the request body properties "$.area.boundary", "$.startTime", "$.endTime" and "$.precision" are set to valid values
     When the request "retrievePopulationDensity" is sent
-    Then the response status code is 400
+    Then the response status code is 422
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 422
     And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST"
