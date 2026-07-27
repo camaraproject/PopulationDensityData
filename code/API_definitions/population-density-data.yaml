@@ -320,6 +320,7 @@ components:
         Request object for retrieving population density data in a
         specified area.
         **NOTE**: The difference between `startTime` and `endTime` cannot be greater than 7 days.
+      additionalProperties: false
       properties:
         area:
           $ref: '#/components/schemas/Area'
@@ -334,7 +335,7 @@ components:
             Precision required of response cells. Precision defines a geohash level and corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash).
             If not included the default precision level 7 is used by default.
             Values within the schema range (1–12) that are not supported by the MNO return the error response `422 POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`. Values outside the schema range are invalid per the OpenAPI definition and return `400 INVALID_ARGUMENT` via request validation.
-            This property MUST only be set when `area.areaType` is `POLYGON`. When `area.areaType` is `GEOHASHLIST`, each requested geohash determines the granularity of its own response cell; if `precision` is sent, the API returns a `400 INVALID_ARGUMENT` error.
+            This property MUST only be set when `area.areaType` is `POLYGON`, if not included the default precision level 7 is used. When `area.areaType` is `GEOHASHLIST`, each requested geohash determines the granularity of its own response cell; if `precision` is sent, the API returns a `400 INVALID_ARGUMENT` error.
           minimum: 1
           maximum: 12
           default: 7
