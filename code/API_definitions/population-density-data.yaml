@@ -160,20 +160,13 @@ info:
 
     This API rejects requests with JSON request bodies that contain properties not declared in this specification, at any nesting level. Unknown properties result in a `400 INVALID_ARGUMENT` response.
     <!-- CAMARA:MANDATORY:request-body-strictness:END -->
-
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: wip
-
-  x-camara-commonalities: wip
-externalDocs:
-  description: Product documentation at CAMARA.
-  url: https://github.com/camaraproject/PopulationDensityData
-
+  version: 1.0.0-rc.1
+  x-camara-commonalities: 0.8.0
 servers:
-  - url: '{apiRoot}/population-density-data/vwip'
-
+  - url: '{apiRoot}/population-density-data/v1rc1'
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -181,20 +174,19 @@ servers:
 tags:
   - name: Population Density Data
     description: Operations to retrieve population density information.
+externalDocs:
+  description: Product documentation at CAMARA.
+  url: https://github.com/camaraproject/PopulationDensityData
 paths:
   /retrieve:
     post:
       tags:
         - Population Density Data
       summary: Retrieves population density information in a specified area
-      description: >-
-        Retrieves population density estimation together with the estimation range related
-        for a time slot for a given area (described as a polygon) as a data set
-        consisting of a sequence of equally-sized objects covering the input
-        polygon area.
+      description: Retrieves population density estimation together with the estimation range related for a time slot for a given area (described as a polygon) as a data set consisting of a sequence of equally-sized objects covering the input polygon area.
       operationId: retrievePopulationDensity
       parameters:
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       requestBody:
         content:
           application/json:
@@ -224,13 +216,13 @@ paths:
             post:
               tags:
                 - Population Density Data
-              summary: 'Population Density Data callback'
+              summary: Population Density Data callback
               description: |
                 Important: this endpoint is to be implemented by the API consumer.
                 The Population Density Data server will call this endpoint when the request result is ready.
               operationId: postNotification
               parameters:
-                - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+                - $ref: '#/components/parameters/x-correlator'
               requestBody:
                 description: Population density data result.
                 content:
@@ -251,17 +243,17 @@ paths:
                   description: Successful notification
                   headers:
                     x-correlator:
-                      $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+                      $ref: '#/components/headers/x-correlator'
                 '400':
-                  $ref: '../common/CAMARA_common.yaml#/components/responses/Generic400'
+                  $ref: '#/components/responses/Generic400'
                 '401':
-                  $ref: '../common/CAMARA_common.yaml#/components/responses/Generic401'
+                  $ref: '#/components/responses/Generic401'
                 '403':
-                  $ref: '../common/CAMARA_common.yaml#/components/responses/Generic403'
+                  $ref: '#/components/responses/Generic403'
                 '410':
-                  $ref: '../common/CAMARA_common.yaml#/components/responses/Generic410'
+                  $ref: '#/components/responses/Generic410'
                 '429':
-                  $ref: '../common/CAMARA_common.yaml#/components/responses/Generic429'
+                  $ref: '#/components/responses/Generic429'
               security:
                 - {}
                 - notificationsBearerAuth: []
@@ -270,7 +262,7 @@ paths:
           description: Population density data result.
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
@@ -282,12 +274,11 @@ paths:
                   $ref: '#/components/examples/PopulationDensityAreaNotSupportedResponseExample'
                 PopulationDensityPartOfAreaNotSupportedResponseExample:
                   $ref: '#/components/examples/PopulationDensityPartOfAreaNotSupportedResponseExample'
-
         '202':
           description: Population density data requested. This response is returned when the behaviour of the API is asynchronous.
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
@@ -295,47 +286,47 @@ paths:
         '400':
           $ref: '#/components/responses/RetrieveLocationBadRequest400'
         '401':
-          $ref: '../common/CAMARA_common.yaml#/components/responses/Generic401'
+          $ref: '#/components/responses/Generic401'
         '403':
-          $ref: '../common/CAMARA_common.yaml#/components/responses/Generic403'
+          $ref: '#/components/responses/Generic403'
         '404':
-          $ref: '../common/CAMARA_common.yaml#/components/responses/Generic404'
+          $ref: '#/components/responses/Generic404'
         '422':
           $ref: '#/components/responses/RetrieveLocationUnprocessableContent422'
         '429':
-          $ref: '../common/CAMARA_common.yaml#/components/responses/Generic429'
+          $ref: '#/components/responses/Generic429'
       security:
         - openId:
             - population-density-data:read
 components:
   securitySchemes:
     openId:
-      $ref: "../common/CAMARA_common.yaml#/components/securitySchemes/openId"
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
+      description: OpenID Connect authentication via discovery metadata.
     notificationsBearerAuth:
-      $ref: "../common/CAMARA_event_common.yaml#/components/securitySchemes/notificationsBearerAuth"
+      type: http
+      scheme: bearer
+      bearerFormat: '{$request.body#/sinkCredential.credentialType}'
+      description: |
+        Bearer token for notification delivery. Token format is determined
+        by `sinkCredential.credentialType` in the subscription request.
   schemas:
     PopulationDensityRequest:
       type: object
-      description: >-
-        Request object for retrieving population density data in a
-        specified area.
-        **NOTE**: The difference between `startTime` and `endTime` cannot be greater than 7 days.
+      description: 'Request object for retrieving population density data in a specified area. **NOTE**: The difference between `startTime` and `endTime` cannot be greater than 7 days.'
       additionalProperties: false
       properties:
         area:
           $ref: '#/components/schemas/Area'
         startTime:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
+          $ref: '#/components/schemas/DateTime'
         endTime:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
+          $ref: '#/components/schemas/DateTime'
         precision:
           type: integer
           format: int32
-          description: >-
-            Precision required of response cells. Precision defines a geohash level and corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash).
-            If not included the default precision level 7 is used by default.
-            Values within the schema range (1–12) that are not supported by the MNO return the error response `422 POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`. Values outside the schema range are invalid per the OpenAPI definition and return `400 INVALID_ARGUMENT` via request validation.
-            This property MUST only be set when `area.areaType` is `POLYGON`, if not included the default precision level 7 is used. When `area.areaType` is `GEOHASHLIST`, each requested geohash determines the granularity of its own response cell; if `precision` is sent, the API returns a `400 INVALID_ARGUMENT` error.
+          description: Precision required of response cells. Precision defines a geohash level and corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash). If not included the default precision level 7 is used by default. Values within the schema range (1–12) that are not supported by the MNO return the error response `422 POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`. Values outside the schema range are invalid per the OpenAPI definition and return `400 INVALID_ARGUMENT` via request validation. This property MUST only be set when `area.areaType` is `POLYGON`, if not included the default precision level 7 is used. When `area.areaType` is `GEOHASHLIST`, each requested geohash determines the granularity of its own response cell; if `precision` is sent, the API returns a `400 INVALID_ARGUMENT` error.
           minimum: 1
           maximum: 12
           default: 7
@@ -345,9 +336,9 @@ components:
           maxLength: 2048
           description: The address where the API response will be asynchronously delivered, using the HTTP protocol.
           pattern: ^https:\/\/.+$
-          example: 'https://endpoint.example.com/sink'
+          example: https://endpoint.example.com/sink
         sinkCredential:
-          $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SinkCredential"
+          $ref: '#/components/schemas/SinkCredential'
       required:
         - area
         - startTime
@@ -357,14 +348,14 @@ components:
       type: object
       properties:
         areaType:
-          $ref: "#/components/schemas/AreaType"
+          $ref: '#/components/schemas/AreaType'
       required:
         - areaType
       discriminator:
         propertyName: areaType
         mapping:
-          POLYGON: "#/components/schemas/Polygon"
-          GEOHASHLIST: "#/components/schemas/GeohashList"
+          POLYGON: '#/components/schemas/Polygon'
+          GEOHASHLIST: '#/components/schemas/GeohashList'
     AreaType:
       type: string
       description: |
@@ -377,18 +368,17 @@ components:
     Polygon:
       description: Polygonal area. The Polygon should be a simple polygon, i.e. should not intersect itself.
       allOf:
-        - $ref: "#/components/schemas/Area"
+        - $ref: '#/components/schemas/Area'
         - type: object
           required:
             - boundary
           properties:
             boundary:
-              $ref: "../common/CAMARA_common.yaml#/components/schemas/PointList"
+              $ref: '#/components/schemas/PointList'
     GeohashList:
-      description: >-
-        Area defined as a list of geohashes. Geohashes do not need to be adjacent or contiguous and may have different precision levels (string lengths), as long as the MNO supports all of them. The `precision` request property MUST NOT be set when `areaType` is `GEOHASHLIST`; if set, the API returns a `400 INVALID_ARGUMENT` error.
+      description: Area defined as a list of geohashes. Geohashes do not need to be adjacent or contiguous and may have different precision levels (string lengths), as long as the MNO supports all of them. The `precision` request property MUST NOT be set when `areaType` is `GEOHASHLIST`; if set, the API returns a `400 INVALID_ARGUMENT` error.
       allOf:
-        - $ref: "#/components/schemas/Area"
+        - $ref: '#/components/schemas/Area'
         - type: object
           required:
             - geohashes
@@ -399,27 +389,20 @@ components:
               minItems: 1
               maxItems: 1000
               items:
-                $ref: "#/components/schemas/Geohash"
+                $ref: '#/components/schemas/Geohash'
     Geohash:
       type: string
-      description: >-
-        Geohash string identifying a cell using the [Geohash system](https://en.wikipedia.org/wiki/Geohash),
-        encoding a geographic location into a short string. Characters are taken from the
-        base-32 geohash alphabet (`0-9` and `b-z` excluding `a`, `i`, `l`, `o`).
-        The length of the string determines the cell granularity (precision).
+      description: Geohash string identifying a cell using the [Geohash system](https://en.wikipedia.org/wiki/Geohash), encoding a geographic location into a short string. Characters are taken from the base-32 geohash alphabet (`0-9` and `b-z` excluding `a`, `i`, `l`, `o`). The length of the string determines the cell granularity (precision).
       pattern: ^[0-9bcdefghjkmnpqrstuvwxyz]{1,12}$
       maxLength: 12
       example: ezdmemd
     PopulationDensityResponse:
       type: object
-      description: >-
-        Population density values is represented in time intervals for different
-        cells of the requested area. Each element in `timedPopulationDensityData` array corresponds
-        to a time interval, containing population density data for the grid cells. The intervals are 1 hour long.
+      description: Population density values is represented in time intervals for different cells of the requested area. Each element in `timedPopulationDensityData` array corresponds to a time interval, containing population density data for the grid cells. The intervals are 1 hour long.
       properties:
         timedPopulationDensityData:
           type: array
-          description: >-
+          description: |-
             Time ranges along with the population density data for the cells within it.
              The request startTime or the request endTime have to be fully covered by the intervals.
              For example, if the intervals are 1-hour long and the input date range were [2024-01-03T11:25:00Z
@@ -462,7 +445,7 @@ components:
       description: The unique identifier of the asynchronous operation that is returned when the operation is initiated.
     ResponseStatus:
       type: string
-      description: >-
+      description: |-
         Represents the state of the response for the input polygon defined in the request, the possible values are:
           - `SUPPORTED_AREA`: The whole request area is supported. Population density data for the entire requested area is returned.
           - `PART_OF_AREA_NOT_SUPPORTED`: Part of the requested area is outside the MNOs coverage area, the cells outside the coverage
@@ -482,18 +465,14 @@ components:
           type: string
           format: date-time
           maxLength: 64
-          description: >-
-            Interval start time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
-            and must have time zone.
-          example: "2023-07-03T10:00:00Z"
+          description: Interval start time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+          example: '2023-07-03T10:00:00Z'
         endTime:
           type: string
           format: date-time
           maxLength: 64
-          description: >-
-            Interval end time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
-            and must have time zone.
-          example: "2023-07-03T11:00:00Z"
+          description: Interval end time. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+          example: '2023-07-03T11:00:00Z'
         cellPopulationDensityData:
           $ref: '#/components/schemas/CellPopulationDensityDataArray'
       required:
@@ -502,20 +481,14 @@ components:
         - cellPopulationDensityData
     CellPopulationDensityDataArray:
       type: array
-      description: >-
-        Population density data for the different cells in a concrete time range.
+      description: Population density data for the different cells in a concrete time range.
       items:
         $ref: '#/components/schemas/CellPopulationDensityData'
       minItems: 1
       maxItems: 10000
     CellPopulationDensityData:
       type: object
-      description: >-
-        Population density data of a cell in a concrete time range. In case of
-        insufficient data, to guarantee an anonymized prediction due to the
-        k-anonymity within a specific cell and time range, no population density
-        data is returned and the property `dataType` value is "LOW_DENSITY". In
-        case of a cell not supported `dataType` value is "NO_DATA"
+      description: Population density data of a cell in a concrete time range. In case of insufficient data, to guarantee an anonymized prediction due to the k-anonymity within a specific cell and time range, no population density data is returned and the property `dataType` value is "LOW_DENSITY". In case of a cell not supported `dataType` value is "NO_DATA"
       properties:
         geohash:
           $ref: '#/components/schemas/Geohash'
@@ -567,11 +540,153 @@ components:
             - maxPplDensity
             - minPplDensity
             - pplDensity
+    XCorrelator:
+      type: string
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
+      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
+      example: b4333c46-49c0-4f62-80d7-f0ef930f1c46
+    Latitude:
+      description: Latitude component of a location
+      type: number
+      format: double
+      minimum: -90
+      maximum: 90
+    Longitude:
+      description: Longitude component of location
+      type: number
+      format: double
+      minimum: -180
+      maximum: 180
+    Point:
+      type: object
+      description: Coordinates (latitude, longitude) defining a location in a map
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          $ref: '#/components/schemas/Latitude'
+        longitude:
+          $ref: '#/components/schemas/Longitude'
+      example:
+        latitude: 50.735851
+        longitude: 7.10066
+    PointList:
+      description: List of points defining a polygon
+      type: array
+      items:
+        $ref: '#/components/schemas/Point'
+      minItems: 3
+      maxItems: 15
+    DateTime:
+      type: string
+      format: date-time
+      maxLength: 64
+      description: Timestamp. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+      example: '2018-04-05T17:31:00Z'
+    SinkCredential:
+      description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
+      type: object
+      properties:
+        credentialType:
+          type: string
+          enum:
+            - ACCESSTOKEN
+            - PRIVATE_KEY_JWT
+          description: |
+            The type of the credential - MUST be set to ACCESSTOKEN or PRIVATE_KEY_JWT for now
+      discriminator:
+        propertyName: credentialType
+        mapping:
+          ACCESSTOKEN: '#/components/schemas/AccessTokenCredential'
+          PRIVATE_KEY_JWT: '#/components/schemas/PrivateKeyJWTCredential'
+      required:
+        - credentialType
+    AccessTokenCredential:
+      type: object
+      description: An access token credential. This type of credential is meant to be used by API Consumers that have limited capabilities to handle authorization requests.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          properties:
+            accessToken:
+              description: REQUIRED. An access token is a token granting access to the target resource.
+              type: string
+              maxLength: 4096
+              writeOnly: true
+            accessTokenExpiresUtc:
+              type: string
+              format: date-time
+              maxLength: 64
+              description: |
+                REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
+                In the case of an ACCESS_TOKEN_EXPIRED termination reason, implementation should notify the client before the expiration date.
+                If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
+                It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+              example: '2023-07-03T12:27:08.312Z'
+            accessTokenType:
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
+              type: string
+              writeOnly: true
+              enum:
+                - bearer
+          required:
+            - accessToken
+            - accessTokenExpiresUtc
+            - accessTokenType
+    PrivateKeyJWTCredential:
+      type: object
+      description: Use PRIVATE_KEY_JWT to get an access token. This type of credential is to be used by clients that have an authorization server.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          properties:
+            clientId:
+              description: The client ID used to authenticate when requesting an access token using PRIVATE_KEY_JWT.
+              type: string
+              maxLength: 128
+              writeOnly: true
+            tokenUri:
+              description: The URI where to request an access token using PRIVATE_KEY_JWT.
+              type: string
+              format: uri
+              maxLength: 2048
+              pattern: ^https:\/\/.+$
+              writeOnly: true
+            jwksUri:
+              description: The URI used to request the public key to verify that the JWT assertion was signed by PRIVATE_KEY_JWT.
+              type: string
+              format: uri
+              maxLength: 2048
+              pattern: ^https:\/\/.+$
+              readOnly: true
+    ErrorInfo:
+      type: object
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
+          description: HTTP response status code
+        code:
+          type: string
+          maxLength: 96
+          description: A human-readable code to describe the error
+        message:
+          type: string
+          maxLength: 512
+          description: A human-readable description of what the event represents
   responses:
     RetrieveLocationBadRequest400:
-      description: >-
-        Problem with the client request. In addition to generic scenarios of
-        `INVALID_ARGUMENT`, `INVALID_CREDENTIAL`, `INVALID_TOKEN`, another scenarios may exist:
+      description: |-
+        Problem with the client request. In addition to generic scenarios of `INVALID_ARGUMENT`, `INVALID_CREDENTIAL`, `INVALID_TOKEN`, another scenarios may exist:
           - The area is not a polygon shape or exceeds supported complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or exceeds supported complexity")
           - Indicated `startTime` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED", "message": "Indicated startTime is greater than the maximum allowed")
           - Indicated `startTime` is earlier than the minimum allowed ("code": "POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED", "message": "Indicated startTime is earlier than the minimum allowed")
@@ -580,12 +695,12 @@ components:
           - Indicated time period is greater than the maximum allowed (More than maximum hours between startTime and endTime) ("code": "POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED", "message": "Indicated time period is greater than the maximum allowed (More than maximum hours between startTime and endTime)")
       headers:
         x-correlator:
-          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -613,12 +728,12 @@ components:
               value:
                 status: 400
                 code: INVALID_CREDENTIAL
-                message: "Only Access token is supported"
+                message: Only Access token is supported
             GENERIC_400_INVALID_TOKEN:
               value:
                 status: 400
                 code: INVALID_TOKEN
-                message: "Only bearer token is supported"
+                message: Only bearer token is supported
             GENERIC_400_INVALID_SINK:
               description: Invalid sink value
               value:
@@ -634,14 +749,12 @@ components:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED
-                message: >-
-                  Indicated startTime is greater than the maximum allowed
+                message: Indicated startTime is greater than the maximum allowed
             POPULATION_DENSITY_DATA_400_MIN_STARTTIME_EXCEEDED:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED
-                message: >-
-                  Indicated startTime is earlier than the minimum allowed
+                message: Indicated startTime is earlier than the minimum allowed
             POPULATION_DENSITY_DATA_400_INVALID_END_TIME:
               value:
                 status: 400
@@ -651,18 +764,14 @@ components:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.MAX_TIME_PERIOD_EXCEEDED
-                message: >-
-                  Indicated time period is greater than the maximum allowed
-                  (More than maximum hours between startTime and endTime)
+                message: Indicated time period is greater than the maximum allowed (More than maximum hours between startTime and endTime)
             POPULATION_DENSITY_DATA_400_INVALID_TIME_PERIOD:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.INVALID_TIME_PERIOD
-                message: >-
-                  Indicated time period is partially in the past and partially in the future
-
+                message: Indicated time period is partially in the past and partially in the future
     RetrieveLocationUnprocessableContent422:
-      description: >-
+      description: |-
         Problem with the client request. The following scenarios may exist:
           - Indicated combination of area, time interval and precision is too big ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big")
           - Indicated cell precision (Geohash level) is not supported ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION", "message": "Indicated cell precision (Geohash level) is not supported")
@@ -670,12 +779,12 @@ components:
           - The requested `areaType` is not supported by the MNO ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_AREA_TYPE", "message": "The requested areaType is not supported by the MNO")
       headers:
         x-correlator:
-          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -697,20 +806,195 @@ components:
               value:
                 status: 422
                 code: POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION
-                message: >-
-                  Indicated cell precision (Geohash length) is not supported
+                message: Indicated cell precision (Geohash length) is not supported
             POPULATION_DENSITY_DATA_422_UNSUPPORTED_SYNC_RESPONSE:
               value:
                 status: 422
                 code: POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE
-                message: >-
-                  Indicated combination of area, time interval and precision is too big for synchronous processing
-                  and asynchronous processing is not enabled
+                message: Indicated combination of area, time interval and precision is too big for synchronous processing and asynchronous processing is not enabled
             POPULATION_DENSITY_DATA_422_UNSUPPORTED_AREA_TYPE:
               value:
                 status: 422
                 code: POPULATION_DENSITY_DATA.UNSUPPORTED_AREA_TYPE
                 message: The requested areaType is not supported by the MNO
+    Generic401:
+      description: Unauthorized
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 401
+                  code:
+                    enum:
+                      - UNAUTHENTICATED
+          examples:
+            GENERIC_401_UNAUTHENTICATED:
+              description: Request cannot be authenticated and a new authentication is required
+              value:
+                status: 401
+                code: UNAUTHENTICATED
+                message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
+    Generic403:
+      description: Forbidden
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+                      - INVALID_TOKEN_CONTEXT
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
+              value:
+                status: 403
+                code: PERMISSION_DENIED
+                message: Client does not have sufficient permissions to perform this action.
+            GENERIC_403_INVALID_TOKEN_CONTEXT:
+              description: Reflect some inconsistency between information in some field of the API and the related OAuth2 Token
+              value:
+                status: 403
+                code: INVALID_TOKEN_CONTEXT
+                message: Request body is not consistent with access token.
+    Generic404:
+      description: Not found
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - NOT_FOUND
+                      - IDENTIFIER_NOT_FOUND
+          examples:
+            GENERIC_404_NOT_FOUND:
+              description: Resource is not found
+              value:
+                status: 404
+                code: NOT_FOUND
+                message: The specified resource is not found.
+            GENERIC_404_IDENTIFIER_NOT_FOUND:
+              description: Some identifier cannot be matched to a device
+              value:
+                status: 404
+                code: IDENTIFIER_NOT_FOUND
+                message: Device identifier not found.
+    Generic429:
+      description: Too Many Requests
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 429
+                  code:
+                    enum:
+                      - QUOTA_EXCEEDED
+                      - TOO_MANY_REQUESTS
+          examples:
+            GENERIC_429_QUOTA_EXCEEDED:
+              description: Request is rejected due to exceeding a business quota limit
+              value:
+                status: 429
+                code: QUOTA_EXCEEDED
+                message: Out of resource quota.
+            GENERIC_429_TOO_MANY_REQUESTS:
+              description: Access to the API has been temporarily blocked due to rate or spike arrest limits being reached
+              value:
+                status: 429
+                code: TOO_MANY_REQUESTS
+                message: Rate limit reached.
+    Generic400:
+      description: Bad Request
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+                      - OUT_OF_RANGE
+          examples:
+            GENERIC_400_INVALID_ARGUMENT:
+              description: Invalid Argument. Generic Syntax Exception
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: Client specified an invalid argument, request body or query param.
+            GENERIC_400_OUT_OF_RANGE:
+              description: Out of Range. Specific Syntax Exception used when a given field has a pre-defined range or a invalid filter criteria combination is requested
+              value:
+                status: 400
+                code: OUT_OF_RANGE
+                message: Client specified an invalid range.
+    Generic410:
+      description: Gone
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 410
+                  code:
+                    enum:
+                      - GONE
+          examples:
+            GENERIC_410_GONE:
+              description: Use in notifications flow to allow API Consumer to indicate that its callback is no longer available
+              value:
+                status: 410
+                code: GONE
+                message: Access to the target resource is no longer available.
   examples:
     PopulationDensitySupportedAreaResponseExample:
       description: Population density supported area response example
@@ -878,3 +1162,15 @@ components:
         timedPopulationDensityData: []
         statusInfo: Some error happened during the processing of the request
         operationId: 2322f362-eaab-4cf3-86d2-efcbdf3a7cb4
+  parameters:
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'
+  headers:
+    x-correlator:
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'

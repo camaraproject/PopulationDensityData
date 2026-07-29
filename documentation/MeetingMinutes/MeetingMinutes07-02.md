@@ -39,7 +39,7 @@ Item | Who | Description
 
 ## Approval of previous meeting minutes & documentation (#1)
 
-[KO Meeting Minutes](https://github.com/camaraproject/PopulationDensityData/blob/main/documentation/MeetingMinutes/PopulationDensityDataAPI-KOmeeting_2024-01-24.md)
+[KO Meeting Minutes](https://github.com/camaraproject/PopulationDensityData/blob/r4.1/documentation/MeetingMinutes/PopulationDensityDataAPI-KOmeeting_2024-01-24.md)
 
 ### Readme modifications (#2)
 
