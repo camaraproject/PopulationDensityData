@@ -142,8 +142,8 @@ info:
     In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
     <!-- CAMARA:MANDATORY:authorization-and-authentication:END -->
 
-    Population Density Data API ensures the usage of anonymized information and do not treat personal data neither as input nor output.
-    Therefore, the access to Population Density Data API is defined as Client Credentials - 2-legged. Please refer to Identify and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the latest detailed specification of this authentication/authorization flow.
+    Population Density Data API ensures the usage of anonymized information and does not treat personal data as either input or output.
+    Therefore, the access to Population Density Data API is defined as Client Credentials - 2-legged. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the latest detailed specification of this authentication/authorization flow.
 
     <!-- CAMARA:MANDATORY:additional-error-responses:BEGIN -->
     # Additional CAMARA error responses
