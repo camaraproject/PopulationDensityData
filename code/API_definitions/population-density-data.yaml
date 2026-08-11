@@ -102,7 +102,7 @@ info:
     The standard behaviour of the API is synchronous, although for large
     area requests the API may behave asynchronously. An API invoker can enforce
     asynchronous behaviour by providing a callback URL (`sink`)
-    is in the request, in this case the API sends a callback
+    is in the request; in this case the API sends a callback
     to the callback URL provided with the result of the request. If `sink` is
     included, it is RECOMMENDED for the client to provide as well the `sinkCredential`
     property to protect the notification endpoint. In the current version,`sinkCredential.credentialType`
@@ -142,8 +142,8 @@ info:
     In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
     <!-- CAMARA:MANDATORY:authorization-and-authentication:END -->
 
-    Population Density Data API ensures the usage of anonymized information and do not treat personal data neither as input nor output.
-    Therefore, the access to Population Density Data API is defined as Client Credentials - 2-legged. Please refer to Identify and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the latest detailed specification of this authentication/authorization flow.
+    Population Density Data API ensures the usage of anonymized information and does not treat personal data as either input or output.
+    Therefore, the access to Population Density Data API is defined as Client Credentials - 2-legged. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the latest detailed specification of this authentication/authorization flow.
 
     <!-- CAMARA:MANDATORY:additional-error-responses:BEGIN -->
     # Additional CAMARA error responses
