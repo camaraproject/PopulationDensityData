@@ -9,11 +9,14 @@ Feature: CAMARA Population Density Data API, vwip
   # * Max size of the response(Combination of area, startTime, endTime and precision requested) supported for an async response
   # * Limitations about max complexity of requested area allowed
   # * Whether the GEOHASHLIST area type is supported
+  # * Whether `PRIVATE_KEY_JWT` is accepted as `sinkCredential.credentialType`
   #
   # Testing assets:
   # * An Area within the supported region
   # * An Area partially within the supported region
   # * An Area outside the supported region
+  # * An API consumer with a JWK Set pre-configured for `PRIVATE_KEY_JWT` authentication
+  # * An API consumer with no JWK Set configured for `PRIVATE_KEY_JWT` authentication
   #
   # References to OAS spec schemas refer to schemas specified in population-density-data.yaml
 
@@ -188,6 +191,27 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "minPplDensity"
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "pplDensity"
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" items with property "dataType" equal to "DENSITY_ESTIMATION" have property "maxPplDensity"
+
+  # The JWT authentication parameters have to be pre-configured out-of-band between the API consumer and the
+  # API provider, as no response of this API returns "$.sinkCredential" and therefore the provider's "jwksUri"
+  # is never conveyed in-band
+  @population_density_data_11_async_private_key_jwt_success_scenario
+  Scenario: Validate success async response for a request when sinkCredential uses PRIVATE_KEY_JWT
+    # Property "$.sink" is set with a valid public accessible HTTPs endpoint
+    Given the API provider has a JWK Set pre-configured for the API consumer used in the test
+    And the request body property "$.area" is set to a valid testing area within supported regions
+    And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
+    And the request body property "$.sink" is set to a valid HTTPS URL
+    And the request body property "$.sinkCredential" is set to a valid credential with property "$.sinkCredential.credentialType" set to "PRIVATE_KEY_JWT"
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 202
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response includes property "$.operationId"
+    And the response does not include property "$.sinkCredential"
+    And the request with the response body will be received at the address of the request property "$.sink" with property "$.operationId" equal to response property "$.operationId"
+    And the request will have header "Authorization" set to "Bearer " + an access token requested to the request property "$.sinkCredential.tokenUri" with the request property "$.sinkCredential.clientId"
+    And the request body complies with the OAS schema at "/components/schemas/PopulationDensityAsyncResponse"
 
   # Error scenarios
 
@@ -548,6 +572,19 @@ Feature: CAMARA Population Density Data API, vwip
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 422
     And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION"
+    And the response property "$.message" contains a user friendly text
+
+   @population_density_data_422.06_private_key_jwt_not_configured
+  #To test this scenario the API consumer must not have a JWK Set pre-configured for PRIVATE_KEY_JWT authentication
+  Scenario: Error 422 when PRIVATE_KEY_JWT is requested and no JWK Set is configured for the API consumer
+    Given the API provider has no JWK Set configured for the API consumer used in the test
+    And the request body property "$.sink" is set to a valid HTTPS URL
+    And the request body property "$.sinkCredential" is set to a valid credential with property "$.sinkCredential.credentialType" set to "PRIVATE_KEY_JWT"
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 422
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 422
+    And the response property "$.code" is "PRIVATE_KEY_JWT_NOT_CONFIGURED"
     And the response property "$.message" contains a user friendly text
 
   # Error 429 scenarios
