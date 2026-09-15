@@ -33,7 +33,7 @@ dependencies:
 # - target_api_status: draft (no file yet) | alpha | rc | public
 apis:
   - api_name: population-density-data
-    target_api_version: 1.0.1
+    target_api_version: 1.0.0
     target_api_status: rc
     main_contacts:
       - sachinvodafone
