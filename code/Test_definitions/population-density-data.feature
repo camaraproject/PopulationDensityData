@@ -10,6 +10,7 @@ Feature: CAMARA Population Density Data API, vwip
   # * Limitations about max complexity of requested area allowed
   # * Whether the GEOHASHLIST area type is supported
   # * Whether `PRIVATE_KEY_JWT` is accepted as `sinkCredential.credentialType`
+  # * Whether asynchronous processing is supported (it determines whether scenarios 07, 08 and 11 or scenario 422.07 apply)
   #
   # Testing assets:
   # * An Area within the supported region
@@ -538,7 +539,7 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.message" contains a user friendly text
 
   @population_density_data_422.03_too_big_request
-  #To test this scenario provided values for "$.area.boundary", "$.startTime", "$.endTime" and "$.precision" MUST generate a too big response in both sync and async scenarios
+  #To test this scenario provided values for "$.area.boundary", "$.startTime", "$.endTime" and "$.precision" MUST generate a too big response in both sync and async scenarios. Unlike 422.07, this error is caused by the size of the request and applies even when the implementation does support asynchronous processing
   Scenario: Error 422 when the response is too big for a sync and async response
     Given the request body properties "$.area.boundary", "$.startTime", "$.endTime" and "$.precision" are set to valid values
     When the request "retrievePopulationDensity" is sent
@@ -574,7 +575,7 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION"
     And the response property "$.message" contains a user friendly text
 
-   @population_density_data_422.06_private_key_jwt_not_configured
+  @population_density_data_422.06_private_key_jwt_not_configured
   #To test this scenario the API consumer must not have a JWK Set pre-configured for PRIVATE_KEY_JWT authentication
   Scenario: Error 422 when PRIVATE_KEY_JWT is requested and no JWK Set is configured for the API consumer
     Given the API provider has no JWK Set configured for the API consumer used in the test
@@ -586,6 +587,21 @@ Feature: CAMARA Population Density Data API, vwip
     And the response property "$.status" is 422
     And the response property "$.code" is "PRIVATE_KEY_JWT_NOT_CONFIGURED"
     And the response property "$.message" contains a user friendly text
+
+  @population_density_data_422.07_unsupported_async_response
+  #To test this scenario the implementation must not support asynchronous processing. The request MUST be small enough to be served synchronously, so that the error is caused by the lack of asynchronous support and not by the size of the request
+  Scenario: Error 422 when sink is provided but the implementation does not support asynchronous processing
+    Given the request body property "$.area" is set to a valid testing area within supported regions
+    And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
+    And the request body properties "$.area", "$.precision", "$.startTime" and "$.endTime" are set to values small enough to be processed synchronously
+    And the request body property "$.sink" is set to a valid HTTPS URL
+    When the request "retrievePopulationDensity" is sent
+    Then the response status code is 422
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 422
+    And the response property "$.code" is "POPULATION_DENSITY_DATA.UNSUPPORTED_ASYNC_RESPONSE"
+    And the response property "$.message" contains a user friendly text
+    And no request is received at the address of the request property "$.sink"
 
   # Error 429 scenarios
 
