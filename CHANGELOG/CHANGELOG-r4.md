@@ -62,7 +62,7 @@ Changes documented below are compared to version 1.0.0-rc.1.
 
 ### Added
 
-* N/A
+* Add test coverage for PRIVATE_KEY_JWT sink credential and 422 PRIVATE_KEY_JWT_NOT_CONFIGURED by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/143
 
 ### Changed
 
