@@ -10,7 +10,7 @@ info:
     With the Population Density Data API the customer can retrieve population density estimations
     for a specific area at the current or a specified period of time. The estimation considers historical
     anonymized information of the network connected devices in the requested
-    area. * Note that the data provided are estimations of population, based on past or future predicted data, for both past or future time ranges.
+    area. Note that the data provided are estimations of population, based on past or future predicted data, for both past or future time ranges.
 
 
     This functionality can be used for multiple use
@@ -191,7 +191,7 @@ info:
 
   x-camara-commonalities: 0.9.0
 externalDocs:
-  description: Product documentation at CAMARA.
+  description: Product documentation at CAMARA
   url: https://github.com/camaraproject/PopulationDensityData
 
 servers:
@@ -200,7 +200,7 @@ servers:
     variables:
       apiRoot:
         default: http://localhost:9091
-        description: API root
+        description: API root, defined by the service provider, e.g. `api.example.com` or `api.example.com/somepath`
 tags:
   - name: Population Density Data
     description: Operations to retrieve population density information.
@@ -354,9 +354,9 @@ components:
           format: int32
           description: >-
             Precision required of response cells. Precision defines a geohash level and corresponds to the length of the geohash for each cell. More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash).
-            If not included the default precision level 7 is used by default.
+            When `area.areaType` is `POLYGON`, if not included the default precision level 7 is used.
             Values within the schema range (1–12) that are not supported by the MNO return the error response `422 POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`. Values outside the schema range are invalid per the OpenAPI definition and return `400 INVALID_ARGUMENT` via request validation.
-            This property MUST only be set when `area.areaType` is `POLYGON`, if not included the default precision level 7 is used. When `area.areaType` is `GEOHASHLIST`, each requested geohash determines the granularity of its own response cell; if `precision` is sent, the API returns a `400 INVALID_ARGUMENT` error.
+            This property MUST only be set when `area.areaType` is `POLYGON`. When `area.areaType` is `GEOHASHLIST`, each requested geohash determines the granularity of its own response cell; if `precision` is sent, the API returns a `400 INVALID_ARGUMENT` error.
           minimum: 1
           maximum: 12
           default: 7
@@ -483,10 +483,12 @@ components:
       type: string
       maxLength: 256
       description: The unique identifier of the asynchronous operation that is returned when the operation is initiated.
+      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{1,256}$
+      example: 2322f362-eaab-4cf3-86d2-efcbdf3a7cb4
     ResponseStatus:
       type: string
       description: >-
-        Represents the state of the response for the input polygon defined in the request, the possible values are:
+        Represents the state of the response for the input area defined in the request, the possible values are:
           - `SUPPORTED_AREA`: The whole request area is supported. Population density data for the entire requested area is returned.
           - `PART_OF_AREA_NOT_SUPPORTED`: Part of the requested area is outside the MNOs coverage area, the cells outside the coverage
           area will have property `dataType` with value `NO_DATA`.
@@ -500,17 +502,20 @@ components:
         - OPERATION_NOT_COMPLETED
     TimedPopulationDensityData:
       type: object
+      description: >-
+        Population density data for a concrete time interval. It contains the start and end time of the
+        interval and the population density data of each grid cell of the requested area within it.
       properties:
         startTime:
+          description: Interval start time.
           allOf:
             - $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
-            - description: Interval start time.
-              example: "2023-07-03T10:00:00Z"
+            - example: "2023-07-03T10:00:00Z"
         endTime:
+          description: Interval end time.
           allOf:
             - $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
-            - description: Interval end time.
-              example: "2023-07-03T11:00:00Z"
+            - example: "2023-07-03T11:00:00Z"
         cellPopulationDensityData:
           $ref: '#/components/schemas/CellPopulationDensityDataArray'
       required:
@@ -538,6 +543,11 @@ components:
           $ref: '#/components/schemas/Geohash'
         dataType:
           type: string
+          description: |
+            Type of population density data returned for the cell, the possible values are:
+              - `DENSITY_ESTIMATION`: The population density estimation is returned for the cell.
+              - `LOW_DENSITY`: The data related to the cell is not sufficient to guarantee k-anonymity, so no population density estimation is returned.
+              - `NO_DATA`: The cell is outside the MNO coverage area, so no population density data is returned.
           enum:
             - NO_DATA
             - LOW_DENSITY
@@ -552,12 +562,20 @@ components:
           LOW_DENSITY: '#/components/schemas/LowDensity'
           DENSITY_ESTIMATION: '#/components/schemas/DensityEstimation'
     NoData:
+      description: >-
+        Cell outside the MNO coverage area. No population density data is returned for it.
       allOf:
         - $ref: '#/components/schemas/CellPopulationDensityData'
     LowDensity:
+      description: >-
+        Cell whose data is not sufficient to guarantee k-anonymity in the time interval. No population
+        density data is returned for it.
       allOf:
         - $ref: '#/components/schemas/CellPopulationDensityData'
     DensityEstimation:
+      description: >-
+        Cell with a population density estimation, expressed in people/km2, together with the estimation
+        range [minimum, maximum].
       allOf:
         - $ref: '#/components/schemas/CellPopulationDensityData'
         - type: object
@@ -588,7 +606,7 @@ components:
     RetrieveLocationBadRequest400:
       description: >-
         Problem with the client request. In addition to generic scenarios of
-        `INVALID_ARGUMENT`, `INVALID_CREDENTIAL`, `INVALID_TOKEN`, another scenarios may exist:
+        `INVALID_ARGUMENT`, `INVALID_CREDENTIAL`, `INVALID_TOKEN`, `INVALID_SINK`, another scenarios may exist:
           - The area is not a polygon shape or exceeds supported complexity ("code": "POPULATION_DENSITY_DATA.INVALID_AREA", "message": "The area is not a polygon shape or exceeds supported complexity")
           - Indicated `startTime` is greater than the maximum allowed ("code": "POPULATION_DENSITY_DATA.MAX_STARTTIME_EXCEEDED", "message": "Indicated startTime is greater than the maximum allowed")
           - Indicated `startTime` is earlier than the minimum allowed ("code": "POPULATION_DENSITY_DATA.MIN_STARTTIME_EXCEEDED", "message": "Indicated startTime is earlier than the minimum allowed")
@@ -650,7 +668,7 @@ components:
               value:
                 status: 400
                 code: POPULATION_DENSITY_DATA.INVALID_END_TIME
-                message: Indicated endDate is earlier than the startTime
+                message: Indicated endTime is earlier than the startTime
             POPULATION_DENSITY_DATA_400_MAX_TIME_PERIOD_EXCEEDED:
               value:
                 status: 400
@@ -668,9 +686,9 @@ components:
     RetrieveLocationUnprocessableContent422:
       description: >-
         Problem with the client request. The following scenarios may exist:
-          - Indicated combination of area, time interval and precision is too big for both synchronous and asynchronous processing, so providing `sink` does not help ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big")
+          - Indicated combination of area, time interval and precision is too big for both synchronous and asynchronous processing, so providing `sink` does not help ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST", "message": "Indicated combination of area, time interval and precision is too big for both synchronous and asynchronous processing")
           - Indicated cell precision (Geohash level) is not supported ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION", "message": "Indicated cell precision (Geohash level) is not supported")
-          - Indicated combination of area, time interval and precision is too big for a sync response and asynchronous processing is not enabled ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE", "message": "Indicated combination of area, time interval and precision is too big for a sync response")
+          - Indicated combination of area, time interval and precision is too big for a sync response and asynchronous processing is not enabled ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE", "message": "Indicated combination of area, time interval and precision is too big for synchronous processing and asynchronous processing is not enabled")
           - `sink` is provided but the API provider does not support asynchronous processing at all, whatever the size of the request ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_ASYNC_RESPONSE", "message": "The API provider does not support the asynchronous processing")
           - The requested `areaType` is not supported by the MNO ("code": "POPULATION_DENSITY_DATA.UNSUPPORTED_AREA_TYPE", "message": "The requested areaType is not supported by the MNO")
           - `sinkCredential.credentialType` is set to `PRIVATE_KEY_JWT` but no JWK Set is configured for the API consumer ("code": "PRIVATE_KEY_JWT_NOT_CONFIGURED", "message": "No JWK Set configured for PRIVATE_KEY_JWT authentication.")
@@ -709,7 +727,7 @@ components:
                 status: 422
                 code: POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION
                 message: >-
-                  Indicated cell precision (Geohash length) is not supported
+                  Indicated cell precision (Geohash level) is not supported
             POPULATION_DENSITY_DATA_422_UNSUPPORTED_SYNC_RESPONSE:
               value:
                 status: 422
