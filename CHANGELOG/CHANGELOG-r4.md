@@ -72,7 +72,8 @@ Changes documented below are compared to version 1.0.0-rc.1.
 
 ### Fixed
 
-* N/A
+* Fix review issues for r4.1 by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/141
+* fix(population-density-data): address validation warnings and hints from Sync26 by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/149
 
 ### Removed
 
