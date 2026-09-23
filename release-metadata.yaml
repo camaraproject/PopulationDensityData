@@ -1,0 +1,13 @@
+repository:
+  repository_name: PopulationDensityData
+  release_tag: r4.2
+  release_type: pre-release-rc
+  release_date: null
+  src_commit_sha: 4c74bc6972dd668b11bca2a0fbf6093117fbb918
+apis:
+- api_name: population-density-data
+  api_version: 1.0.0-rc.2
+  api_title: Population Density Data
+dependencies:
+  commonalities_release: r4.4 (0.9.0)
+  identity_consent_management_release: r4.2 (0.5.0)
