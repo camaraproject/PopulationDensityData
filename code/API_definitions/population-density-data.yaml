@@ -191,7 +191,7 @@ info:
 
   x-camara-commonalities: 0.9.0
 externalDocs:
-  description: Product documentation at CAMARA.
+  description: Product documentation at CAMARA
   url: https://github.com/camaraproject/PopulationDensityData
 
 servers:
@@ -507,15 +507,15 @@ components:
         interval and the population density data of each grid cell of the requested area within it.
       properties:
         startTime:
+          description: Interval start time.
           allOf:
             - $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
-            - description: Interval start time.
-              example: "2023-07-03T10:00:00Z"
+            - example: "2023-07-03T10:00:00Z"
         endTime:
+          description: Interval end time.
           allOf:
             - $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
-            - description: Interval end time.
-              example: "2023-07-03T11:00:00Z"
+            - example: "2023-07-03T11:00:00Z"
         cellPopulationDensityData:
           $ref: '#/components/schemas/CellPopulationDensityDataArray'
       required:
