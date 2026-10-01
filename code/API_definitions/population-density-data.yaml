@@ -6,11 +6,11 @@ info:
 
     # Introduction
 
-    The Population Density Data API allows API Consumers to retrieve anonymized estimations of the number of people per square kilometer in the given area in the time interval on an hourly basis. The resulting data is prepared by the API Provider, either derived from historical network data or using prediction algorithms. The API supports both synchronous and asynchronous processing depending on the size and complexity of the request.
+    The Population Density Data API allows API Consumers to retrieve anonymized estimations of the number of people in each grid cell of in the given area in the time interval on an hourly basis. The resulting data is prepared by the API Provider, either derived from historical network data or using prediction algorithms. The API supports both synchronous and asynchronous processing depending on the size and complexity of the request.
 
     - The defined **area** is either a polygon (a list of geographical coordinates) or a list of geohashes
     - The provided **time interval** is either a fully past or a fully future time interval.
-    - The resulting estimations are derived from anonymized historical device‑based information and predictive models. Returned values include the estimated population density (number of people) for each cell in the requested **area** and each hourly timeslot in the requested **time interval**, as well as an estimation density range [minimum, maximum]. The exact interpretation of minimum and maximum depends on the API Provider's underlying estimation algorithm.
+    - The resulting estimations are derived from anonymized historical device‑based information and predictive models. Returned values include the estimated population density (number of people) for each cell in the requested **area** and each hourly timeslot in the requested **time interval**, as well as an estimation density range [minimum, maximum]. The minimum and maximum are the lower and upper bounds of the range within which the actual number of people is expected to be (e.g. a confidence interval), so that minimum <= estimated value <= maximum. The exact statistical method depends on the API Provider's underlying estimation algorithm.
 
     This API supports a wide range of use cases, including but not limited to:
 
@@ -24,37 +24,37 @@ info:
     # Relevant Terms and Definitions
 
     **Population Density**
-    Number of people at a given time in a given area expressed as an integer value.
+    Estimated number of people in a grid cell during a one-hour time slot, expressed as an integer value. It is a number of people per cell, not a value per square kilometer.
 
     **Area Types**
     - **POLYGON**: Area defined by a list of latitude/longitude points forming a simple polygon. The polygon is subdivided into a grid of equal-sized cells. The number of cells in the grid is dependent on the requested precision.
-    - **GEOHASHLIST**: Area defined as a list of geohash strings. Geohashes may be individual, non‑contiguous geographical areas each with their own (possibly different) precision.
+    - **GEOHASHLIST**: Area defined as a list of geohash strings. Geohashes may be individual, non-contiguous geographical areas each with their own (possibly different) precision.
 
     **Grid Cell**
     A subdivision of the requested area.
 
-    - For polygon areas, the API generates equal‑sized grid cells based on the requested precision, by mapping each polygon coordinate to a geohash at the requested precision level.
+    - For polygon areas, the grid is the set of geohash cells, at the applicable precision level, that cover the polygon. All cells have the same precision level and therefore the same size in degrees of latitude and longitude.
     - For geohash lists, each geohash corresponds to a single cell at the requested precision level.
 
     **Geohash**
-    A geohash is a string-encoded representation of a geographical area/point on the globe. The (32-base) geohash model represents the globe as a grid of 32 fixed rectangular areas, referred to as cells. Each cell is identified by a single letter or digit. Zooming in to one cell (recursively) gives a more granular (or higher precision) 32-cell grid at the next level with each cell again identified by a single letter or digit. The geohash is a string that identifies a cell at a given zoom level by concatenating the identifiers of all previous level grid cells selected. The deeper the zoom, the longer the string and the higher the granularity/precision of the cell. The maximum zoom/precision level in this system is 12. The length (number of characters) of the geohash indicates its precision (zoom level/granularity). For examples, see [here](https://esp.info/geohash) or [here](https://www.geohash.es/encode).
+    A geohash is a string-encoded representation of a geographical area/point on the globe. The (32-base) geohash model represents the globe as a grid of 32 fixed rectangular areas, referred to as cells. Each cell is identified by a single letter or digit. Zooming in to one cell (recursively) gives a more granular (or higher precision) 32-cell grid at the next level with each cell again identified by a single letter or digit. The geohash is a string that identifies a cell at a given zoom level by concatenating the identifiers of all previous level grid cells selected. The deeper the zoom, the longer the string and the higher the granularity/precision of the cell. The maximum zoom/precision level supported by this API is 12. The length (number of characters) of the geohash indicates its precision (zoom level/granularity). More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash).
 
     **Precision**
     Defines the granularity level of grid cells.
 
-    - **POLYGON**: For polygon areas, the precision level 7 is used by default. I.e. a grid is generated for the polygon by creating a list of geohashes, one for each of the coordinates of the provided polygon at zoom level 7. NOTE: several very close polygon coordinates may map into the same geohash.
-    - **GEOHASHLIST**: For geohash lists, each geohash’s own length determines its precision. Example: the geohash for Spain is "e" at precision level 1; the geohash for Madrid (2 cell zoom levels deeper) is "ezj" at precision level 3. Further zooming adds more characters to the geohash, each time identifying a smaller rectangular area on the globe.
+    - **POLYGON**: For polygon areas, the precision level is given by the `precision` request property. If `precision` is not included, the default precision level 7 is used. I.e. a grid is generated for the polygon with all the geohash cells at that precision level that cover the polygon. As a reference, a cell is approximately 1.2 km x 0.6 km at level 6, 153 m x 153 m at level 7 and 38 m x 19 m at level 8.
+    - **GEOHASHLIST**: For geohash lists, each geohash's own length determines its precision. Example: the geohash "e" at precision level 1 covers a large area that includes most of Spain; the geohash "ezj" (2 cell zoom levels deeper) at precision level 3 is a cell that contains Madrid. Further zooming adds more characters to the geohash, each time identifying a smaller rectangular area on the globe.
 
     **MNO Coverage Area**
     The geographic area where the Mobile Network Operator (MNO) provides connectivity services. Cells outside this area are returned with `dataType = NO_DATA`.
 
     **Population Density Data API call result: DataType**
     - **DENSITY_ESTIMATION**: Population density estimation is available.
-    - **LOW_DENSITY**: Insufficient anonymized data due to k‑anonymity constraints; no density estimation is returned.
+    - **LOW_DENSITY**: Insufficient anonymized data due to k-anonymity constraints; no density estimation is returned.
     - **NO_DATA**: The cell lies outside the MNO coverage area.
 
-    **k‑Anonymity**
-    A privacy mechanism ensuring that data cannot be attributed to fewer than *k* individuals. If insufficient data exists for a cell/time interval, the API returns `LOW_DENSITY`.
+    **k-Anonymity**
+    A privacy mechanism ensuring that data cannot be attributed to fewer than *k* individuals (see [k-anonymity](https://en.wikipedia.org/wiki/K-anonymity)). If insufficient data exists for a cell/time interval, the API returns `LOW_DENSITY`.
 
     **Synchronous vs Asynchronous Processing**
     - **Synchronous**: The API returns the result immediately in the response.
@@ -64,7 +64,7 @@ info:
     A unique identifier correlating an asynchronous request with its callback notification.
 
     **Callback URL and Token**
-    A callback URL (`sink`) may be provided to receive asynchronous results. When `sink` is used, the client should also provide `sinkCredential` to secure the callback endpoint. Supported credential types are `ACCESSTOKEN` and `PRIVATE_KEY_JWT`.
+    A callback URL (`sink`) may be provided to receive asynchronous results. When `sink` is used, it is RECOMMENDED for the client to also provide `sinkCredential` to secure the callback endpoint. Supported credential types are `ACCESSTOKEN` and `PRIVATE_KEY_JWT`.
 
     # API Functionality
 
@@ -75,7 +75,7 @@ info:
 
     The API returns a sequence of hourly time slots covering the specified interval (adjusted to the begin and end full hour boundaries). Each time slot contains population density data result for all the grid cells covering the requested area.
 
-    - For polygon areas, the API implementation subdivides the polygon into equal‑sized grid cells based on the precision requested in the API call. If not specified in the request, a default precision level 7 is used.
+    - For polygon areas, the API implementation subdivides the polygon into equal-sized grid cells based on the precision requested in the API call. If not specified in the request, a default precision level 7 is used.
     - For geohash lists, each geohash corresponds to a single cell, and the `precision` property must not be included in the API call.
 
     Population density values are estimated using historical data, prediction models, and population estimation algorithms. The allowed time interval is constrained:
@@ -84,28 +84,28 @@ info:
     - The difference between `startTime` and `endTime` must not exceed 7 days (168 hours).
 
     Polygon areas must meet certain constraints:
-    - Maximum polygon area size (implementation‑specific).
+    - Maximum polygon area size (implementation-specific).
     - Must have a minimum of 3 and can have a maximum of 15 geographical points defining the polygon.
-    - Must lie at least partially within the MNO coverage area; otherwise, an empty array is returned.
+    - Must lie at least partially within the MNO coverage area; otherwise, the response has `status` set to `AREA_NOT_SUPPORTED` and no population density data is returned.
 
     For geohash lists:
-    - Support for `GEOHASHLIST` is optional for MNOs.
-    - Geohashes may be non‑contiguous and have varying precision.
-    - Unsupported geohash precisions result in `UNSUPPORTED_PRECISION`.
+    - Support for `POLYGON` is mandatory for all MNOs, while support for `GEOHASHLIST` is optional. If the MNO does not support `GEOHASHLIST`, the API returns `422 POPULATION_DENSITY_DATA.UNSUPPORTED_AREA_TYPE`.
+    - Geohashes may be non-contiguous and have varying precision.
+    - Unsupported geohash precisions result in `422 POPULATION_DENSITY_DATA.UNSUPPORTED_PRECISION`.
     - Geohashes outside coverage are returned with `NO_DATA`.
     - If all geohashes are outside coverage, the response status is `AREA_NOT_SUPPORTED`.
 
-    The API normally behaves synchronously. However, large requests may trigger asynchronous processing. Clients may enforce asynchronous behavior by providing a `sink` callback URL. If asynchronous processing is not supported, the API returns `UNSUPPORTED_ASYNC_RESPONSE`.
+    The API normally behaves synchronously. However, large requests may trigger asynchronous processing. Clients may enforce asynchronous behavior by providing a `sink` callback URL. If asynchronous processing is not supported, the API returns `422 POPULATION_DENSITY_DATA.UNSUPPORTED_ASYNC_RESPONSE`.
 
-    Three mutually exclusive `422` errors indicate why a request cannot be served:
-    - **UNSUPPORTED_ASYNC_RESPONSE**: Asynchronous processing is not supported.
-    - **UNSUPPORTED_SYNC_RESPONSE**: Request too large for synchronous processing and asynchronous processing is not enabled.
-    - **UNSUPPORTED_REQUEST**: Request too large for both synchronous and asynchronous processing.
+    Three mutually exclusive `422` errors indicate why a request cannot be served. They are evaluated in this order:
+    - **POPULATION_DENSITY_DATA.UNSUPPORTED_ASYNC_RESPONSE**: `sink` is provided but asynchronous processing is not supported at all. It does not depend on the size of the request; the API consumer can retry the same request without `sink` to obtain a synchronous response.
+    - **POPULATION_DENSITY_DATA.UNSUPPORTED_SYNC_RESPONSE**: Request too large for synchronous processing and asynchronous processing is not enabled. A smaller request would succeed.
+    - **POPULATION_DENSITY_DATA.UNSUPPORTED_REQUEST**: Request too large for both synchronous and asynchronous processing. Retrying with `sink` does not help; only a smaller request does.
 
     If an error occurs during asynchronous processing, the callback includes `status = OPERATION_NOT_COMPLETED` and a `statusInfo` field with additional details.
 
     **Privacy Note**
-    To ensure anonymization, if data for a cell/time interval does not meet k‑anonymity requirements, the API returns `LOW_DENSITY` for that cell.
+    To ensure anonymization, if data for a cell/time interval does not meet k-anonymity requirements, the API returns `LOW_DENSITY` for that cell.
 
     # Resources and Operations Overview
 
@@ -113,7 +113,7 @@ info:
     The API call result is an array of hourly timeslots (`timedPopulationDensityData`), with per timeslot an array of cells (`cellPopulationDensityData`), with for each cell the resulting `DataType` with the density data result. If data is available, the result `DataType` is **DENSITY_ESTIMATION**, and the estimated density data is a number of estimated people in the cell in the timeslot, as well as minimum and maximum estimated values. Other possible results are indicated by different DataTypes. The 3 possible results are as follows:
 
     - **DENSITY_ESTIMATION**: Population density estimation is available.
-    - **LOW_DENSITY**: Insufficient anonymized data due to k‑anonymity constraints; no density estimation is returned.
+    - **LOW_DENSITY**: Insufficient anonymized data due to k-anonymity constraints; no density estimation is returned.
     - **NO_DATA**: The cell lies outside the MNO coverage area.
 
     **Callback URL and token**
@@ -121,7 +121,7 @@ info:
 
     - When an asynchronous response is requested (using `sink`), the 202 response of the API will include an `operationId` property. This `operationId` property will also be sent in the callback payload. The purpose of the `operationId` is to correlate an asynchronous response with its corresponding request.
 
-    - Using `credentialType: PRIVATE_KEY_JWT` requires the JWT authentication parameters (a.k.a. JWK Set) to be pre-configured by an agreement between the API consumer and the API provider as part of the onboarding process. The API never returns `sinkCredential`, so the contained provider's `jwksUri` is never conveyed in the response. The `/retrieve` operation creates no resource to read back. The same static `jwksUri` is returned on every `202` response, and the callback may be delivered before the API consumer has processed that response. If `PRIVATE_KEY_JWT` is provided and no JWK Set is configured for the API consumer, the API returns the error response `422 PRIVATE_KEY_JWT_NOT_CONFIGURED`. A failure to authenticate against the API consumer's authorization server when the callback is delivered cannot be detected while the request is being processed, and is therefore reported in the callback with property `status` set to `OPERATION_NOT_COMPLETED`.
+    - Using `credentialType: PRIVATE_KEY_JWT` requires the JWT authentication parameters (a.k.a. JWK Set) to be pre-configured by an agreement between the API consumer and the API provider as part of the onboarding process. The API never returns `sinkCredential`, so the API provider's `jwksUri` is never conveyed in the response. Unlike an event subscription, the `/retrieve` operation creates no resource to read back, the same static `jwksUri` would be repeated on every `202` response, and the callback may be delivered before the API consumer has processed that response. If `PRIVATE_KEY_JWT` is provided and no JWK Set is configured for the API consumer, the API returns the error response `422 PRIVATE_KEY_JWT_NOT_CONFIGURED`. A failure to authenticate against the API consumer's authorization server when the callback is delivered cannot be detected while the request is being processed, and is therefore reported in the callback with property `status` set to `OPERATION_NOT_COMPLETED`.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
 
@@ -134,7 +134,7 @@ info:
     In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
     <!-- CAMARA:MANDATORY:authorization-and-authentication:END -->
 
-    For this API, only anonymized data is processed, and no personal data is exposed. Therefore, access is granted using the Client Credentials (2‑legged) flow.
+    For this API, only anonymized data is processed, and no personal data is exposed. Therefore, access is granted using the Client Credentials (2-legged) flow. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the latest detailed specification of this authentication/authorization flow.
 
     <!-- CAMARA:MANDATORY:additional-error-responses:BEGIN -->
 
