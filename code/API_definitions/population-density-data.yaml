@@ -6,7 +6,7 @@ info:
 
     # Introduction
 
-    The Population Density Data API allows API Consumers to retrieve anonymized estimations of the number of people in each grid cell of in the given area in the time interval on an hourly basis. The resulting data is prepared by the API Provider, either derived from historical network data or using prediction algorithms. The API supports both synchronous and asynchronous processing depending on the size and complexity of the request.
+    The Population Density Data API allows API Consumers to retrieve anonymized estimations of the number of people in each grid cell of the given area in the time interval on an hourly basis. The resulting data is prepared by the API Provider, either derived from historical network data or using prediction algorithms. The API supports both synchronous and asynchronous processing depending on the size and complexity of the request.
 
     - The defined **area** is either a polygon (a list of geographical coordinates) or a list of geohashes
     - The provided **time interval** is either a fully past or a fully future time interval.
@@ -27,7 +27,7 @@ info:
     Estimated number of people in a grid cell during a one-hour time slot, expressed as an integer value. It is a number of people per cell, not a value per square kilometer.
 
     **Area Types**
-    - **POLYGON**: Area defined by a list of latitude/longitude points forming a simple polygon. The polygon is subdivided into a grid of equal-sized cells. The number of cells in the grid is dependent on the requested precision.
+    - **POLYGON**: Area defined by a list of latitude/longitude points forming a simple polygon. The polygon is subdivided into a grid of cells. The set of cells for the polygon correspond to the geohashes covering the polygon obtained by applying the requested precision.
     - **GEOHASHLIST**: Area defined as a list of geohash strings. Geohashes may be individual, non-contiguous geographical areas each with their own (possibly different) precision.
 
     **Grid Cell**
@@ -117,7 +117,7 @@ info:
     - **NO_DATA**: The cell lies outside the MNO coverage area.
 
     **Callback URL and token**
-    Developers may provide a callback URL (`sink`) for receiving an asynchronous response. This is an optional parameter. If `sink` is included, it is RECOMMENDED for the client to provide as well the `sinkCredential` property to protect the notification endpoint. If provided, `sinkCredential.credentialType` MUST be set to `ACCESSTOKEN` or `PRIVATE_KEY_JWT`.
+    API Consumers may provide a callback URL (`sink`) for receiving an asynchronous response. This is an optional parameter. If `sink` is included, it is RECOMMENDED for the API Consumer to provide as well the `sinkCredential` property to protect the callback endpoint. If provided, `sinkCredential.credentialType` MUST be set to `ACCESSTOKEN` or `PRIVATE_KEY_JWT`.
 
     - When an asynchronous response is requested (using `sink`), the 202 response of the API will include an `operationId` property. This `operationId` property will also be sent in the callback payload. The purpose of the `operationId` is to correlate an asynchronous response with its corresponding request.
 
@@ -405,9 +405,9 @@ components:
     PopulationDensityResponse:
       type: object
       description: >-
-        Population density data represented as hourly time intervals for the
+        Population density data represented as hourly time slots covering the requested time interval for the
         cells of the requested area. Each element in `timedPopulationDensityData` array corresponds
-        to a one-hour time interval, containing population density data for the grid cells.
+        to a one-hour time slot, containing population density data for all the grid cells of the requested ares.
       properties:
         timedPopulationDensityData:
           type: array
