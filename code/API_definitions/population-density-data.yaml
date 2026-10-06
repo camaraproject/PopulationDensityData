@@ -34,7 +34,7 @@ info:
     A subdivision of the requested area.
 
     - For polygon areas, the grid is the set of geohash cells, at the applicable precision level, that cover the polygon. All cells have the same precision level.
-    - For geohash lists, each geohash corresponds to a single cell at the requested precision level.
+    - For geohash lists, each geohash corresponds to a single cell at its own precision level.
 
     **Geohash**
     A geohash is a string-encoded representation of a geographical area/point on the globe. The (32-base) geohash model represents the globe as a grid of 32 fixed rectangular areas, referred to as cells. Each cell is identified by a single letter or digit. Zooming in to one cell (recursively) gives a more granular (or higher precision) 32-cell grid at the next level with each cell again identified by a single letter or digit. The geohash is a string that identifies a cell at a given zoom level by concatenating the identifiers of all previous level grid cells selected. The deeper the zoom, the longer the string and the higher the granularity/precision of the cell. The maximum zoom/precision level supported by this API is 12. The length (number of characters) of the geohash indicates its precision (zoom level/granularity). More information at [Geohash system](https://en.wikipedia.org/wiki/Geohash).
@@ -42,7 +42,7 @@ info:
     **Precision**
     Defines the granularity level of grid cells.
 
-    - **POLYGON**: For polygon areas, the precision level is given by the `precision` request property. If `precision` is not included, the default precision level 7 is used. I.e. a grid is generated for the polygon with all the geohash cells at that precision level that cover the polygon. As a reference, a cell is approximately 1.2 km x 0.6 km at level 6, 153 m x 153 m at level 7 and 38 m x 19 m at level 8.
+    - **POLYGON**: For polygon areas, the precision level is given by the `precision` request property. If `precision` is not included, the default precision level 7 is used. I.e. a grid is generated for the polygon with all the geohash cells at that precision level that cover the polygon.
     - **GEOHASHLIST**: For geohash lists, each geohash's own length determines its precision. Example: the geohash "e" at precision level 1 covers a large area that includes most of Spain; the geohash "ezj" (2 cell zoom levels deeper) at precision level 3 is a cell that contains Madrid. Further zooming adds more characters to the geohash, each time identifying a smaller rectangular area on the globe.
 
     **MNO Coverage Area**
@@ -75,7 +75,7 @@ info:
 
     The API returns a sequence of hourly time slots covering the specified interval (adjusted to the begin and end full hour boundaries). Each time slot contains population density data result for all the grid cells covering the requested area.
 
-    - For polygon areas, the API implementation subdivides the polygon into equal-sized grid cells based on the precision requested in the API call. If not specified in the request, a default precision level 7 is used.
+    - For polygon areas, the API implementation subdivides the polygon into grid cells based on the precision requested in the API call. If not specified in the request, a default precision level 7 is used.
     - For geohash lists, each geohash corresponds to a single cell, and the `precision` property must not be included in the API call.
 
     Population density values are estimated using historical data, prediction models, and population estimation algorithms. The allowed time interval is constrained:
@@ -418,7 +418,7 @@ components:
         statusInfo:
           type: string
           maxLength: 512
-          description: Additional context about the `status` value. Mandatory when `status` is `OPERATION_NOT_COMPLETED`, providing details about why the asynchronous operation could not be completed.
+          description: Provides additional context about `status`. Mandatory when `status` is `OPERATION_NOT_COMPLETED`, to convey the reason the asynchronous processing could not be completed.
           example: Some error happened during the processing of the request
       required:
         - timedPopulationDensityData
@@ -450,13 +450,11 @@ components:
     ResponseQualityInfo:
       type: string
       description: >-
-        This is not an HTTP error indicator - it characterises how completely the API was able to fulfil the request. The possible values are:
+        Provides additional information about the quality and coverage of the included response data for the requested area. This is not an HTTP error indicator - it characterises how completely the API was able to fulfil the request:
           - `SUPPORTED_AREA`: The whole request area is supported. Population density data for the entire requested area is returned.
-          - `PART_OF_AREA_NOT_SUPPORTED`: Part of the requested area is outside the MNO's coverage area, the cells outside the coverage
-          area will have property `dataType` with value `NO_DATA`.
-          - `AREA_NOT_SUPPORTED`: The whole requested area is outside the MNO's coverage area. No data will be returned.
-          - `OPERATION_NOT_COMPLETED`: An error happened during asynchronous processing of the request. This status will only be returned
-          in case the asynchronous API behaviour is used.
+          - `PART_OF_AREA_NOT_SUPPORTED`: Part of the requested area is outside the MNO's coverage area. Cells outside coverage have property `dataType` with value `NO_DATA`.
+          - `AREA_NOT_SUPPORTED`: The whole requested area is outside the MNO's coverage area. No population density data is returned.
+          - `OPERATION_NOT_COMPLETED`: The asynchronous processing of the request could not be completed. This value is only used in asynchronous callbacks. See `statusInfo` for details.
       enum:
         - SUPPORTED_AREA
         - PART_OF_AREA_NOT_SUPPORTED
