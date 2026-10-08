@@ -73,8 +73,8 @@ Changes documented below are compared to version 1.0.0-rc.1.
 
 ### Fixed
 
-* Fix review issues for r4.1 by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/141
-* Fix address validation warnings and hints from Sync26 by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/149
+* Fix documentation typos and clarify `jwksUri` handling for `PRIVATE_KEY_JWT` sink credentials (the API never returns `sinkCredential`, so `jwksUri` is not conveyed in responses) by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/141
+* Fix OpenAPI validation findings: update callback media type to `application/cloudevents+json`, add missing schema property descriptions, and align `apiRoot` description with standard CAMARA wording by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/149
 
 ### Removed
 
