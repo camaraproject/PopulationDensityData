@@ -2,6 +2,7 @@
 
 <!-- TOC:START -->
 ## Table of Contents
+- [r4.2](#r42)
 - [r4.1](#r41)
 <!-- TOC:END -->
 
@@ -13,6 +14,51 @@ The below sections record the changes for each API version in each release as fo
 * for the first release-candidate, all changes since the last public release
 * for subsequent release-candidate(s), only the delta to the previous release-candidate
 * for a public release, the consolidated changes since the previous public release
+
+# r4.2
+
+## Release Notes
+
+This release candidate contains the definition and documentation of
+* population-density-data 1.0.0-rc.2
+
+The API definition(s) are based on
+* Commonalities r4.4 (0.9.0)
+* Identity and Consent Management r4.2 (0.5.0)
+
+## population-density-data 1.0.0-rc.2
+
+**population-density-data 1.0.0-rc.2 is a release-candidate version of this API.**
+
+Changes documented below are compared to version 1.0.0-rc.1.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r4.2/code/API_definitions/population-density-data.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r4.2/code/API_definitions/population-density-data.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r4.2/code/API_definitions/population-density-data.yaml)
+
+### Breaking changes
+
+* N/A
+
+### Added
+
+* Add test coverage for PRIVATE_KEY_JWT sink credential and 422 PRIVATE_KEY_JWT_NOT_CONFIGURED by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/143
+
+### Changed
+
+* docs: update inline API documentation, rename schemas and align terminology by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/153
+
+### Fixed
+
+* Fix documentation typos and clarify `jwksUri` handling for `PRIVATE_KEY_JWT` sink credentials (the API never returns `sinkCredential`, so `jwksUri` is not conveyed in responses) by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/141
+* Fix OpenAPI validation findings: update callback media type to `application/cloudevents+json`, add missing schema property descriptions, and align `apiRoot` description with standard CAMARA wording by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/149
+
+### Removed
+
+* N/A
+
+**Full Changelog**: https://github.com/camaraproject/PopulationDensityData/compare/r4.1...r4.2
 
 # r4.1
 
