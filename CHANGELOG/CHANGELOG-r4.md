@@ -69,7 +69,7 @@ Changes documented below are compared to version 1.0.0-rc.1.
 
 ### Changed
 
-* N/A
+* docs: update inline API documentation, rename schemas and align terminology by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/153
 
 ### Fixed
 
