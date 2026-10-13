@@ -83,7 +83,9 @@ Changes documented below are compared to version 0.3.0.
 
 ### Added
 
-* N/A
+* Add `GEOHASHLIST` as optional area type alongside `POLYGON`, including `GeohashList` and `Geohash` schemas with geohash validation pattern, aligned with Commonalities and ICM for Sync26 by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/123
+* Add Population Density Data User Story documenting the API use case and stable requirements phase (#114) by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/116
+* Add test scenarios for `PRIVATE_KEY_JWT` sink credential and `422 PRIVATE_KEY_JWT_NOT_CONFIGURED` error response, aligned with the canonical Commonalities test template by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/143
 
 ### Changed
 
