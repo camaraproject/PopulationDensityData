@@ -20,7 +20,7 @@ Incubating API Repository to evolve and maintain the definitions and documentati
     * Use Case (1): Providing BVLOS flight the data to meet SORA 2.5 requirements in terms of intrinsic Ground Risk Class (iGRC).
     * Use Case (2): Providing data to identify if the ground risk class for a given drone flight is acceptable for the time of the flight, or an alternative time should be considered to lower the risk.
   * Service Inputs: Area of the interest. Date & time range.
-  * Service Outputs: maximum, average and minimum population density value for the given area, and interval corresponding to the valid range of that value. (space and time maps).
+  * Service Outputs: for each grid cell (geohash) of the requested area and each hourly time slot of the requested time interval, the estimated number of people (an integer count, not a density per km²) together with the range [minimum, maximum] within which the actual number of people is expected to be. Cells with insufficient anonymized data (k-anonymity) are reported as `LOW_DENSITY` and cells outside the operator coverage as `NO_DATA`. (space and time maps).
   * NOTE: The scope of these APIs should be limited (at least at a first stage) to 4G and 5G.  
 * Describe, develop, document and test the APIs (with 1-2 Telcos)  
 * Started: December 2023
