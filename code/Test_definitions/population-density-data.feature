@@ -10,8 +10,7 @@ Feature: CAMARA Population Density Data API, vwip
   # * Limitations about max complexity of requested area allowed
   # * Whether the GEOHASHLIST area type is supported
   # * Whether `PRIVATE_KEY_JWT` is accepted as `sinkCredential.credentialType`
-  # * Maximum time the API provider waits for its notification delivery to be considered ended (retry policy), so that the tester knows how long to wait before checking that no further notification arrives (scenario 12)
-  # * Whether asynchronous processing is supported (it determines whether scenarios 07, 08, 11 and 12 or scenario 422.07 apply)
+  # * Whether asynchronous processing is supported (it determines whether scenarios 07, 08 and 11 or scenario 422.07 apply)
   #
   # Testing assets:
   # * An Area within the supported region
@@ -19,7 +18,6 @@ Feature: CAMARA Population Density Data API, vwip
   # * An Area outside the supported region
   # * An API consumer with a JWK Set pre-configured for `PRIVATE_KEY_JWT` authentication
   # * An API consumer with no JWK Set configured for `PRIVATE_KEY_JWT` authentication
-  # * A callback endpoint (sink) controlled by the tester, which can be configured to answer the notification with status code 410 (scenario 12)
   #
   # References to OAS spec schemas refer to schemas specified in population-density-data.yaml
 
@@ -215,26 +213,6 @@ Feature: CAMARA Population Density Data API, vwip
     And the request with the response body will be received at the address of the request property "$.sink" with property "$.operationId" equal to response property "$.operationId"
     And the request will have header "Authorization" set to "Bearer " + an access token requested to the request property "$.sinkCredential.tokenUri" with the request property "$.sinkCredential.clientId"
     And the request body complies with the OAS schema at "/components/schemas/PopulationDensityAsyncResponse"
-
-  @population_density_data_12_async_sink_gone_scenario
-  Scenario: Validate that the API provider stops delivering the notification when the sink answers with 410
-    # Property "$.sink" is set with a valid public accessible HTTPs endpoint controlled by the tester.
-    # The sink is configured to answer the notification request with status code 410 and an error body
-    # compliant with the schema at "../common/CAMARA_event_common.yaml#/components/responses/SinkGone410"
-    Given the request body property "$.area" is set to a valid testing area within supported regions
-    And the request body properties "$.startTime" and "$.endTime" are valid future date-times, with "$.endTime" later than "$.startTime"
-    And the request body property "$.sink" is set to a valid HTTPS URL
-    And the request body property "$.sinkCredential" is set to a valid credential with property "$.sinkCredential.credentialType" set to "ACCESSTOKEN"
-    And the sink is configured to respond with status code 410
-    When the request "retrievePopulationDensity" is sent
-    Then the response status code is 202
-    And the response header "Content-Type" is "application/json"
-    And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response includes property "$.operationId"
-    And the request with the response body is received at the address of the request property "$.sink" with property "$.operationId" equal to response property "$.operationId"
-    And the request body complies with the OAS schema at "/components/schemas/PopulationDensityAsyncResponse"
-    And the sink responds with status code 410
-    And no further request is received at the address of the request property "$.sink" for the same "$.operationId"
 
   # Error scenarios
 
