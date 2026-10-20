@@ -92,7 +92,12 @@ Changes documented below are compared to version 0.3.0.
 
 ### Changed
 
-* N/A
+* Align OpenAPI specification with CAMARA Commonalities 0.9.0 (r4.4): migrate deprecated generic error schemas to versioned catalog equivalents (`Generic401` → `Unauthenticated401`, `Generic403` → `PermissionDenied403`, etc.) and replace inline examples with `$ref` shared examples by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/145
+* Expand test suite from 22 to 41 scenarios: add full `GEOHASHLIST` area type coverage, rename `startDate`/`endDate` to `startTime`/`endTime`, and rework async flow to match updated schema for next meta-release by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/128
+* Update inline API documentation, rename schemas to avoid collision with CAMARA common datatypes (`Area` → `GeoArea`, `AreaType` → `GeoAreaType`, `Polygon` → `GeoPolygon`, `ResponseStatus` → `ResponseQualityInfo`), remove `people/km2` references, and align terminology (`API Consumer`, `x-correlator`) by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/153
+* Rename `## Status and released versions` section heading to standard `## Release Information` to enable automated release-info sync workflow by @hdamker in https://github.com/camaraproject/PopulationDensityData/pull/112
+* Address CAMARA validation warnings and hints deferred from Commonalities r4.4 sync: update notification callback media type to `application/cloudevents+json`, add missing property descriptions, and fix Gherkin indentation by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/149
+* Fix OpenAPI schema component names from SNAKE_CASE to CamelCase (`NO_DATA` → `NoData`, `LOW_DENSITY` → `LowDensity`, `DENSITY_ESTIMATION` → `DensityEstimation`) to follow OpenAPI naming conventions — wire format values unchanged (#107) by @patrice-conil in https://github.com/camaraproject/PopulationDensityData/pull/108
 
 ### Fixed
 
