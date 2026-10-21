@@ -96,7 +96,9 @@ Changes documented below are compared to version 0.3.0.
 
 ### Fixed
 
-* N/A
+* Fix incorrect ATP test assertions for time interval coverage: returned intervals must fully cover the requested range (first may start before, last may end after), not be strictly contained within it by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/119
+* Fix post-release r4.1 review issues: typos in User Story (#133), feature file (#134), and API documentation (#135); remove stale `Meeting Minutes` folder (#136); fix `jwksUri` never returned for `PRIVATE_KEY_JWT` sink credentials (#139) by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/141
+* Fix extra non-normative text incorrectly appended to the RFC 3339 date-time format description by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/104
 
 ### Removed
 
