@@ -2,7 +2,7 @@ repository:
   repository_name: PopulationDensityData
   release_tag: r4.3
   release_type: public-release
-  release_date: null
+  release_date: '2026-11-06T09:02:31Z'
   src_commit_sha: e0fc6051de8adeff6e00acb7049c02b704aacd29
 apis:
 - api_name: population-density-data
