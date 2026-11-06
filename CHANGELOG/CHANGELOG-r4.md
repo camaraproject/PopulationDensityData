@@ -2,6 +2,7 @@
 
 <!-- TOC:START -->
 ## Table of Contents
+- **[r4.3](#r43)**
 - [r4.2](#r42)
 - [r4.1](#r41)
 <!-- TOC:END -->
@@ -14,6 +15,60 @@ The below sections record the changes for each API version in each release as fo
 * for the first release-candidate, all changes since the last public release
 * for subsequent release-candidate(s), only the delta to the previous release-candidate
 * for a public release, the consolidated changes since the previous public release
+
+# r4.3
+
+## Release Notes
+
+This public release contains the definition and documentation of
+* population-density-data 1.0.0
+
+The API definition(s) are based on
+* Commonalities r4.4 (0.9.0)
+* Identity and Consent Management r4.2 (0.5.0)
+
+## population-density-data 1.0.0
+
+**population-density-data 1.0.0 is the first stable version of this API.**
+
+Changes documented below are compared to version 0.3.0.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r4.3/code/API_definitions/population-density-data.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/PopulationDensityData/r4.3/code/API_definitions/population-density-data.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/PopulationDensityData/blob/r4.3/code/API_definitions/population-density-data.yaml)
+
+### Breaking changes
+
+* N/A
+
+### Added
+
+* Add `GEOHASHLIST` as optional area type alongside `POLYGON`, including `GeohashList` and `Geohash` schemas with geohash validation pattern, aligned with Commonalities and ICM for Sync26 by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/123
+* Add Population Density Data User Story documenting the API use case and stable requirements phase (#114) by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/116
+* Add test scenarios for `PRIVATE_KEY_JWT` sink credential and `422 PRIVATE_KEY_JWT_NOT_CONFIGURED` error response, aligned with the canonical Commonalities test template by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/143
+
+### Changed
+
+* Align OpenAPI specification with CAMARA Commonalities 0.9.0 (r4.4): migrate deprecated generic error schemas to versioned catalog equivalents (`Generic401` → `Unauthenticated401`, `Generic403` → `PermissionDenied403`, etc.) and replace inline examples with `$ref` shared examples by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/145
+* Expand test suite from 22 to 41 scenarios: add full `GEOHASHLIST` area type coverage, rename `startDate`/`endDate` to `startTime`/`endTime`, and rework async flow to match updated schema for next meta-release by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/128
+* Update inline API documentation, rename schemas to avoid collision with CAMARA common datatypes (`Area` → `GeoArea`, `AreaType` → `GeoAreaType`, `Polygon` → `GeoPolygon`, `ResponseStatus` → `ResponseQualityInfo`), remove `people/km2` references, and align terminology (`API Consumer`, `x-correlator`) by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/153
+* Rename `## Status and released versions` section heading to standard `## Release Information` to enable automated release-info sync workflow by @hdamker in https://github.com/camaraproject/PopulationDensityData/pull/112
+* Address CAMARA validation warnings and hints deferred from Commonalities r4.4 sync: update notification callback media type to `application/cloudevents+json`, add missing property descriptions, and fix Gherkin indentation by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/149
+* Fix OpenAPI schema component names from SNAKE_CASE to CamelCase (`NO_DATA` → `NoData`, `LOW_DENSITY` → `LowDensity`, `DENSITY_ESTIMATION` → `DensityEstimation`) to follow OpenAPI naming conventions — wire format values unchanged (#107) by @patrice-conil in https://github.com/camaraproject/PopulationDensityData/pull/108
+* Update the algorithm supporting document (terminology, inputs and wording) and align the User Story with the API definition (GEOHASHLIST, time interval, dataType, status) by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/173
+
+### Fixed
+
+* Fix incorrect ATP test assertions for time interval coverage: returned intervals must fully cover the requested range (first may start before, last may end after), not be strictly contained within it by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/119
+* Fix post-release r4.1 review issues: typos in User Story (#133), feature file (#134), and API documentation (#135); remove stale `Meeting Minutes` folder (#136); fix `jwksUri` never returned for `PRIVATE_KEY_JWT` sink credentials (#139) by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/141
+* Fix extra non-normative text incorrectly appended to the RFC 3339 date-time format description by @albertoramosmonagas in https://github.com/camaraproject/PopulationDensityData/pull/104
+
+### Removed
+
+* N/A
+
+**Full Changelog**: https://github.com/camaraproject/PopulationDensityData/compare/r3.2...r4.3
 
 # r4.2
 
