@@ -26,7 +26,7 @@ Feature: CAMARA Population Density Data API, vwip
     And the resource "/population-density-data/vwip/retrieve"
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
-    And the header "x-correlator" complies with the schema at "../common/CAMARA_common.yaml#/components/schemas/XCorrelator"
+    And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
     And the request body is set by default to a request body compliant with the schema
 
   # Happy path scenarios
@@ -39,7 +39,7 @@ Feature: CAMARA Population Density Data API, vwip
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/PopulationDensityResponse"
     And the response property "$.status" value is "SUPPORTED_AREA"
     And the response property "$.timedPopulationDensityData" intervals fully cover the requested time range from "$.startTime" to "$.endTime"
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].geohash" is a valid Geohash inside the request area
@@ -56,7 +56,7 @@ Feature: CAMARA Population Density Data API, vwip
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/PopulationDensityResponse"
     And the response property "$.status" value is "PART_OF_AREA_NOT_SUPPORTED"
     And the response property "$.timedPopulationDensityData" intervals fully cover the requested time range from "$.startTime" to "$.endTime"
     And there is at least one item in response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].dataType" equal to "NO_DATA"
@@ -73,7 +73,7 @@ Feature: CAMARA Population Density Data API, vwip
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/PopulationDensityResponse"
     And the response property "$.status" value is "AREA_NOT_SUPPORTED"
     And the response property "$.timedPopulationDensityData" is an empty array
 
@@ -87,7 +87,7 @@ Feature: CAMARA Population Density Data API, vwip
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/PopulationDensityResponse"
     And the response property "$.status" value is "SUPPORTED_AREA"
     And the response property "$.timedPopulationDensityData" intervals fully cover the requested time range from "$.startTime" to "$.endTime"
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" contains one cell per geohash in the request property "$.area.geohashes"
@@ -107,7 +107,7 @@ Feature: CAMARA Population Density Data API, vwip
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/PopulationDensityResponse"
     And the response property "$.status" value is "PART_OF_AREA_NOT_SUPPORTED"
     And the response property "$.timedPopulationDensityData" intervals fully cover the requested time range from "$.startTime" to "$.endTime"
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*]" contains one cell per geohash in the request property "$.area.geohashes"
@@ -127,7 +127,7 @@ Feature: CAMARA Population Density Data API, vwip
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/PopulationDensityResponse"
     And the response property "$.status" value is "AREA_NOT_SUPPORTED"
     And the response property "$.timedPopulationDensityData" is an empty array
 
@@ -145,7 +145,7 @@ Feature: CAMARA Population Density Data API, vwip
     And the response includes property "$.operationId"
     And the request with the response body will be received at the address of the request property "$.sink" with property "$.operationId" equal to response property "$.operationId"
     And the request will have header "Authorization" set to "Bearer " + the value of the request property "$.sinkCredential.accessToken"
-    And the request body complies with the OAS schema at "/components/schemas/PopulationDensityAsyncResponse"
+    And the request body complies with the OAS schema at "#/components/schemas/PopulationDensityAsyncResponse"
 
   @population_density_data_08_async_operation_not_completed_scenario
   Scenario: Validate async callback when operation fails
@@ -162,7 +162,7 @@ Feature: CAMARA Population Density Data API, vwip
     And there has been a problem processing the request asynchronously
     And the request with the response body will be received at the address of the request property "$.sink" with property "$.operationId" equal to response property "$.operationId"
     And the request will have header "Authorization" set to "Bearer " + the value of the request property "$.sinkCredential.accessToken"
-    And the request body complies with the OAS schema at "/components/schemas/PopulationDensityAsyncResponse"
+    And the request body complies with the OAS schema at "#/components/schemas/PopulationDensityAsyncResponse"
     And the request body will have property "$.status" equal to "OPERATION_NOT_COMPLETED" and includes property "$.statusInfo"
 
   @population_density_data_09_custom_precision_success_scenario
@@ -174,7 +174,7 @@ Feature: CAMARA Population Density Data API, vwip
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/PopulationDensityResponse"
 
   @population_density_data_10_supported_area_past_success_scenario
   Scenario: Validate success response for a supported area in a past time period request
@@ -184,7 +184,7 @@ Feature: CAMARA Population Density Data API, vwip
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/PopulationDensityResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/PopulationDensityResponse"
     And the response property "$.status" value is "SUPPORTED_AREA"
     And the response property "$.timedPopulationDensityData" intervals fully cover the requested time range from "$.startTime" to "$.endTime"
     And the response property "$.timedPopulationDensityData[*].cellPopulationDensityData[*].geohash" is a valid Geohash inside the request area
@@ -212,7 +212,7 @@ Feature: CAMARA Population Density Data API, vwip
     And the response does not include property "$.sinkCredential"
     And the request with the response body will be received at the address of the request property "$.sink" with property "$.operationId" equal to response property "$.operationId"
     And the request will have header "Authorization" set to "Bearer " + an access token requested to the request property "$.sinkCredential.tokenUri" with the request property "$.sinkCredential.clientId"
-    And the request body complies with the OAS schema at "/components/schemas/PopulationDensityAsyncResponse"
+    And the request body complies with the OAS schema at "#/components/schemas/PopulationDensityAsyncResponse"
 
   # Error scenarios
 
@@ -392,7 +392,7 @@ Feature: CAMARA Population Density Data API, vwip
   @population_density_data_400.15_invalid_geohash_format
   Scenario: Error 400 when a geohash in the list does not comply with the Geohash format
     Given the request body property "$.area.areaType" is set to "GEOHASHLIST"
-    And the request body property "$.area.geohashes" contains a value that does not comply with the schema at "/components/schemas/Geohash"
+    And the request body property "$.area.geohashes" contains a value that does not comply with the schema at "#/components/schemas/Geohash"
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "Content-Type" is "application/json"
@@ -412,7 +412,7 @@ Feature: CAMARA Population Density Data API, vwip
 
   @population_density_data_400.17_schema_not_compliant
   Scenario: Error 400 when the request body does not comply with the schema
-    Given the request body is not compliant with the OAS schema at "/components/schemas/PopulationDensityRequest"
+    Given the request body is not compliant with the OAS schema at "#/components/schemas/PopulationDensityRequest"
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "x-correlator" has same value as the request header "x-correlator"
@@ -457,7 +457,7 @@ Feature: CAMARA Population Density Data API, vwip
   # The x-correlator sent in the request is invalid, so the response is not expected to echo it back
   @population_density_data_400.21_invalid_x_correlator
   Scenario: Error 400 when the x-correlator header does not comply with the schema
-    Given the request header "x-correlator" is not compliant with the schema at "../common/CAMARA_common.yaml#/components/schemas/XCorrelator"
+    Given the request header "x-correlator" is not compliant with the schema at "#/components/schemas/XCorrelator"
     When the request "retrievePopulationDensity" is sent
     Then the response status code is 400
     And the response header "Content-Type" is "application/json"
